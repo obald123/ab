@@ -61,7 +61,7 @@ export default function News() {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px' }} ref={containerRef}>
 
         {/* Header */}
-        <div data-reveal style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 52 }}>
+        <div data-reveal className="news-header" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 52 }}>
           <div>
             <span className="section-pill">Media & News</span>
             <h2 style={{
@@ -98,14 +98,13 @@ export default function News() {
 
         {/* Featured article */}
         <div data-reveal style={{ marginBottom: 24 }}>
-          <div style={{
+          <div className="news-featured" style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
             background: '#ffffff', border: '1px solid rgba(40,121,191,0.12)',
             borderRadius: 20, overflow: 'hidden',
             boxShadow: '0 8px 40px rgba(40,121,191,0.08)',
             transition: 'box-shadow 0.3s, border-color 0.3s',
           }}
-            className="grid-cols-1 lg:grid-cols-2"
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLDivElement
               el.style.boxShadow = '0 20px 60px rgba(40,121,191,0.16)'
@@ -117,7 +116,7 @@ export default function News() {
               el.style.borderColor = 'rgba(40,121,191,0.12)'
             }}
           >
-            <div style={{ position: 'relative', minHeight: 300, background: '#e6f2fa', overflow: 'hidden' }}>
+            <div className="news-featured-image" style={{ position: 'relative', minHeight: 300, background: '#e6f2fa', overflow: 'hidden' }}>
               <img
                 src={articles[0].image}
                 alt={articles[0].title}
@@ -147,7 +146,7 @@ export default function News() {
               </div>
             </div>
 
-            <div style={{ padding: '44px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div className="news-featured-content" style={{ padding: '44px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
                 <div style={{ width: 40, height: 3, background: '#2879bf', borderRadius: 2 }} />
                 <span style={{ fontSize: 12, color: '#8fa0aa', fontWeight: 600 }}>{articles[0].date}</span>
@@ -179,8 +178,7 @@ export default function News() {
         </div>
 
         {/* Sub articles */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}
-          className="grid-cols-1 md:grid-cols-2">
+        <div className="news-sub-articles" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           {articles.slice(1).map(article => (
             <div key={article.title} data-reveal style={{
               background: '#ffffff', border: '1px solid rgba(40,121,191,0.1)',

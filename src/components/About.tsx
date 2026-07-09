@@ -174,7 +174,7 @@ function TimelineCard({ item, index }: { item: typeof timeline[0]; index: number
   const { ref, onMove, onLeave } = use3DTilt(8)
   return (
     <R delay={index * 70}>
-      <div style={{ display: 'grid', gridTemplateColumns: '72px 1fr', gap: 0, marginBottom: 6 }}>
+      <div className="about-timeline-card" style={{ display: 'grid', gridTemplateColumns: '72px 1fr', gap: 0, marginBottom: 6 }}>
         {/* Node column */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 26 }}>
           <div style={{
@@ -502,7 +502,7 @@ export default function About() {
           </R>
 
           {/* Vision/Mission 3D cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 36 }}>
+          <div className="about-vm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 36 }}>
             {[
               { label: 'VISION', icon: '◈', text: 'To be the leading provider of financial services to micro, small, and medium entrepreneurs and their families in Rwanda.' },
               { label: 'MISSION', icon: '◉', text: 'Improve access to broad financial services for the majority of Rwandan businesses in a sustainable, efficient manner.' },
@@ -511,7 +511,7 @@ export default function About() {
               return (
                 <R key={item.label} delay={i * 120}>
                   <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} style={{ transformStyle: 'preserve-3d', transition: 'transform 0.15s ease-out', borderRadius: 22 }}>
-                    <div style={{
+                    <div className="about-vm-card" style={{
                       background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(170,212,242,0.16)',
                       borderRadius: 22, padding: '38px 40px', backdropFilter: 'blur(16px)',
                       position: 'relative', overflow: 'hidden',
@@ -551,7 +551,7 @@ export default function About() {
 
           {/* Photo + copy */}
           <R delay={200}>
-            <div style={{
+            <div className="about-photo-copy" style={{
               display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 0,
               background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(170,212,242,0.12)',
               borderRadius: 22, overflow: 'hidden',
@@ -565,7 +565,7 @@ export default function About() {
                 />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 55%, rgba(2,30,60,0.75) 100%)' }} />
               </div>
-              <div style={{ padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div className="about-photo-copy-content" style={{ padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <p style={{ fontSize: 15.5, lineHeight: 1.85, color: 'rgba(255,255,255,0.7)', marginBottom: 18 }}>
                   Established in 2014 and headquartered on Nyarugenge Avenue, Kigali, AB Rwanda Plc has grown from a single branch in Nyamirambo to a nationwide network of <strong style={{ color: '#aad4f2' }}>47+ branches</strong> and rural credit outlets spanning all five provinces.
                 </p>
@@ -589,7 +589,7 @@ export default function About() {
         }} />
 
         {/* Journey header — full bleed dark 3D panel */}
-        <div style={{
+        <div className="about-journey-header" style={{
           background: 'linear-gradient(160deg, #001e38 0%, #021e3c 30%, #003d70 60%, #2879bf 90%)',
           padding: '72px 28px 88px', position: 'relative', overflow: 'hidden',
           marginBottom: 72,
@@ -642,8 +642,8 @@ export default function About() {
 
             {/* 3D stat blocks */}
             <R delay={140}>
-              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                {[
+            <div className="about-stat-blocks" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              {[
                   { value: 47, suffix: '+', label: 'Branches & Outlets', Icon: IconBuilding },
                   { value: 9, suffix: ' yrs', label: 'Years Operating', Icon: IconCalendar },
                   { value: 5, suffix: '', label: 'Provinces Covered', Icon: IconMap },
@@ -687,8 +687,8 @@ export default function About() {
         {/* Timeline */}
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
           {/* Spine */}
-          <div style={{
-            position: 'absolute', left: 28 + 36, top: 0, bottom: 60, width: 2,
+          <div className="about-spine" style={{
+            position: 'absolute', left: 64, top: 0, bottom: 60, width: 2,
             background: 'linear-gradient(180deg, #2879bf 0%, #3a8fd0 60%, rgba(40,121,191,0.1) 100%)',
           }} />
 
@@ -696,7 +696,7 @@ export default function About() {
 
           {/* End cap */}
           <R delay={timeline.length * 70}>
-            <div style={{ marginLeft: 72, marginTop: -4 }}>
+            <div className="about-timeline-node" style={{ marginLeft: 72, marginTop: -4 }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 10,
                 padding: '13px 24px',
@@ -729,7 +729,7 @@ export default function About() {
               Management Team
             </h2>
           </R>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 22 }}>
+          <div className="about-management" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 22 }}>
             {management.map((m, i) => <ManagementCard key={m.name} m={m} i={i} />)}
           </div>
         </div>
@@ -757,7 +757,7 @@ export default function About() {
               Our Shareholders
             </h2>
           </R>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>
+          <div className="about-shareholders" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>
             {shareholders.map((s, i) => <ShareholderCard key={s.name} s={s} i={i} />)}
           </div>
         </div>

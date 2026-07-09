@@ -142,7 +142,7 @@ export default function Services() {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px' }}>
 
         {/* Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 64, alignItems: 'flex-end' }}>
+        <div className="services-header" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 64, alignItems: 'flex-end' }}>
           <div>
             <span className="section-pill">Our Services</span>
             <h2 style={{
@@ -163,7 +163,7 @@ export default function Services() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '2px solid rgba(40,121,191,0.1)', marginBottom: 44, gap: 0 }}>
+        <div className="services-tabs" style={{ display: 'flex', borderBottom: '2px solid rgba(40,121,191,0.1)', marginBottom: 44, gap: 0 }}>
           {tabs.map(tab => (
             <button
               key={tab}
@@ -190,14 +190,14 @@ export default function Services() {
         </div>
 
         {/* Service cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 22 }}>
+        <div className="services-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 22 }}>
           {services[activeTab].map(service => (
             <ServiceCard key={service.title} service={service} />
           ))}
         </div>
 
         {/* Bottom CTA bar */}
-        <div style={{
+        <div className="services-cta" style={{
           marginTop: 60, padding: '36px 48px',
           background: 'linear-gradient(135deg, #f0f7fd 0%, #e8f2fb 100%)',
           border: '1.5px solid rgba(40,121,191,0.1)',

@@ -36,7 +36,7 @@ function MeshBg() {
 /* ── Floating debit card ── */
 function DebitCard3D({ style }: { style?: React.CSSProperties }) {
   return (
-    <div style={{
+    <div className="hero-card-3d" style={{
       width: 320, height: 190,
       borderRadius: 20,
       background: `linear-gradient(135deg, ${BD} 0%, ${BM} 45%, ${B} 100%)`,
@@ -264,7 +264,7 @@ export default function Hero() {
       <MeshBg />
 
       {/* ── Main 2-col grid ── */}
-      <div style={{
+      <div className="hero-grid" style={{
         position: 'relative', zIndex: 2, flex: 1,
         maxWidth: 1280, margin: '0 auto', width: '100%',
         padding: '48px 32px 80px',
@@ -322,7 +322,7 @@ export default function Hero() {
           </p>
 
           {/* CTA buttons */}
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 52, animation: 'fadeUp 0.7s ease 0.4s both' } as React.CSSProperties}>
+          <div className="hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 52, animation: 'fadeUp 0.7s ease 0.4s both' } as React.CSSProperties}>
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               background: '#ffffff', color: BD,
@@ -353,7 +353,7 @@ export default function Hero() {
           </div>
 
           {/* Stats row */}
-          <div style={{
+          <div className="hero-stats" style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(170,212,242,0.12)',
@@ -378,21 +378,21 @@ export default function Hero() {
         </div>
 
         {/* ── RIGHT: 3D scene ── */}
-        <div style={{ animation: 'fadeUp 0.9s ease 0.3s both' } as React.CSSProperties}>
+        <div className="hero-scene" style={{ animation: 'fadeUp 0.9s ease 0.3s both' } as React.CSSProperties}>
           <Scene3D mouse={mouse} />
         </div>
       </div>
 
       {/* ── Quick access strip ── */}
-      <div style={{
+      <div className="hero-quick-links" style={{
         position: 'relative', zIndex: 2,
         borderTop: '1px solid rgba(170,212,242,0.10)',
         background: 'rgba(0,0,0,0.25)',
         backdropFilter: 'blur(16px)',
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'stretch' }}>
-          {quickLinks.map((q, i) => (
-            <a key={i} href="#products" style={{
+            {quickLinks.map((q, i) => (
+            <a key={i} href="#products" className="hero-quick-link" style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
               padding: '18px 8px', textDecoration: 'none',
               borderRight: i < quickLinks.length - 1 ? '1px solid rgba(170,212,242,0.08)' : 'none',

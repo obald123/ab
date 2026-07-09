@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import logo from '../imports/logo1.png'
 
 const smartValues = [
   { letter: 'S', word: 'Simple', desc: 'Easy to understand products and processes' },
@@ -71,7 +72,7 @@ export default function Contact() {
           </div>
 
           {/* SMART letters */}
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div className="contact-smart-cards" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             {smartValues.map((v, i) => (
               <div key={v.letter} data-reveal style={{
                 flex: '1 1 180px', maxWidth: 220,
@@ -127,7 +128,7 @@ export default function Contact() {
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+          <div className="contact-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
 
             {/* Address */}
             <div data-reveal style={{
@@ -284,68 +285,12 @@ export default function Contact() {
       {/* Footer */}
       <footer style={{ background: '#003d70', padding: '48px 28px 28px' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 40 }}>
+          <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 40 }}>
 
             {/* Brand */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 18 }}>
-                {/* Footer logo — white version on dark bg, same globe structure as navbar */}
-                <svg viewBox="0 0 64 64" width={46} height={46} style={{ flexShrink: 0 }}>
-                  <defs>
-                    <radialGradient id="ftrSphere" cx="34%" cy="30%" r="62%">
-                      <stop offset="0%"   stopColor="#c0dff2" />
-                      <stop offset="20%"  stopColor="#90c8e8" />
-                      <stop offset="48%"  stopColor="#5eaad4" />
-                      <stop offset="78%"  stopColor="#2878b0" />
-                      <stop offset="100%" stopColor="#0a4878" />
-                    </radialGradient>
-                    <radialGradient id="ftrHL" cx="32%" cy="28%" r="38%">
-                      <stop offset="0%"   stopColor="rgba(255,255,255,0.65)" />
-                      <stop offset="55%"  stopColor="rgba(255,255,255,0.12)" />
-                      <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                    </radialGradient>
-                    <clipPath id="ftrClip">
-                      <circle cx="32" cy="32" r="18" />
-                    </clipPath>
-                  </defs>
-                  {/* Left blue arc */}
-                  <path d="M 14 48 C 4 40, 2 28, 6 18 C 8 12, 13 7, 19 4"
-                    stroke="rgba(170,212,242,0.9)" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-                  <path d="M 16 5 L 19 4 L 18 7.5"
-                    stroke="rgba(170,212,242,0.9)" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  {/* Right grey arc */}
-                  <path d="M 50 16 C 60 24, 62 36, 58 46 C 56 52, 51 57, 45 60"
-                    stroke="rgba(255,255,255,0.4)" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M 48 59 L 45 60 L 46 56.5"
-                    stroke="rgba(255,255,255,0.4)" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  {/* Sphere */}
-                  <circle cx="32" cy="32" r="18" fill="url(#ftrSphere)" />
-                  {/* Latitude rings */}
-                  <g clipPath="url(#ftrClip)" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.65">
-                    <ellipse cx="32" cy="32" rx="18" ry="2.2" />
-                    <ellipse cx="32" cy="29" rx="17" ry="2" />
-                    <ellipse cx="32" cy="26" rx="14.5" ry="1.8" />
-                    <ellipse cx="32" cy="23" rx="11" ry="1.5" />
-                    <ellipse cx="32" cy="20" rx="7"  ry="1.2" />
-                    <ellipse cx="32" cy="35" rx="17" ry="2" />
-                    <ellipse cx="32" cy="38" rx="14.5" ry="1.8" />
-                    <ellipse cx="32" cy="41" rx="11" ry="1.5" />
-                    <ellipse cx="32" cy="44" rx="7"  ry="1.2" />
-                  </g>
-                  <ellipse cx="32" cy="32" rx="18" ry="2.2" clipPath="url(#ftrClip)"
-                    fill="none" stroke="rgba(255,255,255,0.38)" strokeWidth="0.9" />
-                  <circle cx="32" cy="32" r="18" fill="url(#ftrHL)" />
-                </svg>
-
-                <div style={{ lineHeight: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 22, fontWeight: 800, color: '#ffffff' }}>AB</span>
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 22, fontWeight: 400, color: 'rgba(255,255,255,0.72)' }}>Rwanda</span>
-                  </div>
-                  <div style={{ fontSize: 8, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginTop: 4, fontFamily: 'var(--font-sans)', fontWeight: 700 }}>
-                    RWANDA · ACCESS GROUP
-                  </div>
-                </div>
+                <img src={logo} alt="AB Bank Rwanda" style={{ height: 46, width: 'auto' }} />
               </div>
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320 }}>
                 The Bank Which Cares For You. Providing accessible, responsible financial services to micro, small and medium entrepreneurs across Rwanda since 2014.
@@ -418,7 +363,7 @@ export default function Contact() {
           </div>
 
           {/* Bottom bar */}
-          <div style={{
+          <div className="footer-bottom" style={{
             paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)',
             display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12,
           }}>

@@ -82,7 +82,7 @@ function CampaignBanner() {
     <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg,#021e3c 0%,#2879bf 55%,#3a8fd0 100%)', borderRadius: 28, padding: '52px', boxShadow: '0 32px 80px rgba(40,121,191,0.30)' }}>
       {[200,300,400].map((s, i) => <div key={i} style={{ position: 'absolute', right: -s/2.5, top: '50%', transform: 'translateY(-50%)', width: s, height: s, borderRadius: '50%', border: `1px solid rgba(255,255,255,${0.07-i*0.02})`, pointerEvents: 'none' }} />)}
       <div style={{ position: 'absolute', right: '6%', top: '8%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(170,212,242,0.15) 0%,transparent 70%)', pointerEvents: 'none' }} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'center', position: 'relative' }}>
+      <div className="campaign-banner" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'center', position: 'relative' }}>
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(232,244,0,0.15)', border: '1px solid rgba(232,244,0,0.40)', borderRadius: 100, padding: '5px 18px', marginBottom: 22 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#e8f400', display: 'block', animation: 'blink 1.4s ease-in-out infinite' }} />
@@ -109,7 +109,7 @@ function CampaignBanner() {
           </div>
         </div>
         {/* Countdown */}
-        <div style={{ textAlign: 'center', minWidth: 230 }}>
+        <div className="campaign-countdown" style={{ textAlign: 'center', minWidth: 230 }}>
           <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', marginBottom: 14 }}>Offer ends in</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
             {([['d', cd.d], ['h', cd.h], ['m', cd.m], ['s', cd.s]] as [string, number][]).map(([lbl, val]) => (
@@ -196,7 +196,7 @@ function StatsStrip() {
     { value: 200, suffix: 'K+', label: 'Customers served' },
   ]
   return (
-    <div ref={ref} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'rgba(40,121,191,0.08)', borderRadius: 20, overflow: 'hidden', marginTop: 56 }}>
+    <div ref={ref} className="campaign-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'rgba(40,121,191,0.08)', borderRadius: 20, overflow: 'hidden', marginTop: 56 }}>
       {statsData.map((s, i) => <StatBlock key={i} value={s.value} suffix={s.suffix} label={s.label} trigger={visible} delay={i * 0.12} />)}
     </div>
   )
@@ -212,7 +212,7 @@ export default function Campaign() {
           <div style={{ width: 36, height: 2, background: '#2879bf', borderRadius: 2 }} />
           <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: '#2879bf', textTransform: 'uppercase' }}>New Products &amp; Campaigns</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'end', marginBottom: 48 }}>
+        <div className="campaign-header" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'end', marginBottom: 48 }}>
           <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, color: '#021e3c', lineHeight: 1.1 }}>
             Built for Rwanda's<br /><span style={{ color: '#2879bf' }}>Next Chapter</span>
           </h2>
@@ -225,7 +225,7 @@ export default function Campaign() {
         <CampaignBanner />
 
         {/* Product cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 48 }}>
+        <div className="campaign-products" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 48 }}>
           {products.map((p, i) => <ProductCard key={p.id} p={p} index={i} />)}
         </div>
 
@@ -233,7 +233,7 @@ export default function Campaign() {
         <StatsStrip />
 
         {/* Bottom CTA */}
-        <div style={{ marginTop: 56, padding: '52px', background: 'linear-gradient(135deg,#021e3c,#2879bf)', borderRadius: 24, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div className="campaign-bottom-cta" style={{ marginTop: 56, padding: '52px', background: 'linear-gradient(135deg,#021e3c,#2879bf)', borderRadius: 24, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 15% 50%,rgba(170,212,242,0.12) 0%,transparent 50%),radial-gradient(circle at 85% 50%,rgba(0,106,174,0.2) 0%,transparent 50%)', pointerEvents: 'none' }} />
           <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.42)', textTransform: 'uppercase', marginBottom: 16, position: 'relative' }}>Limited time offer</p>
           <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(22px,3vw,36px)', fontWeight: 900, color: '#ffffff', marginBottom: 12, position: 'relative' }}>Ready to get started?</h3>

@@ -299,7 +299,7 @@ export default function Products() {
 
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
         {/* Asymmetric header: heading left, stats right */}
-        <div data-reveal style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end', marginBottom: 64 }}>
+        <div data-reveal className="products-header" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end', marginBottom: 64 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <div style={{ width: 32, height: 2, background: '#2879bf', borderRadius: 2 }} />
@@ -318,7 +318,7 @@ export default function Products() {
             </p>
           </div>
           {/* Side stats panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, background: '#ffffff', borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(40,121,191,0.09)', boxShadow: '0 4px 20px rgba(40,121,191,0.07)', minWidth: 200 }}>
+          <div className="products-side-stats" style={{ display: 'flex', flexDirection: 'column', gap: 0, background: '#ffffff', borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(40,121,191,0.09)', boxShadow: '0 4px 20px rgba(40,121,191,0.07)', minWidth: 200 }}>
             {[
               { value: '47+', label: 'Branches', color: '#2879bf' },
               { value: '15+', label: 'Products', color: '#003d70' },
@@ -337,7 +337,7 @@ export default function Products() {
 
         {/* Tabs */}
         <div data-reveal style={{ display: 'flex', justifyContent: 'center', marginBottom: 52 }}>
-          <div style={{
+          <div className="products-tabs" style={{
             display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center',
             padding: '6px', background: '#ffffff', borderRadius: 16,
             border: '1.5px solid rgba(40,121,191,0.09)',
@@ -362,7 +362,7 @@ export default function Products() {
         </div>
 
         {/* Cards */}
-        <div style={{
+        <div className="products-cards" style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${Math.min(data[active].length, 3)}, 1fr)`,
           gap: 24,
@@ -387,7 +387,7 @@ export default function Products() {
             background: 'radial-gradient(ellipse, rgba(0,106,174,0.3) 0%, transparent 70%)',
             pointerEvents: 'none',
           }} />
-          <div style={{ position: 'relative', padding: '44px 56px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+          <div className="products-cta" style={{ position: 'relative', padding: '44px 56px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
             <div>
               <p style={{ fontSize: 22, fontWeight: 900, color: '#ffffff', marginBottom: 8, letterSpacing: '-0.01em' }}>
                 Ready to get started?

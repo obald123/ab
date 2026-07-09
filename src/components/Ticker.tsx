@@ -23,7 +23,7 @@ export default function Ticker() {
       display: 'flex', alignItems: 'center',
     }}>
       {/* Left label */}
-      <div style={{
+      <div className="ticker-label" style={{
         flexShrink: 0,
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '0 16px',
@@ -74,7 +74,7 @@ export default function Ticker() {
       </div>
 
       {/* Right CTA */}
-      <a href="#campaign" style={{
+      <a href="#campaign" className="ticker-cta" style={{
         flexShrink: 0, padding: '0 16px', height: '100%',
         display: 'flex', alignItems: 'center', gap: 6,
         borderLeft: '1px solid rgba(168,216,240,0.15)',
