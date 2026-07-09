@@ -1,0 +1,93 @@
+import { IconGift, IconMobile, IconTrendUp, IconHeart, IconGlobe, IconStar } from './Icons'
+
+/* ── Top announcement bar — sits above the navbar ── */
+const items = [
+  { Icon: IconGift,     text: 'GRAND CAMPAIGN: Open an account before August 15 — get 3 months zero fees + free debit card' },
+  { Icon: IconMobile,   text: 'NEW: eKash Plus — instant transfers, savings pockets & cross-border remittance via *540#' },
+  { Icon: IconTrendUp,  text: 'SME Boost Loan: up to RWF 50M approved in 48 hours — apply now at any branch' },
+  { Icon: IconHeart,    text: "Umugore Savings: 9.5% p.a. interest rate — celebrating Rwanda's women entrepreneurs" },
+  { Icon: IconGlobe,    text: 'Send money to 12 African countries instantly via eKash — competitive FX rates daily' },
+  { Icon: IconStar,     text: 'AB Rwanda rated #1 for customer satisfaction — 94% of customers would recommend us' },
+]
+
+export default function Ticker() {
+  const doubled = [...items, ...items]
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 300,
+      background: '#003d70',
+      borderBottom: '1px solid rgba(40,121,191,0.3)',
+      height: 36,
+      overflow: 'hidden',
+      display: 'flex', alignItems: 'center',
+    }}>
+      {/* Left label */}
+      <div style={{
+        flexShrink: 0,
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '0 16px',
+        borderRight: '1px solid rgba(168,216,240,0.15)',
+        height: '100%',
+        background: '#004070',
+        zIndex: 2,
+      }}>
+        <span style={{
+          width: 5, height: 5, borderRadius: '50%', background: '#e8f400',
+          display: 'block', animation: 'blink 1.4s ease-in-out infinite',
+          boxShadow: '0 0 5px rgba(232,244,0,0.6)',
+          flexShrink: 0,
+        }} />
+        <span style={{
+          fontSize: 9, fontWeight: 900, letterSpacing: '0.18em',
+          color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', whiteSpace: 'nowrap',
+        }}>Latest News</span>
+      </div>
+
+      {/* Edge fade right of label */}
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 180, zIndex: 1, background: 'linear-gradient(90deg,#004070 70%,rgba(0,64,112,0))', pointerEvents: 'none' }} />
+      {/* Edge fade right */}
+      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 60, zIndex: 1, background: 'linear-gradient(270deg,#003d70,rgba(0,61,104,0))', pointerEvents: 'none' }} />
+
+      {/* Scrolling text */}
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center',
+          animation: 'marquee 50s linear infinite',
+          width: 'max-content', willChange: 'transform',
+          paddingLeft: 32,
+        }}>
+          {doubled.map((item, i) => (
+            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 20, flexShrink: 0 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <item.Icon size={13} color="rgba(168,216,240,0.7)" strokeWidth={2} />
+                </span>
+                <span style={{ fontSize: 11.5, color: 'rgba(168,216,240,0.85)', fontWeight: 600, letterSpacing: '0.01em' }}>
+                  {item.text}
+                </span>
+              </span>
+              <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(168,216,240,0.25)', flexShrink: 0 }} />
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Right CTA */}
+      <a href="#campaign" style={{
+        flexShrink: 0, padding: '0 16px', height: '100%',
+        display: 'flex', alignItems: 'center', gap: 6,
+        borderLeft: '1px solid rgba(168,216,240,0.15)',
+        fontSize: 10.5, fontWeight: 800, color: '#e8f400',
+        textDecoration: 'none', letterSpacing: '0.06em', whiteSpace: 'nowrap',
+        transition: 'background 0.2s',
+      }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(232,244,0,0.08)' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+      >
+        View Offers
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="#e8f400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </a>
+    </div>
+  )
+}

@@ -1,0 +1,8 @@
+{
+  "fonts": [
+    { "family": "Nunito Sans", "style": "Regular" },
+    { "family": "Nunito Sans", "style": "SemiBold" },
+    { "family": "Nunito Sans", "style": "Bold" },
+    { "family": "Nunito Sans", "style": "ExtraBold" }
+  ]
+}

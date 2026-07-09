@@ -1,0 +1,17 @@
+{
+  "title": "AB Bank Rwanda",
+  "description": "AB Bank Rwanda - Banking Services",
+  "language": "en",
+  "robots": {
+    "index": true
+  },
+  "icons": {
+    "icon": "/favicon.ico"
+  },
+  "openGraph": {
+    "image": ""
+  },
+  "accessibility": {
+    "addBypassLinks": true
+  }
+}
