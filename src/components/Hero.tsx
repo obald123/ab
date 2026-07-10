@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { IconMobile, IconMapPin, IconCalculator, IconExchange, IconPen, IconCheckCircle, IconTrendUp, IconShield } from './Icons'
+import cardTop from '../imports/landing/card.png'
+import cardMiddle from '../imports/landing/card (1).png'
+import cardBottom from '../imports/landing/card (2).png'
+import starOutline from '../imports/landing/Star 17.png'
+import starFilled from '../imports/landing/Star 17 (1).png'
 
 /* ══════════════════════════════════════════════
    BRAND TOKENS  (from logo exactly)
@@ -9,20 +14,20 @@ import { IconMobile, IconMapPin, IconCalculator, IconExchange, IconPen, IconChec
 const B  = '#2879bf'
 const BD = '#003d70'
 const BM = '#1a5c96'
-const GL = '#aad4f2'
+const GL = '#9fa8b8'
 
 /* ── Animated mesh background ── */
 function MeshBg() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
       {/* Base gradient */}
-      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(145deg, ${BD} 0%, #061e3c 40%, #020e1e 100%)` }} />
+      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(145deg, ${BD} 0%, #102b55 40%, #020b18 100%)` }} />
       {/* Radial light sources */}
-      <div style={{ position: 'absolute', top: '-20%', left: '-5%',  width: '70vw', height: '70vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(40,121,191,0.28) 0%, transparent 65%)` }} />
-      <div style={{ position: 'absolute', top: '30%',  right: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(170,212,242,0.10) 0%, transparent 65%)` }} />
-      <div style={{ position: 'absolute', bottom: '-10%', left: '30%', width: '40vw', height: '40vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(26,92,150,0.20) 0%, transparent 65%)` }} />
+      <div style={{ position: 'absolute', top: '-20%', left: '-5%',  width: '70vw', height: '70vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(40,121,191,0.24) 0%, transparent 65%)` }} />
+      <div style={{ position: 'absolute', top: '30%',  right: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(140,170,210,0.12) 0%, transparent 65%)` }} />
+      <div style={{ position: 'absolute', bottom: '-10%', left: '30%', width: '40vw', height: '40vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(120,135,160,0.18) 0%, transparent 65%)` }} />
       {/* Fine grid */}
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'linear-gradient(rgba(170,212,242,1) 1px, transparent 1px), linear-gradient(90deg, rgba(170,212,242,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'linear-gradient(rgba(140,170,210,1) 1px, transparent 1px), linear-gradient(90deg, rgba(140,170,210,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       {/* Diagonal lines */}
       <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.03 }} preserveAspectRatio="none">
         {Array.from({ length: 8 }, (_, i) => (
@@ -41,7 +46,7 @@ function DebitCard3D({ style }: { style?: React.CSSProperties }) {
       borderRadius: 20,
       background: `linear-gradient(135deg, ${BD} 0%, ${BM} 45%, ${B} 100%)`,
       padding: '24px 26px',
-      boxShadow: `0 40px 80px rgba(0,10,30,0.6), 0 0 0 1px rgba(170,212,242,0.12), inset 0 1px 0 rgba(255,255,255,0.1)`,
+      boxShadow: `0 40px 80px rgba(0,10,30,0.6), 0 0 0 1px rgba(140,170,210,0.12), inset 0 1px 0 rgba(255,255,255,0.1)`,
       position: 'relative', overflow: 'hidden',
       ...style,
     }}>
@@ -50,8 +55,8 @@ function DebitCard3D({ style }: { style?: React.CSSProperties }) {
       {/* Logo area */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
         {/* EMV chip */}
-        <div style={{ width: 38, height: 28, borderRadius: 5, background: 'linear-gradient(135deg, #c8a84a, #e8c870)', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 26, height: 18, borderRadius: 3, border: '1px solid rgba(0,0,0,0.15)', background: 'linear-gradient(135deg, #d4af55, #f0d080)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, padding: 3 }}>
+        <div style={{ width: 38, height: 28, borderRadius: 5, background: 'linear-gradient(135deg, rgba(102,132,184,1), rgba(78,109,170,1))', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.24)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 26, height: 18, borderRadius: 3, border: '1px solid rgba(255,255,255,0.12)', background: 'linear-gradient(135deg, rgba(148,176,221,1), rgba(110,142,206,1))', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, padding: 3 }}>
             {[0,1,2,3].map(i => <div key={i} style={{ background: 'rgba(0,0,0,0.12)', borderRadius: 1 }} />)}
           </div>
         </div>
@@ -86,18 +91,18 @@ function BalanceWidget({ style }: { style?: React.CSSProperties }) {
       width: 220,
       background: 'rgba(255,255,255,0.06)',
       backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-      border: '1px solid rgba(170,212,242,0.18)',
+      border: '1px solid rgba(140,170,210,0.18)',
       borderRadius: 18, padding: '18px 20px',
       boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
       ...style,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 10, background: `rgba(40,121,191,0.25)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IconTrendUp size={15} color={GL} />
+        <div style={{ width: 32, height: 32, borderRadius: 10, background: `rgba(40,121,191,0.18)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <IconTrendUp size={15} color={BD} />
         </div>
         <div>
           <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.08em' }}>SAVINGS BALANCE</div>
-          <div style={{ fontSize: 9, color: '#4ade80', fontWeight: 700 }}>↑ 8.2% this month</div>
+          <div style={{ fontSize: 9, color: '#9fcaff', fontWeight: 700 }}>↑ 8.2% this month</div>
         </div>
       </div>
       <div style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 12, letterSpacing: '-0.01em' }}>
@@ -125,97 +130,103 @@ function TxNotif({ icon, label, amount, positive, style }: { icon: React.ReactNo
       minWidth: 220,
       ...style,
     }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: positive ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: positive ? 'rgba(40,121,191,0.15)' : 'rgba(119,137,153,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         {icon}
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 1 }}>{label}</div>
         <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>Just now</div>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 800, color: positive ? '#4ade80' : '#f87171' }}>{amount}</div>
+      <div style={{ fontSize: 13, fontWeight: 800, color: positive ? '#9fcaff' : '#c5d2de' }}>{amount}</div>
     </div>
   )
 }
 
 /* ── 3D right panel scene ── */
-function Scene3D({ mouse }: { mouse: { x: number; y: number } }) {
-  const rx = (mouse.y - 0.5) * -8
-  const ry = (mouse.x - 0.5) * 12
+function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: number }; spread: number; compact: boolean }) {
+  const rx = (mouse.y - 0.5) * -6
+  const ry = (mouse.x - 0.5) * 10
+  const size = compact ? 0.95 : 1.3
+  const topOffset = compact ? 14 + spread * 18 : 10 + spread * 20
+  const middleOffset = compact ? 34 + spread * 30 : 30 + spread * 35
+  const bottomOffset = compact ? 54 + spread * 43 : 52 + spread * 50
+  const cardWidth = compact ? '94%' : '84%'
+  const leftBase = compact ? 12 : 24
+  const leftStep = compact ? 0 : 6
+  const topStep = compact ? 0 : 2
 
   return (
-    <div style={{ position: 'relative', height: 560, perspective: 1400, perspectiveOrigin: '50% 50%' }}>
+    <div style={{
+      position: 'relative', width: '100%', minHeight: compact ? 520 : 620,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: compact ? 12 : 32,
+      perspective: 1400, perspectiveOrigin: '50% 50%',
+      flexWrap: 'wrap',
+      marginTop: 18,
+    }}>
       <div style={{
-        position: 'relative', width: '100%', height: '100%',
+        position: 'relative', width: compact ? '100%' : 'calc(55% - 16px)', minWidth: compact ? 0 : 320, minHeight: compact ? 420 : 520,
         transformStyle: 'preserve-3d',
-        transform: `rotateX(${rx}deg) rotateY(${ry}deg)`,
+        transform: `scale(${size}) rotateX(${rx}deg) rotateY(${ry}deg)`,
         transition: 'transform 0.12s ease-out',
       }}>
-
-        {/* ── Debit card — main focal point ── */}
-        <div style={{ position: 'absolute', top: 40, left: '5%', animation: 'float3d-1 7s ease-in-out infinite', transformStyle: 'preserve-3d' }}>
-          <DebitCard3D />
-          {/* Card shadow plane */}
-          <div style={{ position: 'absolute', bottom: -30, left: '10%', width: '80%', height: 20, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(40,121,191,0.3) 0%, transparent 70%)', filter: 'blur(8px)', transform: 'translateZ(-20px)' }} />
-        </div>
-
-        {/* ── Balance widget ── */}
-        <div style={{ position: 'absolute', bottom: 100, left: '8%', animation: 'float3d-3 8s ease-in-out 1s infinite', transformStyle: 'preserve-3d' }}>
-          <BalanceWidget />
-        </div>
-
-        {/* ── Transaction notifications ── */}
-        <div style={{ position: 'absolute', top: 30, right: '2%', animation: 'float3d-2 6s ease-in-out 0.5s infinite', transformStyle: 'preserve-3d' }}>
-          <TxNotif icon={<IconCheckCircle size={16} color="#4ade80" />} label="Salary Received" amount="+450,000" positive={true} />
-        </div>
-        <div style={{ position: 'absolute', top: 120, right: '2%', animation: 'float3d-2 6s ease-in-out 1.5s infinite', transformStyle: 'preserve-3d' }}>
-          <TxNotif icon={<IconMobile size={16} color="#f87171" />} label="eKash Transfer" amount="-25,000" positive={false} />
-        </div>
-        <div style={{ position: 'absolute', bottom: 80, right: '2%', animation: 'float3d-2 7s ease-in-out 2s infinite', transformStyle: 'preserve-3d' }}>
-          <TxNotif icon={<IconShield size={16} color="#a78bfa" />} label="Insurance Premium" amount="-4,500" positive={false} />
-        </div>
-
-        {/* ── eKash badge ── */}
-        <div style={{
-          position: 'absolute', top: 80, right: '30%',
-          background: `linear-gradient(135deg, ${B}, ${BD})`,
-          border: `1px solid rgba(170,212,242,0.2)`,
-          borderRadius: 16, padding: '14px 18px',
-          boxShadow: `0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(170,212,242,0.1)`,
-          textAlign: 'center',
-          animation: 'float3d-1 5s ease-in-out 0.3s infinite',
-          transformStyle: 'preserve-3d',
-        }}>
-          <div style={{ marginBottom: 6 }}><IconMobile size={28} color="#fff" /></div>
-          <div style={{ fontSize: 15, fontWeight: 900, color: '#fff' }}>*540#</div>
-          <div style={{ fontSize: 8, color: GL, fontWeight: 700, letterSpacing: '0.1em', marginTop: 3 }}>EKASH</div>
-        </div>
-
-        {/* ── Decorative floating orbs ── */}
-        {[
-          { size: 6, top: '20%', left: '55%', delay: '0s', col: GL },
-          { size: 4, top: '60%', left: '70%', delay: '1s', col: '#fff' },
-          { size: 8, top: '75%', left: '40%', delay: '2s', col: B },
-          { size: 5, top: '15%', left: '80%', delay: '0.5s', col: GL },
-        ].map((o, i) => (
-          <div key={i} style={{
-            position: 'absolute', top: o.top, left: o.left,
-            width: o.size, height: o.size, borderRadius: '50%',
-            background: o.col, opacity: 0.5,
-            animation: `floatY ${4 + i}s ease-in-out ${o.delay} infinite`,
-          }} />
-        ))}
-
-        {/* ── Decorative rings ── */}
-        {[200, 320, 440].map((s, i) => (
-          <div key={i} style={{
-            position: 'absolute', top: '50%', left: '35%',
-            transform: 'translate(-50%, -50%)',
-            width: s, height: s, borderRadius: '50%',
-            border: `1px solid rgba(170,212,242,${0.07 - i * 0.02})`,
-            pointerEvents: 'none',
-          }} />
-        ))}
+        <img
+          src={cardBottom}
+          alt="Bottom card stack"
+          style={{
+            position: 'absolute', top: `${bottomOffset}%`, left: `${leftBase + spread * leftStep}%`, width: cardWidth, height: 'auto',
+            transform: `rotate(${6 + spread * 2}deg)`,
+            boxShadow: '0 40px 90px rgba(0,0,0,0.35)',
+            borderRadius: 28,
+            filter: 'grayscale(1) brightness(1.04) contrast(1.08)',
+            zIndex: 1,
+          }}
+        />
+        <img
+          src={cardMiddle}
+          alt="Middle card stack"
+          style={{
+            position: 'absolute', top: `${middleOffset}%`, left: `${14 + spread * 6}%`, width: compact ? '92%' : '86%', height: 'auto',
+            transform: `rotate(${4 + spread * 1.5}deg)`,
+            boxShadow: '0 44px 88px rgba(0,0,0,0.34)',
+            borderRadius: 28,
+            filter: 'grayscale(1) brightness(1.06) contrast(1.1)',
+            zIndex: 2,
+          }}
+        />
+        <img
+          src={cardTop}
+          alt="Top card stack"
+          style={{
+            position: 'absolute', top: `${topOffset}%`, left: `${12 + spread * 8}%`, width: compact ? '96%' : '88%', height: 'auto',
+            transform: `rotate(${2 + spread * 1}deg)`,
+            boxShadow: '0 50px 96px rgba(0,0,0,0.38)',
+            borderRadius: 28,
+            filter: 'grayscale(1) brightness(1.08) contrast(1.12)',
+            zIndex: 3,
+          }}
+        />
       </div>
+
+      <img
+        src={starOutline}
+        alt="Decorative star"
+        style={{
+          display: compact ? 'none' : 'block',
+          position: 'absolute', top: '12%', right: '-6%', width: 88,
+          opacity: 0.75,
+          animation: 'floatY 6s ease-in-out infinite',
+        }}
+      />
+      <img
+        src={starFilled}
+        alt="Decorative star"
+        style={{
+          display: compact ? 'none' : 'block',
+          position: 'absolute', bottom: '8%', left: '-8%', width: 80,
+          opacity: 0.85,
+          animation: 'floatY2 7s ease-in-out 0.5s infinite',
+        }}
+      />
     </div>
   )
 }
@@ -248,7 +259,29 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
 
 export default function Hero() {
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
+  const [stackSpread, setStackSpread] = useState(1)
+  const [isCompact, setIsCompact] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const rect = sectionRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const progress = Math.min(Math.max(-rect.top / 220, 0), 1)
+      setStackSpread(0.2 + 0.8 * (1 - progress))
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 900px)')
+    const update = () => setIsCompact(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
 
   const onMouseMove = useCallback((e: React.MouseEvent) => {
     const r = sectionRef.current?.getBoundingClientRect(); if (!r) return
@@ -277,7 +310,7 @@ export default function Hero() {
           {/* Eyebrow */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: 'rgba(40,121,191,0.18)', border: `1px solid rgba(170,212,242,0.25)`,
+            background: 'rgba(40,121,191,0.14)', border: `1px solid rgba(140,170,210,0.25)`,
             borderRadius: 100, padding: '6px 18px', marginBottom: 30,
             animation: 'fadeUp 0.6s ease both',
           }}>
@@ -345,8 +378,8 @@ export default function Hero() {
               background: 'rgba(170,212,242,0.06)',
               transition: 'border-color 0.2s, background 0.2s',
             }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(170,212,242,0.7)'; el.style.background = 'rgba(170,212,242,0.12)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(170,212,242,0.4)'; el.style.background = 'rgba(170,212,242,0.06)' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(100,140,190,0.75)'; el.style.background = 'rgba(100,140,190,0.14)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(140,170,210,0.4)'; el.style.background = 'rgba(140,170,210,0.06)' }}
             >
               Explore Products
             </a>
@@ -377,16 +410,16 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* ── RIGHT: 3D scene ── */}
+        {/* ── RIGHT: landing cards scene ── */}
         <div className="hero-scene" style={{ animation: 'fadeUp 0.9s ease 0.3s both' } as React.CSSProperties}>
-          <Scene3D mouse={mouse} />
+          <LandingCards mouse={mouse} spread={stackSpread} compact={isCompact} />
         </div>
       </div>
 
       {/* ── Quick access strip ── */}
       <div className="hero-quick-links" style={{
         position: 'relative', zIndex: 2,
-        borderTop: '1px solid rgba(170,212,242,0.10)',
+        borderTop: '1px solid rgba(140,170,210,0.10)',
         background: 'rgba(0,0,0,0.25)',
         backdropFilter: 'blur(16px)',
       }}>
@@ -395,10 +428,10 @@ export default function Hero() {
             <a key={i} href="#products" className="hero-quick-link" style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
               padding: '18px 8px', textDecoration: 'none',
-              borderRight: i < quickLinks.length - 1 ? '1px solid rgba(170,212,242,0.08)' : 'none',
+              borderRight: i < quickLinks.length - 1 ? '1px solid rgba(140,170,210,0.08)' : 'none',
               transition: 'background 0.2s',
             }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(40,121,191,0.15)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(40,121,191,0.1)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
             >
               <q.Icon size={18} color={GL} strokeWidth={1.75} />

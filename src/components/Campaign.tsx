@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { IconMobile, IconTrendUp, IconHeart } from './Icons'
 
+const B = '#2879bf'
+const BD = '#003d70'
+const BM = '#1a5c96'
+const GL = '#9fa8b8'
+const BG = '#eef4fb'
+const TEXT = '#647080'
+
 /* ── Countdown ── */
 function useCountdown(target: Date) {
   const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0 })
@@ -52,25 +59,25 @@ const LAUNCH = new Date('2026-08-15T09:00:00')
 
 const products = [
   {
-    id: 'ekash-plus', badge: 'NEW LAUNCH', badgeColor: '#e8f400', badgeText: '#021e3c',
+    id: 'ekash-plus', badge: 'NEW LAUNCH', badgeColor: '#aad4f2', badgeText: '#003d70',
     name: 'eKash Plus', tagline: 'Super-charged mobile money',
     description: 'Instant transfers, merchant payments, savings pockets, and cross-border remittance — all from your phone. No branch visit needed.',
     features: ['Zero transfer fees for 3 months', 'Earn 8% p.a. on savings pocket', 'Send to 12 African countries', 'USSD *540# or app'],
-    accent: '#2879bf', accentLight: '#e8f6ff', Icon: IconMobile, stat: '50,000+', statLabel: 'Active users',
+    accent: B, accentLight: '#e7f0fb', Icon: IconMobile, stat: '50,000+', statLabel: 'Active users',
   },
   {
-    id: 'sme-boost', badge: 'LIMITED OFFER', badgeColor: '#ff6b35', badgeText: '#ffffff',
+    id: 'sme-boost', badge: 'LIMITED OFFER', badgeColor: '#2879bf', badgeText: '#ffffff',
     name: 'SME Boost Loan', tagline: 'Fuel your business growth',
     description: "Collateral-light business loans up to RWF 50M approved in 48 hours. Designed for Rwanda's entrepreneurs and growing enterprises.",
     features: ['Up to RWF 50 million', '48-hour approval', 'Flexible 12–60 month terms', 'Grace period available'],
-    accent: '#c24a00', accentLight: '#fff4ee', Icon: IconTrendUp, stat: 'RWF 50M', statLabel: 'Max loan amount',
+    accent: '#1f5b93', accentLight: '#e8eff8', Icon: IconTrendUp, stat: 'RWF 50M', statLabel: 'Max loan amount',
   },
   {
-    id: 'umugore', badge: 'CAMPAIGN', badgeColor: '#8b5cf6', badgeText: '#ffffff',
+    id: 'umugore', badge: 'CAMPAIGN', badgeColor: GL, badgeText: '#ffffff',
     name: 'Umugore Savings', tagline: 'Savings built for women',
     description: "A dedicated savings account celebrating Rwanda's women entrepreneurs. Higher interest, financial coaching, and community benefits.",
     features: ['9.5% interest p.a.', 'Monthly financial coaching', 'Free accident insurance', "Women-only networking events"],
-    accent: '#6d28d9', accentLight: '#f5f0ff', Icon: IconHeart, stat: '9.5%', statLabel: 'Interest p.a.',
+    accent: '#5f748f', accentLight: '#ebf0f7', Icon: IconHeart, stat: '9.5%', statLabel: 'Interest p.a.',
   },
 ]
 
@@ -84,9 +91,9 @@ function CampaignBanner() {
       <div style={{ position: 'absolute', right: '6%', top: '8%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(170,212,242,0.15) 0%,transparent 70%)', pointerEvents: 'none' }} />
       <div className="campaign-banner" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'center', position: 'relative' }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(232,244,0,0.15)', border: '1px solid rgba(232,244,0,0.40)', borderRadius: 100, padding: '5px 18px', marginBottom: 22 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#e8f400', display: 'block', animation: 'blink 1.4s ease-in-out infinite' }} />
-            <span style={{ fontSize: 10.5, fontWeight: 900, color: '#e8f400', letterSpacing: '0.14em' }}>GRAND CAMPAIGN · LAUNCH 15 AUGUST 2026</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(170,212,242,0.18)', border: '1px solid rgba(170,212,242,0.45)', borderRadius: 100, padding: '5px 18px', marginBottom: 22 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#aad4f2', display: 'block', animation: 'blink 1.4s ease-in-out infinite' }} />
+            <span style={{ fontSize: 10.5, fontWeight: 900, color: '#aad4f2', letterSpacing: '0.14em' }}>GRAND CAMPAIGN · LAUNCH 15 AUGUST 2026</span>
           </div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(26px,3.5vw,44px)', fontWeight: 700, color: '#ffffff', lineHeight: 1.1, marginBottom: 16 }}>
             Empowering Rwanda,<br /><span style={{ color: '#aad4f2' }}>One Account at a Time</span>
@@ -95,15 +102,15 @@ function CampaignBanner() {
             Open any new account before August 15 and get 3 months of zero fees, a free debit card, and exclusive campaign rewards.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#e8f400', color: '#021e3c', padding: '13px 28px', borderRadius: 10, fontWeight: 900, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(232,244,0,0.35)', transition: 'transform 0.2s,box-shadow 0.2s' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-2px)'; el.style.boxShadow='0 14px 36px rgba(232,244,0,0.5)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow='0 8px 24px rgba(232,244,0,0.35)' }}>
+            <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#aad4f2', color: '#003d70', padding: '13px 28px', borderRadius: 10, fontWeight: 900, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(170,212,242,0.35)', transition: 'transform 0.2s,box-shadow 0.2s' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-2px)'; el.style.boxShadow='0 14px 36px rgba(170,212,242,0.5)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow='0 8px 24px rgba(170,212,242,0.35)' }}>
               Claim Your Offer
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M8.5 4l4 3.5-4 3.5" stroke="#021e3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M8.5 4l4 3.5-4 3.5" stroke="#003d70" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
-            <a href="#about" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.28)', color: 'rgba(255,255,255,0.85)', padding: '13px 28px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none', background: 'rgba(255,255,255,0.06)', transition: 'border-color 0.2s,color 0.2s' }}
+            <a href="#about" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.32)', color: 'rgba(255,255,255,0.95)', padding: '13px 28px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none', background: 'rgba(255,255,255,0.08)', transition: 'border-color 0.2s,color 0.2s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor='rgba(255,255,255,0.65)'; el.style.color='#ffffff' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor='rgba(255,255,255,0.28)'; el.style.color='rgba(255,255,255,0.85)' }}>
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor='rgba(255,255,255,0.32)'; el.style.color='rgba(255,255,255,0.95)' }}>
               Learn More
             </a>
           </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import logo from '../imports/logo1.png'
+import logo from '../imports/logo1-transparent.png'
 
 const smartValues = [
   { letter: 'S', word: 'Simple', desc: 'Easy to understand products and processes' },
