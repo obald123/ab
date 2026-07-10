@@ -54,16 +54,93 @@ const timeline = [
 ]
 
 const management = [
-  { initials: 'ZR', name: 'Zachary Raymond', role: 'Chief Executive Officer', detail: 'MBA · University of Cape Town', color: '#003d70' },
-  { initials: 'JN', name: 'Joas Ndikumana', role: 'Chief Business Officer', detail: 'With AB Rwanda since 2013', color: '#2879bf' },
-  { initials: 'CK', name: 'Celestin Karera', role: 'Chief Finance Officer', detail: 'Masters · Jomo Kenyatta University', color: '#3a8fd0' },
-  { initials: 'JB', name: 'Joselyne Bivugire', role: 'Chief Risk Officer', detail: 'Certified Microfinance Expert', color: '#1a7ab5' },
+  {
+    name: 'Zachary Raymond', role: 'Chief Executive Officer',
+    image: 'https://abr.rw/wp-content/uploads/2023/02/CEO_Zach.jpg',
+    detail: 'MBA · University of Cape Town',
+    bio: 'Zach joined AB Rwanda as CEO in September 2022. Prior to joining AB Rwanda, he served as Chief Business Officer at Access Microfinance Bank Tanzania and spent 2012–2020 in senior roles at The Small Enterprise Foundation in South Africa.',
+    color: '#003d70',
+  },
+  {
+    name: 'Joas Ndikumana', role: 'Chief Business Officer',
+    image: 'https://abr.rw/wp-content/uploads/2021/05/Jerry-Joas.jpg',
+    detail: 'With AB Rwanda since 2013',
+    bio: 'Joas has led multiple business, microcredit and branch teams since joining AB Rwanda in November 2013. He holds a Master’s degree in Economics and a First Class Honors Bachelor’s degree in Management.',
+    color: '#2879bf',
+  },
+  {
+    name: 'Celestin Karera', role: 'Chief Finance Officer',
+    image: 'https://abr.rw/wp-content/uploads/2022/12/Celestin-Pictures-150x150.jpg',
+    detail: 'M.A. · Jomo Kenyatta University',
+    bio: 'Celestin joined AB Rwanda in July 2022 as Head of Finance. Before that he spent seven years as Senior Manager – Financial Reporting at NCBA and five years as Chief Accountant for Access Bank and Volcanoes Safaris Rwanda.',
+    color: '#3a8fd0',
+  },
+  {
+    name: 'Joselyne Bivugire', role: 'Chief Risk Officer',
+    image: 'https://abr.rw/wp-content/uploads/2022/12/joselyne-Picture-2-150x150.jpg',
+    detail: 'Certified microfinance expert',
+    bio: 'Joselyne joined AB Rwanda in 2013 and has served in credit, compliance and risk leadership roles. She holds a Master’s degree in Finance and Accounting, a Bachelor’s degree in Computer Science, and multiple risk management certifications.',
+    color: '#1a7ab5',
+  },
+]
+
+const board = [
+  {
+    name: 'Dianne Dusaidi', role: 'Chairperson',
+    image: 'https://abr.rw/wp-content/uploads/2021/05/Dianne_Dusaidi.jpg',
+    detail: 'MBA · Maastricht School of Management',
+    bio: 'Dianne is a Program Manager at the Mastercard Foundation, leading programs for financial inclusion, women’s e-commerce and youth employment. She joined AB Rwanda’s board in September 2020.',
+    color: '#003d70',
+  },
+  {
+    name: 'Susan Mutoni', role: 'Board Member',
+    image: 'https://abr.rw/wp-content/uploads/2023/02/Susan_Use-2.jpg',
+    detail: 'CPA K & R · Audit Partner',
+    bio: 'Susan is a Certified Public Accountant and Audit Partner at RUMA CPA. She has experience in auditing, UN HACT assessments, EU and USAID reviews, and holds a bachelor’s degree in Business Management majoring in Accounting.',
+    color: '#2879bf',
+  },
+  {
+    name: 'Bernd Zattler', role: 'Board Member',
+    image: 'https://abr.rw/wp-content/uploads/2021/05/bernd_zattler-2.jpg',
+    detail: 'PhD · Economics',
+    bio: 'Bernd joined AB Rwanda’s board in September 2018 and also chairs several AccessHolding investees. He founded LFS Advisory GmbH and has extensive experience in development finance across Europe and Africa.',
+    color: '#3a8fd0',
+  },
+  {
+    name: 'Gregor Taistra', role: 'Board Member',
+    image: 'https://abr.rw/wp-content/uploads/2021/05/gregor_taistra.jpg',
+    detail: 'PhD · Goethe University Frankfurt',
+    bio: 'Gregor is Principal Project Manager at KfW Development Bank Germany. He is a financial specialist focused on policy, credit risk and microfinance with over 20 years of experience across Central Africa.',
+    color: '#1a7ab5',
+  },
+  {
+    name: 'Albert Kinuma', role: 'Board Member',
+    image: 'https://abr.rw/wp-content/uploads/2021/05/albert_Kinuma.jpg',
+    detail: 'Payments & remittance leader',
+    bio: 'Albert is African Partnerships Lead at Segovia and led Rwanda’s first mobile money deployment at MTN Mobile Money. He previously served at IFC and Visa on digital financial services and interoperable banking solutions.',
+    color: '#006494',
+  },
 ]
 
 const shareholders = [
-  { name: 'AccessHolding', abbr: 'AH', color: '#003d70', desc: 'Majority shareholder — public-private partnership specialising in early-stage microfinance institutions globally.' },
-  { name: 'KFW Development Bank', abbr: 'KFW', color: '#2879bf', desc: 'German federal promotional bank financing development in emerging markets.' },
-  { name: 'IFC (World Bank Group)', abbr: 'IFC', color: '#3a8fd0', desc: 'Private sector arm of the World Bank focused on sustainable growth in developing countries.' },
+  {
+    name: 'AccessHolding', abbr: 'AH', color: '#003d70',
+    logo: 'https://abr.rw/wp-content/uploads/2021/04/AH-Logo-rgb-e1618829595587-1024x189.png',
+    shareIcon: 'https://abr.rw/wp-content/uploads/2021/07/AHshare.svg',
+    desc: 'AccessHolding is a public-private partnership established in 2016 with the aim to make equity investments in start-up and early stage MFIs in developing and transitional countries.',
+  },
+  {
+    name: 'KFW Development Bank', abbr: 'KFW', color: '#2879bf',
+    logo: 'https://abr.rw/wp-content/uploads/2021/04/KfW_RGB-e1618829694683.jpg',
+    shareIcon: 'https://abr.rw/wp-content/uploads/2021/07/KFWshare-1.svg',
+    desc: 'KFW Development Bank is a member of KfW Bankengruppe, a promotional bank under the ownership of the Federal Republic of Germany and its federal states.',
+  },
+  {
+    name: 'International Finance Corporation', abbr: 'IFC', color: '#3a8fd0',
+    logo: 'https://abr.rw/wp-content/uploads/2021/04/IFC-1024x206.png',
+    shareIcon: 'https://abr.rw/wp-content/uploads/2021/07/IFCshare.svg',
+    desc: 'International Finance Corporation (IFC) is the private sector arm of the World Bank, which creates opportunity for people to escape poverty and improve their lives. IFC fosters sustainable economic growth in developing countries by supporting private sector development, mobilizing private capital and providing advisory and risk mitigation services to business and governments.',
+  },
 ]
 
 /* ── reveal ── */
@@ -323,52 +400,75 @@ function ManagementCard({ m, i }: { m: typeof management[0]; i: number }) {
       >
         <div style={{
           background: '#ffffff', border: '1.5px solid rgba(40,121,191,0.1)',
-          borderRadius: 22, padding: '32px 22px 28px', textAlign: 'center',
+          borderRadius: 22, padding: '26px 22px 28px', textAlign: 'center',
           position: 'relative', overflow: 'hidden',
           boxShadow: '0 6px 28px rgba(40,121,191,0.08), inset 0 1px 0 rgba(255,255,255,1)',
         }}>
-          {/* Top gradient bar */}
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, height: 4,
             background: `linear-gradient(90deg, ${m.color}, #3a8fd0)`,
             borderRadius: '22px 22px 0 0',
           }} />
-          {/* Dot grid */}
           <div style={{
             position: 'absolute', inset: 0,
             backgroundImage: 'radial-gradient(rgba(40,121,191,0.04) 1px, transparent 1px)',
             backgroundSize: '24px 24px', pointerEvents: 'none',
           }} />
 
-          {/* Avatar — floats forward on z-axis */}
-          <div style={{ transform: 'translateZ(24px)', marginBottom: 16, position: 'relative' }}>
+          <div style={{ transform: 'translateZ(24px)', marginBottom: 18, position: 'relative' }}>
             <div style={{
-              width: 68, height: 68, borderRadius: '50%',
-              background: `linear-gradient(145deg, ${m.color}, #3a8fd0)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto',
-              fontSize: 19, fontWeight: 900, color: '#ffffff',
-              boxShadow: `0 12px 32px ${m.color}55, 0 4px 8px rgba(0,0,0,0.15)`,
+              width: 110, height: 110, borderRadius: 24, overflow: 'hidden',
+              margin: '0 auto', boxShadow: `0 20px 48px ${m.color}22, 0 8px 18px rgba(0,0,0,0.12)`,
             }}>
-              {m.initials}
+              <img src={m.image} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
-            {/* Ring glow */}
-            <div style={{
-              position: 'absolute', top: -4, left: '50%', transform: 'translateX(-50%)',
-              width: 76, height: 76, borderRadius: '50%',
-              border: `2px solid ${m.color}33`,
-            }} />
           </div>
 
           <div style={{ position: 'relative', transform: 'translateZ(8px)' }}>
-            <p style={{ fontWeight: 900, fontSize: 15, color: '#003d70', marginBottom: 5, lineHeight: 1.25 }}>{m.name}</p>
-            <p style={{ fontSize: 10.5, color: m.color, fontWeight: 800, marginBottom: 8, letterSpacing: '0.05em' }}>{m.role}</p>
+            <p style={{ fontWeight: 900, fontSize: 16, color: '#003d70', marginBottom: 8, lineHeight: 1.2 }}>{m.name}</p>
+            <p style={{ fontSize: 11.5, color: m.color, fontWeight: 800, marginBottom: 12, letterSpacing: '0.05em' }}>{m.role}</p>
+            <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.8, margin: 0 }}>{m.bio}</p>
             <div style={{
               display: 'inline-block', background: 'rgba(40,121,191,0.06)',
               border: '1px solid rgba(40,121,191,0.1)', borderRadius: 100,
-              padding: '3px 10px', fontSize: 11, color: '#647080',
+              padding: '6px 14px', fontSize: 11, color: '#647080', marginTop: 16,
             }}>
               {m.detail}
+            </div>
+          </div>
+        </div>
+      </div>
+    </R>
+  )
+}
+
+function BoardCard({ b, i }: { b: typeof board[0]; i: number }) {
+  const { ref, onMove, onLeave } = use3DTilt(10)
+  return (
+    <R delay={i * 90}>
+      <div
+        ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}
+        style={{ transformStyle: 'preserve-3d', transition: 'transform 0.15s ease-out, box-shadow 0.15s ease-out', borderRadius: 22, cursor: 'default' }}
+      >
+        <div style={{
+          background: '#ffffff', border: '1.5px solid rgba(40,121,191,0.1)',
+          borderRadius: 22, padding: '24px', position: 'relative', overflow: 'hidden',
+          boxShadow: '0 6px 28px rgba(40,121,191,0.08), inset 0 1px 0 rgba(255,255,255,1)',
+        }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${b.color}, #3a8fd0)`, borderRadius: '22px 22px 0 0' }} />
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(40,121,191,0.04) 1px, transparent 1px)', backgroundSize: '24px 24px', pointerEvents: 'none' }} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1 }}>
+            <div style={{ width: 106, height: 106, borderRadius: 22, overflow: 'hidden', boxShadow: `0 18px 42px ${b.color}22, 0 8px 18px rgba(0,0,0,0.1)` }}>
+              <img src={b.image} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontWeight: 900, fontSize: 15.5, color: '#003d70', marginBottom: 8 }}>{b.name}</p>
+              <p style={{ fontSize: 11, color: b.color, fontWeight: 800, marginBottom: 12, letterSpacing: '0.05em' }}>{b.role}</p>
+              <p style={{ fontSize: 13, color: '#647080', lineHeight: 1.75, margin: 0 }}>{b.bio}</p>
+            </div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '7px 14px', background: 'rgba(40,121,191,0.08)', borderRadius: 100, border: '1px solid rgba(40,121,191,0.12)', fontSize: 11, color: '#647080' }}>
+              {b.detail}
             </div>
           </div>
         </div>
@@ -412,22 +512,25 @@ function ShareholderCard({ s, i }: { s: typeof shareholders[0]; i: number }) {
             borderRadius: '0 4px 4px 0',
           }} />
 
-          {/* Icon cube — floats forward */}
+          {/* Logo — floats forward */}
           <div style={{ transform: 'translateZ(20px)', marginBottom: 20, position: 'relative', display: 'inline-block' }}>
             <div style={{
-              width: 56, height: 56, borderRadius: 16,
-              background: `linear-gradient(145deg, ${s.color}, #3a8fd0)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: `0 10px 28px ${s.color}44, 0 4px 8px rgba(0,0,0,0.1)`,
+              width: 92, height: 48, borderRadius: 8, overflow: 'hidden',
+              background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: `0 10px 28px ${s.color}22, 0 4px 8px rgba(0,0,0,0.06)`,
             }}>
-              <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.01em' }}>{s.abbr}</span>
+              {s.logo ? <img src={s.logo} alt={s.name + ' logo'} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} /> : <span style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}>{s.abbr}</span>}
             </div>
             {/* Shadow plane */}
             <div style={{
-              position: 'absolute', bottom: -6, left: '10%', right: '10%', height: 8,
-              background: `${s.color}28`, borderRadius: '50%',
+              position: 'absolute', bottom: -6, left: '6%', right: '6%', height: 8,
+              background: `${s.color}22`, borderRadius: '50%',
               filter: 'blur(6px)',
             }} />
+            {/* small shareholder badge */}
+            {s.shareIcon && (
+              <img src={s.shareIcon} alt={s.name + ' share icon'} style={{ position: 'absolute', top: -12, right: -12, width: 44, height: 44 }} />
+            )}
           </div>
 
           <div style={{ position: 'relative', transform: 'translateZ(8px)' }}>
@@ -731,6 +834,26 @@ export default function About() {
           </R>
           <div className="about-management" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 22 }}>
             {management.map((m, i) => <ManagementCard key={m.name} m={m} i={i} />)}
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Board of Directors ─── */}
+      <div style={{ background: '#f8fbfe', padding: '88px 0 80px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'radial-gradient(rgba(40,121,191,0.03) 1px, transparent 1px)',
+          backgroundSize: '32px 32px', pointerEvents: 'none',
+        }} />
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px' }}>
+          <R style={{ textAlign: 'center', marginBottom: 52 }}>
+            <span className="section-pill">Board</span>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#003d70', letterSpacing: '-0.025em' }}>
+              Board of Directors
+            </h2>
+          </R>
+          <div className="about-board" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 22 }}>
+            {board.map((b, i) => <BoardCard key={b.name} b={b} i={i} />)}
           </div>
         </div>
       </div>

@@ -231,7 +231,7 @@ export default function Services() {
             >
               Talk to an Advisor
             </a>
-            <a href="https://abr.rw/what-we-offer/" target="_blank" rel="noopener noreferrer" style={{
+            <a href="#products" style={{
               padding: '12px 28px', borderRadius: 10,
               border: '2px solid rgba(40,121,191,0.3)', color: '#2879bf',
               fontWeight: 700, fontSize: 14, textDecoration: 'none',

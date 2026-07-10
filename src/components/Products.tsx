@@ -157,7 +157,7 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
         </ul>
 
         <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <a href="https://abr.rw/what-we-offer/" target="_blank" rel="noopener noreferrer" style={{
+          <a href="#products" style={{
             display: 'inline-flex', alignItems: 'center', gap: 7,
             fontSize: 13.5, fontWeight: 800, color: '#ffffff', textDecoration: 'none',
             transition: 'gap 0.2s',
@@ -233,7 +233,7 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
       </ul>
 
       <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #f0f7fc', position: 'relative' }}>
-        <a href="https://abr.rw/what-we-offer/" target="_blank" rel="noopener noreferrer" style={{
+        <a href="#products" style={{
           display: 'inline-flex', alignItems: 'center', gap: 7,
           fontSize: 13.5, fontWeight: 800, color: '#2879bf', textDecoration: 'none',
           transition: 'gap 0.2s',
@@ -416,7 +416,7 @@ export default function Products() {
               >
                 Find a Branch
               </a>
-              <a href="https://abr.rw/what-we-offer/" target="_blank" rel="noopener noreferrer" style={{
+              <a href="#products" style={{
                 padding: '13px 30px', borderRadius: 11,
                 border: '1.5px solid rgba(170,212,242,0.35)', color: '#ffffff',
                 fontWeight: 700, fontSize: 14, textDecoration: 'none',

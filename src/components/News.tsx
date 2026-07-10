@@ -72,7 +72,7 @@ export default function News() {
               Latest from AB Rwanda
             </h2>
           </div>
-          <a href="https://abr.rw/" target="_blank" rel="noopener noreferrer" style={{
+          <a href="#news" style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             fontSize: 14, fontWeight: 700, color: '#2879bf', textDecoration: 'none',
             padding: '10px 20px', border: '2px solid #2879bf', borderRadius: 10,
@@ -160,7 +160,7 @@ export default function News() {
               <p style={{ fontSize: 14.5, color: '#647080', lineHeight: 1.7, marginBottom: 28 }}>
                 {articles[0].excerpt}
               </p>
-              <a href="https://abr.rw/" target="_blank" rel="noopener noreferrer" style={{
+              <a href="#news" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 fontSize: 13.5, fontWeight: 700, color: '#2879bf', textDecoration: 'none',
                 transition: 'gap 0.2s',
