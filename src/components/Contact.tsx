@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X } from 'lucide-react'
 import logo from '../imports/logo1-transparent.png'
 
 const smartValues = [
@@ -17,6 +18,8 @@ const branches = [
 
 export default function Contact() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [formState, setFormState] = useState({ name: '', email: '', message: '' })
+  const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
     const el = containerRef.current; if (!el) return
@@ -40,6 +43,104 @@ export default function Contact() {
     obs.observe(el)
     return () => obs.disconnect()
   }, [])
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setFormState(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    // In this demo we simply show a success state; integrate with backend as needed
+    setSubmitted(true)
+    setTimeout(() => setSubmitted(false), 4000)
+    setFormState({ name: '', email: '', message: '' })
+  }
+
+  // Accessibility widget state hooks
+  const [a11yOpen, setA11yOpen] = useState(false)
+  const [a11yState, setA11yState] = useState({
+    highContrast: false,
+    largeText: false,
+    hideImages: false,
+    lineHeight: false,
+    letterSpacing: false,
+    readingMask: false,
+    grayscale: false,
+  })
+
+  useEffect(() => {
+    const saved = localStorage.getItem('a11y-state')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      setA11yState(parsed)
+      applyA11yClasses(parsed)
+    }
+  }, [])
+
+  function applyA11yClasses(state: typeof a11yState) {
+    const root = document.documentElement
+    root.classList.toggle('a11y-high-contrast', state.highContrast)
+    root.classList.toggle('a11y-large-text', state.largeText)
+    root.classList.toggle('a11y-hide-images', state.hideImages)
+    root.classList.toggle('a11y-line-height', state.lineHeight)
+    root.classList.toggle('a11y-letter-spacing', state.letterSpacing)
+    root.classList.toggle('a11y-reading-mask', state.readingMask)
+    root.classList.toggle('a11y-grayscale', state.grayscale)
+  }
+
+  function toggleA11yOption(option: keyof typeof a11yState) {
+    setA11yState((current) => {
+      const next = { ...current, [option]: !current[option] }
+      localStorage.setItem('a11y-state', JSON.stringify(next))
+      applyA11yClasses(next)
+      return next
+    })
+  }
+
+  function applyProfile(profile: 'vision' | 'navigation' | 'focus') {
+    if (profile === 'vision') {
+      const next = {
+        highContrast: true,
+        largeText: true,
+        hideImages: false,
+        lineHeight: true,
+        letterSpacing: true,
+        readingMask: false,
+        grayscale: false,
+      }
+      setA11yState(next)
+      localStorage.setItem('a11y-state', JSON.stringify(next))
+      applyA11yClasses(next)
+    }
+    if (profile === 'navigation') {
+      const next = {
+        highContrast: false,
+        largeText: true,
+        hideImages: false,
+        lineHeight: true,
+        letterSpacing: false,
+        readingMask: true,
+        grayscale: false,
+      }
+      setA11yState(next)
+      localStorage.setItem('a11y-state', JSON.stringify(next))
+      applyA11yClasses(next)
+    }
+    if (profile === 'focus') {
+      const next = {
+        highContrast: true,
+        largeText: false,
+        hideImages: true,
+        lineHeight: true,
+        letterSpacing: false,
+        readingMask: true,
+        grayscale: false,
+      }
+      setA11yState(next)
+      localStorage.setItem('a11y-state', JSON.stringify(next))
+      applyA11yClasses(next)
+    }
+  }
 
   return (
     <section id="contact" style={{ fontFamily: 'var(--font-sans)' }}>
@@ -257,6 +358,33 @@ export default function Contact() {
             </div>
           </div>
 
+          {/* Contact form */}
+          <div data-reveal style={{ marginTop: 40, display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+            <form onSubmit={handleSubmit} style={{ flex: 1, background: '#ffffff', border: '1px solid rgba(40,121,191,0.06)', borderRadius: 12, padding: 22 }} aria-label="Contact form">
+              <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+                <label style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>Name</div>
+                  <input name="name" value={formState.name} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
+                </label>
+                <label style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>Email</div>
+                  <input name="email" type="email" value={formState.email} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
+                </label>
+              </div>
+              <label style={{ display: 'block', marginBottom: 12 }}>
+                <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>Message</div>
+                <textarea name="message" value={formState.message} onChange={handleChange} rows={5} required style={{ width: '100%', padding: '12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
+              </label>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <button type="submit" style={{ background: '#2879bf', color: '#fff', padding: '10px 18px', borderRadius: 10, border: 'none', fontWeight: 800 }}>Send Message</button>
+                {submitted && <div role="status" aria-live="polite" style={{ color: '#2b7a3a', fontWeight: 700 }}>Message sent — thank you.</div>}
+              </div>
+            </form>
+
+            {/* right column intentionally left for other content or images */}
+            <div style={{ width: 320 }} />
+          </div>
+
           {/* Branch list */}
           <div data-reveal style={{ marginTop: 48 }}>
             <h3 style={{ fontSize: 18, fontWeight: 800, color: '#003d70', marginBottom: 20 }}>Key Branches</h3>
@@ -383,6 +511,96 @@ export default function Contact() {
           </div>
         </div>
       </footer>
+      {/* Floating accessibility FAB + panel */}
+      <div className="a11y-fab" aria-hidden={false}>
+        <button aria-label="Toggle accessibility menu" onClick={() => setA11yOpen(s => !s)} className="a11y-fab-button">
+          <Accessibility size={24} />
+        </button>
+        {a11yOpen && (
+          <>
+            <div className="a11y-backdrop" onClick={() => setA11yOpen(false)} />
+            <div role="dialog" aria-modal="true" aria-label="Accessibility menu" className="a11y-panel" onClick={(e) => e.stopPropagation()}>
+              <div className="a11y-panel-header">
+                <div>Accessibility Menu</div>
+                <button type="button" onClick={() => setA11yOpen(false)} aria-label="Close accessibility menu" className="a11y-panel-close">
+                  <X size={20} />
+                </button>
+              </div>
+            <div className="a11y-panel-section">
+              <div className="a11y-panel-section-title">Content</div>
+              <div className="a11y-panel-grid">
+                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('largeText')}>
+                  <div className="a11y-tile-icon"><Type size={18} /></div>
+                  <div>Bigger Text</div>
+                </button>
+                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('lineHeight')}>
+                  <div className="a11y-tile-icon"><AlignJustify size={18} /></div>
+                  <div>Line Height</div>
+                </button>
+                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('letterSpacing')}>
+                  <div className="a11y-tile-icon"><TextCursor size={18} /></div>
+                  <div>Letter Spacing</div>
+                </button>
+                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('hideImages')}>
+                  <div className="a11y-tile-icon"><ImageOff size={18} /></div>
+                  <div>Hide Images</div>
+                </button>
+              </div>
+            </div>
+            <div className="a11y-panel-section">
+              <div className="a11y-panel-section-title">Colors</div>
+              <div className="a11y-panel-grid">
+                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('highContrast')}>
+                  <div className="a11y-tile-icon"><Contrast size={18} /></div>
+                  <div>High Contrast</div>
+                </button>
+                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('grayscale')}>
+                  <div className="a11y-tile-icon"><Accessibility size={18} /></div>
+                  <div>Grayscale</div>
+                </button>
+                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('readingMask')}>
+                  <div className="a11y-tile-icon"><Eye size={18} /></div>
+                  <div>Reading Mask</div>
+                </button>
+              </div>
+            </div>
+            <div className="a11y-panel-section">
+              <div className="a11y-panel-section-title">Profiles</div>
+              <div className="a11y-panel-grid">
+                <button type="button" className="a11y-tile" onClick={() => applyProfile('vision')}>
+                  <div className="a11y-tile-icon"><Eye size={18} /></div>
+                  <div>Vision Friendly</div>
+                </button>
+                <button type="button" className="a11y-tile" onClick={() => applyProfile('navigation')}>
+                  <div className="a11y-tile-icon"><Compass size={18} /></div>
+                  <div>Easy Navigation</div>
+                </button>
+                <button type="button" className="a11y-tile" onClick={() => applyProfile('focus')}>
+                  <div className="a11y-tile-icon"><Target size={18} /></div>
+                  <div>Focus Assist</div>
+                </button>
+              </div>
+            </div>
+            <div className="a11y-panel-footer">
+              <button type="button" className="a11y-panel-reset" onClick={() => {
+                const resetState = {
+                  highContrast: false,
+                  largeText: false,
+                  hideImages: false,
+                  lineHeight: false,
+                  letterSpacing: false,
+                  readingMask: false,
+                  grayscale: false,
+                }
+                setA11yState(resetState)
+                applyA11yClasses(resetState)
+                localStorage.setItem('a11y-state', JSON.stringify(resetState))
+              }}>Reset</button>
+            </div>
+          </div>
+          </>
+        )}
+      </div>
     </section>
   )
 }

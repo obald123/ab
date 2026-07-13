@@ -397,7 +397,7 @@ export default function Products() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <a href="#contact" style={{
+              <a href="#branches" style={{
                 padding: '13px 30px', borderRadius: 11, background: '#ffffff',
                 color: '#003d70', fontWeight: 900, fontSize: 14, textDecoration: 'none',
                 boxShadow: '0 8px 28px rgba(0,0,0,0.2)',

@@ -15,6 +15,7 @@ const B  = '#2879bf'
 const BD = '#003d70'
 const BM = '#1a5c96'
 const GL = '#9fa8b8'
+const AG = '#3ccc5f'
 
 /* ── Animated mesh background ── */
 function MeshBg() {
@@ -169,6 +170,62 @@ function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: numbe
         transform: `scale(${size}) rotateX(${rx}deg) rotateY(${ry}deg)`,
         transition: 'transform 0.12s ease-out',
       }}>
+        {!compact && (
+          <svg viewBox="0 0 80 520" width={8} height="100%" style={{
+            position: 'absolute', top: '10%', left: '18%', bottom: '10%',
+            pointerEvents: 'none', overflow: 'visible', zIndex: 6,
+            filter: 'drop-shadow(0 0 18px rgba(255,255,255,0.14))',
+          }}>
+            <path d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
+              fill="none"
+              stroke="rgba(255,255,255,0.96)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
+              fill="none"
+              stroke="rgba(255,255,255,0.28)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray="8 16"
+            />
+          </svg>
+        )}
+        <img
+          src={starOutline}
+          alt="Decorative white star"
+          style={{
+            display: compact ? 'none' : 'block',
+            position: 'absolute', top: '14%', left: '19.4%', width: 30,
+            filter: 'brightness(0) invert(1)',
+            opacity: 0.95,
+            zIndex: 4,
+          }}
+        />
+        <img
+          src={starFilled}
+          alt="Decorative white star"
+          style={{
+            display: compact ? 'none' : 'block',
+            position: 'absolute', top: '44%', left: '19.4%', width: 26,
+            filter: 'brightness(0) invert(1)',
+            opacity: 0.9,
+            zIndex: 4,
+          }}
+        />
+        <img
+          src={starOutline}
+          alt="Decorative white star"
+          style={{
+            display: compact ? 'none' : 'block',
+            position: 'absolute', top: '72%', left: '19.4%', width: 22,
+            filter: 'brightness(0) invert(1)',
+            opacity: 0.9,
+            zIndex: 4,
+          }}
+        />
         <img
           src={cardBottom}
           alt="Bottom card stack"
@@ -215,6 +272,7 @@ function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: numbe
           position: 'absolute', top: '12%', right: '-6%', width: 88,
           opacity: 0.75,
           animation: 'floatY 6s ease-in-out infinite',
+          zIndex: 4,
         }}
       />
       <img
@@ -225,6 +283,7 @@ function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: numbe
           position: 'absolute', bottom: '8%', left: '-8%', width: 80,
           opacity: 0.85,
           animation: 'floatY2 7s ease-in-out 0.5s infinite',
+          zIndex: 4,
         }}
       />
     </div>
@@ -260,6 +319,7 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
 export default function Hero() {
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
   const [stackSpread, setStackSpread] = useState(1)
+  const [lineProgress, setLineProgress] = useState(0)
   const [isCompact, setIsCompact] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -268,7 +328,9 @@ export default function Hero() {
       const rect = sectionRef.current?.getBoundingClientRect()
       if (!rect) return
       const progress = Math.min(Math.max(-rect.top / 220, 0), 1)
+      const lineReveal = Math.min(Math.max((window.scrollY + 260 - rect.top) / (rect.height + 260), 0), 1)
       setStackSpread(0.2 + 0.8 * (1 - progress))
+      setLineProgress(lineReveal)
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -295,6 +357,47 @@ export default function Hero() {
       display: 'flex', flexDirection: 'column',
     }}>
       <MeshBg />
+      {!isCompact && (
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: '52%',
+          transform: `translateX(-50%) translateY(${lineProgress * 12}px)`,
+          width: 240,
+          pointerEvents: 'none',
+          zIndex: 1,
+          opacity: 0.76,
+          filter: 'drop-shadow(0 0 8px rgba(40,121,191,0.04))',
+          transition: 'transform 0.2s ease-out',
+        }}>
+          <svg viewBox="0 0 350 1400" preserveAspectRatio="none" width="100%" height="100%">
+            <defs>
+              <linearGradient id="hero-white-to-blue-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={lineProgress < 0.3 ? '#ffffff' : `rgba(${Math.round(255 - lineProgress * 255 * 1.5)}, ${Math.round(200 - lineProgress * 100)}, 255, 0.8)`} />
+                <stop offset="40%" stopColor={lineProgress < 0.5 ? '#f5fbff' : `rgba(${Math.round(180 - lineProgress * 100)}, ${Math.round(190 - lineProgress * 80)}, 255, 0.72)`} />
+                <stop offset="100%" stopColor={lineProgress < 0.7 ? '#e8f4ff' : `rgba(40, 121, 191, ${0.64 + lineProgress * 0.2})`} />
+              </linearGradient>
+            </defs>
+            <path d="M175 -20 C 320 120, 340 240, 100 360 C -80 440, -100 580, 200 720 C 340 800, 330 950, 50 1080 C -80 1150, -60 1280, 220 1380 C 300 1420, 175 1400, 175 1400"
+              fill="none"
+              stroke="url(#hero-white-to-blue-gradient)"
+              strokeWidth="12"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ transition: 'all 0.3s ease-out' }}
+            />
+            <path d="M175 -20 C 320 120, 340 240, 100 360 C -80 440, -100 580, 200 720 C 340 800, 330 950, 50 1080 C -80 1150, -60 1280, 220 1380 C 300 1420, 175 1400, 175 1400"
+              fill="none"
+              stroke="rgba(255,255,255,0.12)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray="24 20"
+            />
+          </svg>
+        </div>
+      )}
 
       {/* ── Main 2-col grid ── */}
       <div className="hero-grid" style={{
@@ -310,12 +413,13 @@ export default function Hero() {
           {/* Eyebrow */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: 'rgba(40,121,191,0.14)', border: `1px solid rgba(140,170,210,0.25)`,
-            borderRadius: 100, padding: '6px 18px', marginBottom: 30,
+            background: 'rgba(255,255,255,0.12)', border: `1px solid rgba(170,212,242,0.24)`,
+            borderRadius: 100, padding: '6px 18px', marginBottom: 24,
             animation: 'fadeUp 0.6s ease both',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.16)',
           }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: GL, display: 'block', animation: 'blink 2s ease-in-out infinite' }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: GL, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Member of Access Group</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#f2f8ff', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Member of Access Group</span>
           </div>
 
           {/* Headline */}
@@ -347,39 +451,56 @@ export default function Hero() {
           }}>& Beyond</h1>
 
           <p style={{
-            fontSize: 17, color: 'rgba(255,255,255,0.6)', lineHeight: 1.78,
-            maxWidth: 430, marginBottom: 44,
+            fontSize: 17, color: 'rgba(255,255,255,0.72)', lineHeight: 1.78,
+            maxWidth: 470, marginBottom: 18,
             animation: 'fadeUp 0.7s ease 0.3s both',
           }}>
-            Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling <strong style={{ color: GL }}>*540#</strong>.
+            Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling <strong style={{ color: '#ffffff' }}>*540#</strong>.
           </p>
 
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 28,
+            animation: 'fadeUp 0.7s ease 0.35s both',
+          }}>
+            {['24/7 digital access', '47 branches', 'Fast account opening'].map((item) => (
+              <span key={item} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '8px 12px', borderRadius: 999,
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(170,212,242,0.16)',
+                color: '#eaf5ff', fontSize: 12, fontWeight: 700,
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: GL, display: 'block' }} />
+                {item}
+              </span>
+            ))}
+          </div>
+
           {/* CTA buttons */}
-          <div className="hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 52, animation: 'fadeUp 0.7s ease 0.4s both' } as React.CSSProperties}>
+          <div className="hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 36, animation: 'fadeUp 0.7s ease 0.4s both' } as React.CSSProperties}>
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: '#ffffff', color: BD,
-              padding: '15px 32px', borderRadius: 10,
+              background: 'linear-gradient(135deg, #ffffff 0%, #f2f8ff 100%)', color: BD,
+              padding: '15px 30px', borderRadius: 999,
               fontWeight: 800, fontSize: 15, textDecoration: 'none',
-              boxShadow: '0 6px 30px rgba(0,0,0,0.25)',
+              boxShadow: '0 12px 35px rgba(0,0,0,0.22)',
               transition: 'transform 0.2s, box-shadow 0.2s',
             }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'translateY(-3px)'; el.style.boxShadow = '0 12px 40px rgba(0,0,0,0.35)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = ''; el.style.boxShadow = '0 6px 30px rgba(0,0,0,0.25)' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'translateY(-3px)'; el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.28)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = ''; el.style.boxShadow = '0 12px 35px rgba(0,0,0,0.22)' }}
             >
               Open an Account
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke={BD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              border: `2px solid rgba(170,212,242,0.4)`, color: GL,
-              padding: '15px 32px', borderRadius: 10,
+              border: `1px solid rgba(170,212,242,0.34)`, color: '#f5fbff',
+              padding: '15px 30px', borderRadius: 999,
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              background: 'rgba(170,212,242,0.06)',
-              transition: 'border-color 0.2s, background 0.2s',
+              background: 'rgba(255,255,255,0.08)',
+              transition: 'border-color 0.2s, background 0.2s, transform 0.2s',
             }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(100,140,190,0.75)'; el.style.background = 'rgba(100,140,190,0.14)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(140,170,210,0.4)'; el.style.background = 'rgba(140,170,210,0.06)' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(255,255,255,0.62)'; el.style.background = 'rgba(255,255,255,0.14)'; el.style.transform = 'translateY(-2px)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(170,212,242,0.34)'; el.style.background = 'rgba(255,255,255,0.08)'; el.style.transform = '' }}
             >
               Explore Products
             </a>
@@ -388,10 +509,11 @@ export default function Hero() {
           {/* Stats row */}
           <div className="hero-stats" style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(170,212,242,0.12)',
-            borderRadius: 16, overflow: 'hidden',
-            backdropFilter: 'blur(12px)',
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(170,212,242,0.16)',
+            borderRadius: 18, overflow: 'hidden',
+            backdropFilter: 'blur(14px)',
+            boxShadow: '0 16px 40px rgba(0,0,0,0.16)',
             animation: 'fadeUp 0.7s ease 0.5s both',
           } as React.CSSProperties}>
             {[
@@ -400,18 +522,18 @@ export default function Hero() {
               { v: 9,   s: '+',   l: 'Years' },
               { v: 15,  s: '+',   l: 'Products' },
             ].map((s, i) => (
-              <div key={i} style={{ padding: '18px 12px', textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(170,212,242,0.08)' : 'none' }}>
+              <div key={i} style={{ padding: '18px 12px', textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(170,212,242,0.08)' : 'none', background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1, marginBottom: 4 }}>
                   <Counter to={s.v} suffix={s.s} />
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(170,212,242,0.5)', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{s.l}</div>
+                <div style={{ fontSize: 10, color: 'rgba(220,237,255,0.7)', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{s.l}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* ── RIGHT: landing cards scene ── */}
-        <div className="hero-scene" style={{ animation: 'fadeUp 0.9s ease 0.3s both' } as React.CSSProperties}>
+        <div className="hero-scene" style={{ position: 'relative', zIndex: 2, animation: 'fadeUp 0.9s ease 0.3s both' } as React.CSSProperties}>
           <LandingCards mouse={mouse} spread={stackSpread} compact={isCompact} />
         </div>
       </div>
@@ -420,22 +542,22 @@ export default function Hero() {
       <div className="hero-quick-links" style={{
         position: 'relative', zIndex: 2,
         borderTop: '1px solid rgba(140,170,210,0.10)',
-        background: 'rgba(0,0,0,0.25)',
+        background: 'rgba(2, 10, 26, 0.32)',
         backdropFilter: 'blur(16px)',
       }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'stretch' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
             {quickLinks.map((q, i) => (
             <a key={i} href="#products" className="hero-quick-link" style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-              padding: '18px 8px', textDecoration: 'none',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+              padding: '18px 8px', textDecoration: 'none', minHeight: 86,
               borderRight: i < quickLinks.length - 1 ? '1px solid rgba(140,170,210,0.08)' : 'none',
-              transition: 'background 0.2s',
+              transition: 'background 0.2s, transform 0.2s',
             }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(40,121,191,0.1)' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(40,121,191,0.12)'; el.style.transform = 'translateY(-2px)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.transform = '' }}
             >
               <q.Icon size={18} color={GL} strokeWidth={1.75} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.03em' }}>{q.label}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{q.label}</span>
             </a>
           ))}
         </div>

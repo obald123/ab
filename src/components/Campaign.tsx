@@ -246,7 +246,7 @@ export default function Campaign() {
           <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(22px,3vw,36px)', fontWeight: 900, color: '#ffffff', marginBottom: 12, position: 'relative' }}>Ready to get started?</h3>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.58)', marginBottom: 32, position: 'relative' }}>Visit any branch or dial *540# to open your account today.</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', position: 'relative', flexWrap: 'wrap' }}>
-            <a href="#contact" style={{ background: '#ffffff', color: '#2879bf', padding: '14px 34px', borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', transition: 'transform 0.2s' }}
+            <a href="#branches" style={{ background: '#ffffff', color: '#2879bf', padding: '14px 34px', borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', transition: 'transform 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform='translateY(-2px)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform='' }}>
               Find a Branch

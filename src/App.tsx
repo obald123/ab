@@ -7,6 +7,7 @@ import Campaign from './components/Campaign'
 import About from './components/About'
 import News from './components/News'
 import Contact from './components/Contact'
+import Branches from './components/Branches'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
       <Services />
       <Campaign />
       <About />
+      <Branches />
       <News />
       <Contact />
     </div>

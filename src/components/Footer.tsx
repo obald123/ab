@@ -34,7 +34,7 @@ export default function Footer() {
                 Open Account Online
               </a>
               <a
-                href="#"
+                href="#branches"
                 className="px-7 py-3.5 border border-white/30 text-white font-medium rounded hover:bg-white/10 transition-colors text-sm"
               >
                 Find a Branch
