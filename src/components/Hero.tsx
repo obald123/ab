@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import { IconMobile, IconMapPin, IconCalculator, IconExchange, IconPen, IconCheckCircle, IconTrendUp, IconShield } from './Icons'
 import cardTop from '../imports/landing/card.png'
 import cardMiddle from '../imports/landing/card (1).png'
@@ -366,7 +367,7 @@ export default function Hero() {
           transform: `translateX(-50%) translateY(${lineProgress * 12}px)`,
           width: 240,
           pointerEvents: 'none',
-          zIndex: 1,
+          zIndex: 0,
           opacity: 0.76,
           filter: 'drop-shadow(0 0 8px rgba(40,121,191,0.04))',
           transition: 'transform 0.2s ease-out',
@@ -409,74 +410,124 @@ export default function Hero() {
       }}>
 
         {/* ── LEFT: copy ── */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true, margin: '-200px' }}
+        >
           {/* Eyebrow */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: 'rgba(255,255,255,0.12)', border: `1px solid rgba(170,212,242,0.24)`,
-            borderRadius: 100, padding: '6px 18px', marginBottom: 24,
-            animation: 'fadeUp 0.6s ease both',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.16)',
-          }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: true }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'rgba(255,255,255,0.12)', border: `1px solid rgba(170,212,242,0.24)`,
+              borderRadius: 100, padding: '6px 18px', marginBottom: 24,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.16)',
+            }}
+          >
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: GL, display: 'block', animation: 'blink 2s ease-in-out infinite' }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: '#f2f8ff', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Member of Access Group</span>
-          </div>
+          </motion.div>
 
           {/* Headline */}
-          <h1 style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(42px, 5.5vw, 74px)',
-            fontWeight: 700, lineHeight: 1.04,
-            color: '#ffffff', margin: '0 0 6px',
-            letterSpacing: '-0.025em',
-            animation: 'fadeUp 0.7s ease 0.1s both',
-          }}>Banking Built</h1>
-          <h1 style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(42px, 5.5vw, 74px)',
-            fontWeight: 700, lineHeight: 1.04,
-            margin: '0 0 6px', letterSpacing: '-0.025em',
-            backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
-            backgroundSize: '200% auto',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-            animation: 'fadeUp 0.7s ease 0.15s both, shimmer 4s linear 1s infinite',
-          } as React.CSSProperties}>for Rwanda</h1>
-          <h1 style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(42px, 5.5vw, 74px)',
-            fontWeight: 700, lineHeight: 1.04,
-            color: 'rgba(255,255,255,0.75)', margin: '0 0 28px',
-            letterSpacing: '-0.025em',
-            animation: 'fadeUp 0.7s ease 0.2s both',
-          }}>& Beyond</h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            viewport={{ once: true }}
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(42px, 5.5vw, 74px)',
+              fontWeight: 700, lineHeight: 1.04,
+              color: '#ffffff', margin: '0 0 6px',
+              letterSpacing: '-0.025em',
+            }}
+          >Banking Built</motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            viewport={{ once: true }}
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(42px, 5.5vw, 74px)',
+              fontWeight: 700, lineHeight: 1.04,
+              margin: '0 0 6px', letterSpacing: '-0.025em',
+              backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
+              backgroundSize: '200% auto',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              animation: 'shimmer 4s linear 1s infinite',
+            } as React.CSSProperties}
+          >for Rwanda</motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            viewport={{ once: true }}
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(42px, 5.5vw, 74px)',
+              fontWeight: 700, lineHeight: 1.04,
+              color: 'rgba(255,255,255,0.75)', margin: '0 0 28px',
+              letterSpacing: '-0.025em',
+            }}
+          >& Beyond</motion.h1>
 
-          <p style={{
-            fontSize: 17, color: 'rgba(255,255,255,0.72)', lineHeight: 1.78,
-            maxWidth: 470, marginBottom: 18,
-            animation: 'fadeUp 0.7s ease 0.3s both',
-          }}>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+            style={{
+              fontSize: 17, color: 'rgba(255,255,255,0.72)', lineHeight: 1.78,
+              maxWidth: 470, marginBottom: 18,
+            }}
+          >
             Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling <strong style={{ color: '#ffffff' }}>*540#</strong>.
-          </p>
+          </motion.p>
 
-          <div style={{
-            display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 28,
-            animation: 'fadeUp 0.7s ease 0.35s both',
-          }}>
-            {['24/7 digital access', '47 branches', 'Fast account opening'].map((item) => (
-              <span key={item} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '8px 12px', borderRadius: 999,
-                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(170,212,242,0.16)',
-                color: '#eaf5ff', fontSize: 12, fontWeight: 700,
-              }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            viewport={{ once: true }}
+            style={{
+              display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 28,
+            }}
+          >
+            {['24/7 digital access', '47 branches', 'Fast account opening'].map((item, i) => (
+              <motion.span
+                key={item}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.35 + i * 0.08 }}
+                viewport={{ once: true }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '8px 12px', borderRadius: 999,
+                  background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(170,212,242,0.16)',
+                  color: '#eaf5ff', fontSize: 12, fontWeight: 700,
+                }}
+              >
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: GL, display: 'block' }} />
                 {item}
-              </span>
+              </motion.span>
             ))}
-          </div>
+          </motion.div>
 
           {/* CTA buttons */}
-          <div className="hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 36, animation: 'fadeUp 0.7s ease 0.4s both' } as React.CSSProperties}>
+          <motion.div
+            className="hero-cta"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 36 } as React.CSSProperties}
+          >
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               background: 'linear-gradient(135deg, #ffffff 0%, #f2f8ff 100%)', color: BD,
@@ -504,18 +555,24 @@ export default function Hero() {
             >
               Explore Products
             </a>
-          </div>
+          </motion.div>
 
           {/* Stats row */}
-          <div className="hero-stats" style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(170,212,242,0.16)',
-            borderRadius: 18, overflow: 'hidden',
-            backdropFilter: 'blur(14px)',
-            boxShadow: '0 16px 40px rgba(0,0,0,0.16)',
-            animation: 'fadeUp 0.7s ease 0.5s both',
-          } as React.CSSProperties}>
+          <motion.div
+            className="hero-stats"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            viewport={{ once: true }}
+            style={{
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(170,212,242,0.16)',
+              borderRadius: 18, overflow: 'hidden',
+              backdropFilter: 'blur(14px)',
+              boxShadow: '0 16px 40px rgba(0,0,0,0.16)',
+            } as React.CSSProperties}
+          >
             {[
               { v: 47,  s: '+',   l: 'Branches' },
               { v: 200, s: 'K+',  l: 'Customers' },
@@ -529,39 +586,62 @@ export default function Hero() {
                 <div style={{ fontSize: 10, color: 'rgba(220,237,255,0.7)', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{s.l}</div>
               </div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* ── RIGHT: landing cards scene ── */}
-        <div className="hero-scene" style={{ position: 'relative', zIndex: 2, animation: 'fadeUp 0.9s ease 0.3s both' } as React.CSSProperties}>
+        <motion.div
+          className="hero-scene"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          viewport={{ once: true }}
+          style={{ position: 'relative', zIndex: 2 } as React.CSSProperties}
+        >
           <LandingCards mouse={mouse} spread={stackSpread} compact={isCompact} />
-        </div>
+        </motion.div>
       </div>
 
       {/* ── Quick access strip ── */}
-      <div className="hero-quick-links" style={{
-        position: 'relative', zIndex: 2,
-        borderTop: '1px solid rgba(140,170,210,0.10)',
-        background: 'rgba(2, 10, 26, 0.32)',
-        backdropFilter: 'blur(16px)',
-      }}>
+      <motion.div
+        className="hero-quick-links"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        viewport={{ once: true }}
+        style={{
+          position: 'relative', zIndex: 2,
+          borderTop: '1px solid rgba(140,170,210,0.10)',
+          background: 'rgba(2, 10, 26, 0.32)',
+          backdropFilter: 'blur(16px)',
+        }}
+      >
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
             {quickLinks.map((q, i) => (
-            <a key={i} href="#products" className="hero-quick-link" style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
-              padding: '18px 8px', textDecoration: 'none', minHeight: 86,
-              borderRight: i < quickLinks.length - 1 ? '1px solid rgba(140,170,210,0.08)' : 'none',
-              transition: 'background 0.2s, transform 0.2s',
-            }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(40,121,191,0.12)'; el.style.transform = 'translateY(-2px)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.transform = '' }}
+            <motion.a
+              key={i}
+              href="#products"
+              className="hero-quick-link"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.4, delay: 0.6 + i * 0.06 }}
+              viewport={{ once: true }}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '18px 8px', textDecoration: 'none', minHeight: 86,
+                borderRight: i < quickLinks.length - 1 ? '1px solid rgba(140,170,210,0.08)' : 'none',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(40,121,191,0.12)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent' }}
             >
               <q.Icon size={18} color={GL} strokeWidth={1.75} />
               <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{q.label}</span>
-            </a>
+            </motion.a>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

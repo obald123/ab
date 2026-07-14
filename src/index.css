@@ -461,7 +461,6 @@ body.a11y-large-text { font-size: 1.12rem; }
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(2px);
   z-index: 10000;
 }
 .a11y-panel-close {
