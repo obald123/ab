@@ -82,10 +82,10 @@ export default function Branches() {
 
   return (
     <section id="branches" style={{ padding: '48px 0', background: '#f6fbff' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
+      <div style={{ margin: '0 auto', padding: '0 48px' }}>
         <div style={{ textAlign: 'center', marginBottom: 18 }}>
           <span className="section-pill">Locations</span>
-          <h2 style={{ fontWeight: 900, fontSize: 28, color: '#003d70' }}>Our Branch Network</h2>
+          <h2 style={{ fontWeight: 900, fontSize: 28, color: '#0284c7' }}>Our Branch Network</h2>
           <p style={{ color: '#647080', marginTop: 8 }}>Interactive map showing all branch locations. Click a marker for details.</p>
         </div>
 

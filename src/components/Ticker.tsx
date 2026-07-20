@@ -16,8 +16,8 @@ export default function Ticker() {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 300,
-      background: '#003d70',
-      borderBottom: '1px solid rgba(40,121,191,0.3)',
+      background: '#0284c7',
+      borderBottom: '1px solid rgba(14,165,233,0.3)',
       height: 36,
       overflow: 'hidden',
       display: 'flex', alignItems: 'center',
@@ -47,7 +47,7 @@ export default function Ticker() {
       {/* Edge fade right of label */}
       <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 180, zIndex: 1, background: 'linear-gradient(90deg,#004070 70%,rgba(0,64,112,0))', pointerEvents: 'none' }} />
       {/* Edge fade right */}
-      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 60, zIndex: 1, background: 'linear-gradient(270deg,#003d70,rgba(0,61,104,0))', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 60, zIndex: 1, background: 'linear-gradient(270deg,#0284c7,rgba(2,132,199,0))', pointerEvents: 'none' }} />
 
       {/* Scrolling text */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>

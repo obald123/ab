@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { IconMobile, IconTrendUp, IconHeart } from './Icons'
 
-const B = '#2879bf'
-const BD = '#003d70'
+const B = '#0ea5e9'
+const BD = '#0284c7'
 const BM = '#1a5c96'
 const GL = '#9fa8b8'
 const BG = '#eef4fb'
@@ -49,7 +49,7 @@ function StatBlock({ value, suffix, label, trigger, delay }: { value: number, su
   }, [trigger, value])
   return (
     <div style={{ background: '#ffffff', padding: '36px 28px', textAlign: 'center', opacity: trigger ? 1 : 0, transform: trigger ? 'translateY(0)' : 'translateY(20px)', transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s` }}>
-      <div style={{ fontFamily: 'var(--font-sans)', fontSize: 40, fontWeight: 900, color: '#2879bf', lineHeight: 1, marginBottom: 8 }}>{count}{suffix}</div>
+      <div style={{ fontFamily: 'var(--font-sans)', fontSize: 40, fontWeight: 900, color: '#0ea5e9', lineHeight: 1, marginBottom: 8 }}>{count}{suffix}</div>
       <div style={{ fontSize: 13, color: '#6a7880', fontWeight: 600 }}>{label}</div>
     </div>
   )
@@ -59,14 +59,14 @@ const LAUNCH = new Date('2026-08-15T09:00:00')
 
 const products = [
   {
-    id: 'ekash-plus', badge: 'NEW LAUNCH', badgeColor: '#aad4f2', badgeText: '#003d70',
+    id: 'ekash-plus', badge: 'NEW LAUNCH', badgeColor: '#bae6fd', badgeText: '#0284c7',
     name: 'eKash Plus', tagline: 'Super-charged mobile money',
     description: 'Instant transfers, merchant payments, savings pockets, and cross-border remittance — all from your phone. No branch visit needed.',
     features: ['Zero transfer fees for 3 months', 'Earn 8% p.a. on savings pocket', 'Send to 12 African countries', 'USSD *540# or app'],
     accent: B, accentLight: '#e7f0fb', Icon: IconMobile, stat: '50,000+', statLabel: 'Active users',
   },
   {
-    id: 'sme-boost', badge: 'LIMITED OFFER', badgeColor: '#2879bf', badgeText: '#ffffff',
+    id: 'sme-boost', badge: 'LIMITED OFFER', badgeColor: '#0ea5e9', badgeText: '#ffffff',
     name: 'SME Boost Loan', tagline: 'Fuel your business growth',
     description: "Collateral-light business loans up to RWF 50M approved in 48 hours. Designed for Rwanda's entrepreneurs and growing enterprises.",
     features: ['Up to RWF 50 million', '48-hour approval', 'Flexible 12–60 month terms', 'Grace period available'],
@@ -86,27 +86,27 @@ function CampaignBanner() {
   const cd = useCountdown(LAUNCH)
   const pad = (n: number) => String(n).padStart(2, '0')
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg,#021e3c 0%,#2879bf 55%,#3a8fd0 100%)', borderRadius: 28, padding: '52px', boxShadow: '0 32px 80px rgba(40,121,191,0.30)' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg,#0c4a6e 0%,#0ea5e9 55%,#38bdf8 100%)', borderRadius: 28, padding: '52px', boxShadow: '0 32px 80px rgba(14,165,233,0.30)' }}>
       {[200,300,400].map((s, i) => <div key={i} style={{ position: 'absolute', right: -s/2.5, top: '50%', transform: 'translateY(-50%)', width: s, height: s, borderRadius: '50%', border: `1px solid rgba(255,255,255,${0.07-i*0.02})`, pointerEvents: 'none' }} />)}
-      <div style={{ position: 'absolute', right: '6%', top: '8%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(170,212,242,0.15) 0%,transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', right: '6%', top: '8%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(186,230,253,0.15) 0%,transparent 70%)', pointerEvents: 'none' }} />
       <div className="campaign-banner" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'center', position: 'relative' }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(170,212,242,0.18)', border: '1px solid rgba(170,212,242,0.45)', borderRadius: 100, padding: '5px 18px', marginBottom: 22 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#aad4f2', display: 'block', animation: 'blink 1.4s ease-in-out infinite' }} />
-            <span style={{ fontSize: 10.5, fontWeight: 900, color: '#aad4f2', letterSpacing: '0.14em' }}>GRAND CAMPAIGN · LAUNCH 15 AUGUST 2026</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(186,230,253,0.18)', border: '1px solid rgba(186,230,253,0.45)', borderRadius: 100, padding: '5px 18px', marginBottom: 22 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#bae6fd', display: 'block', animation: 'blink 1.4s ease-in-out infinite' }} />
+            <span style={{ fontSize: 10.5, fontWeight: 900, color: '#bae6fd', letterSpacing: '0.14em' }}>GRAND CAMPAIGN · LAUNCH 15 AUGUST 2026</span>
           </div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(26px,3.5vw,44px)', fontWeight: 700, color: '#ffffff', lineHeight: 1.1, marginBottom: 16 }}>
-            Empowering Rwanda,<br /><span style={{ color: '#aad4f2' }}>One Account at a Time</span>
+            Empowering Rwanda,<br /><span style={{ color: '#bae6fd' }}>One Account at a Time</span>
           </h2>
           <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.62)', lineHeight: 1.75, maxWidth: 480, marginBottom: 32 }}>
             Open any new account before August 15 and get 3 months of zero fees, a free debit card, and exclusive campaign rewards.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#aad4f2', color: '#003d70', padding: '13px 28px', borderRadius: 10, fontWeight: 900, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(170,212,242,0.35)', transition: 'transform 0.2s,box-shadow 0.2s' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-2px)'; el.style.boxShadow='0 14px 36px rgba(170,212,242,0.5)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow='0 8px 24px rgba(170,212,242,0.35)' }}>
+            <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#bae6fd', color: '#0284c7', padding: '13px 28px', borderRadius: 10, fontWeight: 900, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(186,230,253,0.35)', transition: 'transform 0.2s,box-shadow 0.2s' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-2px)'; el.style.boxShadow='0 14px 36px rgba(186,230,253,0.5)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow='0 8px 24px rgba(186,230,253,0.35)' }}>
               Claim Your Offer
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M8.5 4l4 3.5-4 3.5" stroke="#003d70" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M8.5 4l4 3.5-4 3.5" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
             <a href="#about" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.32)', color: 'rgba(255,255,255,0.95)', padding: '13px 28px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none', background: 'rgba(255,255,255,0.08)', transition: 'border-color 0.2s,color 0.2s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor='rgba(255,255,255,0.65)'; el.style.color='#ffffff' }}
@@ -145,9 +145,9 @@ function ProductCard({ p, index }: { p: typeof products[0], index: number }) {
   return (
     <div ref={ref} style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(40px)', transition: `opacity 0.65s ease ${index*0.14}s, transform 0.65s ease ${index*0.14}s`, height: '100%' }}>
       <div ref={tilt.ref} onMouseMove={tilt.onMove}
-        style={{ background: '#ffffff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 8px 32px rgba(40,121,191,0.09)', border: '1px solid rgba(40,121,191,0.07)', transition: 'box-shadow 0.25s', height: '100%', display: 'flex', flexDirection: 'column' }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 24px 64px rgba(40,121,191,0.18)' }}
-        onMouseLeave={e => { tilt.onLeave(); (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(40,121,191,0.09)' }}>
+        style={{ background: '#ffffff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 8px 32px rgba(14,165,233,0.09)', border: '1px solid rgba(14,165,233,0.07)', transition: 'box-shadow 0.25s', height: '100%', display: 'flex', flexDirection: 'column' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 24px 64px rgba(14,165,233,0.18)' }}
+        onMouseLeave={e => { tilt.onLeave(); (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(14,165,233,0.09)' }}>
         {/* Header */}
         <div style={{ padding: '28px 28px 22px', background: p.accentLight, position: 'relative' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${p.accent},${p.accent}88)` }} />
@@ -203,7 +203,7 @@ function StatsStrip() {
     { value: 200, suffix: 'K+', label: 'Customers served' },
   ]
   return (
-    <div ref={ref} className="campaign-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'rgba(40,121,191,0.08)', borderRadius: 20, overflow: 'hidden', marginTop: 56 }}>
+    <div ref={ref} className="campaign-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'rgba(14,165,233,0.08)', borderRadius: 20, overflow: 'hidden', marginTop: 56 }}>
       {statsData.map((s, i) => <StatBlock key={i} value={s.value} suffix={s.suffix} label={s.label} trigger={visible} delay={i * 0.12} />)}
     </div>
   )
@@ -212,16 +212,16 @@ function StatsStrip() {
 export default function Campaign() {
   return (
     <section id="campaign" style={{ background: '#f4f8fc', padding: '96px 0' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px' }}>
+      <div style={{ margin: '0 auto', padding: '0 48px' }}>
 
         {/* Section header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-          <div style={{ width: 36, height: 2, background: '#2879bf', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: '#2879bf', textTransform: 'uppercase' }}>New Products &amp; Campaigns</span>
+          <div style={{ width: 36, height: 2, background: '#0ea5e9', borderRadius: 2 }} />
+          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: '#0ea5e9', textTransform: 'uppercase' }}>New Products &amp; Campaigns</span>
         </div>
         <div className="campaign-header" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'end', marginBottom: 48 }}>
-          <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, color: '#021e3c', lineHeight: 1.1 }}>
-            Built for Rwanda's<br /><span style={{ color: '#2879bf' }}>Next Chapter</span>
+          <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, color: '#0c4a6e', lineHeight: 1.1 }}>
+            Built for Rwanda's<br /><span style={{ color: '#0ea5e9' }}>Next Chapter</span>
           </h2>
           <p style={{ fontSize: 16, color: '#647080', lineHeight: 1.75, maxWidth: 400, marginLeft: 'auto' }}>
             We're launching three powerful new products this August designed to serve more Rwandans — whether you're saving, growing a business, or sending money home.
@@ -240,13 +240,13 @@ export default function Campaign() {
         <StatsStrip />
 
         {/* Bottom CTA */}
-        <div className="campaign-bottom-cta" style={{ marginTop: 56, padding: '52px', background: 'linear-gradient(135deg,#021e3c,#2879bf)', borderRadius: 24, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 15% 50%,rgba(170,212,242,0.12) 0%,transparent 50%),radial-gradient(circle at 85% 50%,rgba(0,106,174,0.2) 0%,transparent 50%)', pointerEvents: 'none' }} />
+        <div className="campaign-bottom-cta" style={{ marginTop: 56, padding: '52px', background: 'linear-gradient(135deg,#0c4a6e,#0ea5e9)', borderRadius: 24, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 15% 50%,rgba(186,230,253,0.12) 0%,transparent 50%),radial-gradient(circle at 85% 50%,rgba(2,132,199,0.2) 0%,transparent 50%)', pointerEvents: 'none' }} />
           <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.42)', textTransform: 'uppercase', marginBottom: 16, position: 'relative' }}>Limited time offer</p>
           <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(22px,3vw,36px)', fontWeight: 900, color: '#ffffff', marginBottom: 12, position: 'relative' }}>Ready to get started?</h3>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.58)', marginBottom: 32, position: 'relative' }}>Visit any branch or dial *540# to open your account today.</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', position: 'relative', flexWrap: 'wrap' }}>
-            <a href="#branches" style={{ background: '#ffffff', color: '#2879bf', padding: '14px 34px', borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', transition: 'transform 0.2s' }}
+            <a href="#branches" style={{ background: '#ffffff', color: '#0ea5e9', padding: '14px 34px', borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', transition: 'transform 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform='translateY(-2px)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform='' }}>
               Find a Branch

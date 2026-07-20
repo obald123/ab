@@ -84,24 +84,24 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
     const y = (e.clientY - r.top) / r.height - 0.5
     el.style.transform = `perspective(800px) rotateY(${x * 10}deg) rotateX(${y * -7}deg) translateY(-8px)`
     el.style.boxShadow = item.highlight
-      ? `${-x * 16}px ${-y * 8}px 60px rgba(40,121,191,0.35), 0 30px 70px rgba(40,121,191,0.2)`
-      : `${-x * 14}px ${-y * 6}px 50px rgba(40,121,191,0.14), 0 20px 50px rgba(40,121,191,0.08)`
+      ? `${-x * 16}px ${-y * 8}px 60px rgba(14,165,233,0.35), 0 30px 70px rgba(14,165,233,0.2)`
+      : `${-x * 14}px ${-y * 6}px 50px rgba(14,165,233,0.14), 0 20px 50px rgba(14,165,233,0.08)`
   }
   const onLeave = () => {
     const el = ref.current; if (!el) return
     el.style.transform = 'perspective(800px) rotateY(0) rotateX(0) translateY(0)'
-    el.style.boxShadow = item.highlight ? '0 8px 32px rgba(40,121,191,0.25)' : '0 4px 24px rgba(40,121,191,0.07)'
+    el.style.boxShadow = item.highlight ? '0 8px 32px rgba(14,165,233,0.25)' : '0 4px 24px rgba(14,165,233,0.07)'
   }
 
   if (item.highlight) {
     return (
       <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} style={{
-        background: 'linear-gradient(145deg, #003d70 0%, #2879bf 45%, #3a8fd0 100%)',
+        background: 'linear-gradient(145deg, #0284c7 0%, #0ea5e9 45%, #38bdf8 100%)',
         borderRadius: 20, padding: 30, cursor: 'default',
         transition: 'transform 0.14s ease-out, box-shadow 0.14s ease-out',
-        boxShadow: '0 8px 32px rgba(40,121,191,0.25)',
+        boxShadow: '0 8px 32px rgba(14,165,233,0.25)',
         transformStyle: 'preserve-3d', position: 'relative', overflow: 'hidden',
-        border: '1px solid rgba(170,212,242,0.15)',
+        border: '1px solid rgba(186,230,253,0.15)',
       }}>
         <div style={{
           position: 'absolute', top: '-40%', right: '-20%',
@@ -130,12 +130,12 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
           border: '1px solid rgba(255,255,255,0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <item.Icon size={24} color="#aad4f2" strokeWidth={1.75} />
+          <item.Icon size={24} color="#bae6fd" strokeWidth={1.75} />
         </div>
 
         <div style={{
           display: 'inline-block', fontSize: 10, fontWeight: 800,
-          color: 'rgba(170,212,242,0.85)', background: 'rgba(170,212,242,0.12)',
+          color: 'rgba(186,230,253,0.85)', background: 'rgba(186,230,253,0.12)',
           borderRadius: 100, padding: '3px 11px', letterSpacing: '0.06em', marginBottom: 12,
         }}>
           {item.tag}
@@ -148,7 +148,7 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
         <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 9 }}>
           {item.bullets.map(b => (
             <li key={b} style={{ display: 'flex', gap: 10, fontSize: 13.5, color: 'rgba(255,255,255,0.75)', alignItems: 'flex-start' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(170,212,242,0.85)" strokeWidth={2.5} style={{ flexShrink: 0, marginTop: 2 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(186,230,253,0.85)" strokeWidth={2.5} style={{ flexShrink: 0, marginTop: 2 }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               {b}
@@ -177,43 +177,43 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
 
   return (
     <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} style={{
-      background: '#ffffff', border: '1.5px solid rgba(40,121,191,0.1)',
+      background: '#ffffff', border: '1.5px solid rgba(14,165,233,0.1)',
       borderRadius: 20, padding: 30, cursor: 'default',
       transition: 'transform 0.14s ease-out, box-shadow 0.14s ease-out',
-      boxShadow: '0 4px 24px rgba(40,121,191,0.07)',
+      boxShadow: '0 4px 24px rgba(14,165,233,0.07)',
       transformStyle: 'preserve-3d', position: 'relative', overflow: 'hidden',
     }}>
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-        background: 'linear-gradient(90deg, #2879bf, #3a8fd0)',
+        background: 'linear-gradient(90deg, #0ea5e9, #38bdf8)',
         borderRadius: '20px 20px 0 0',
       }} />
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'radial-gradient(rgba(40,121,191,0.04) 1px, transparent 1px)',
+        backgroundImage: 'radial-gradient(rgba(14,165,233,0.04) 1px, transparent 1px)',
         backgroundSize: '28px 28px', pointerEvents: 'none',
       }} />
 
       <div style={{
         width: 52, height: 52, borderRadius: 14, marginBottom: 18,
         background: 'linear-gradient(135deg, #e6f2fa 0%, #c8e4f5 100%)',
-        border: '1px solid rgba(40,121,191,0.08)',
+        border: '1px solid rgba(14,165,233,0.08)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative',
       }}>
-        <item.Icon size={22} color="#2879bf" strokeWidth={1.75} />
+        <item.Icon size={22} color="#0ea5e9" strokeWidth={1.75} />
       </div>
 
       <div style={{
         display: 'inline-block', fontSize: 10, fontWeight: 800,
-        color: '#2879bf', background: 'rgba(40,121,191,0.06)',
-        border: '1px solid rgba(40,121,191,0.12)',
+        color: '#0ea5e9', background: 'rgba(14,165,233,0.06)',
+        border: '1px solid rgba(14,165,233,0.12)',
         borderRadius: 100, padding: '3px 11px', letterSpacing: '0.06em', marginBottom: 12,
       }}>
         {item.tag}
       </div>
 
-      <h3 style={{ fontSize: 19, fontWeight: 900, color: '#003d70', marginBottom: 18, letterSpacing: '-0.01em', position: 'relative' }}>
+      <h3 style={{ fontSize: 19, fontWeight: 900, color: '#0284c7', marginBottom: 18, letterSpacing: '-0.01em', position: 'relative' }}>
         {item.title}
       </h3>
 
@@ -222,10 +222,10 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
           <li key={b} style={{ display: 'flex', gap: 10, fontSize: 13.5, color: '#647080', alignItems: 'flex-start' }}>
             <div style={{
               width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 1,
-              background: 'rgba(40,121,191,0.08)',
+              background: 'rgba(14,165,233,0.08)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#2879bf' }} />
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#0ea5e9' }} />
             </div>
             {b}
           </li>
@@ -235,7 +235,7 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
       <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #f0f7fc', position: 'relative' }}>
         <a href="#products" style={{
           display: 'inline-flex', alignItems: 'center', gap: 7,
-          fontSize: 13.5, fontWeight: 800, color: '#2879bf', textDecoration: 'none',
+          fontSize: 13.5, fontWeight: 800, color: '#0ea5e9', textDecoration: 'none',
           transition: 'gap 0.2s',
         }}
           onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '12px' }}
@@ -283,32 +283,32 @@ export default function Products() {
       <div style={{
         position: 'absolute', top: -200, right: -200, width: 700, height: 700,
         borderRadius: '50%', pointerEvents: 'none',
-        border: '1px solid rgba(40,121,191,0.05)',
-        background: 'radial-gradient(circle, rgba(40,121,191,0.03) 0%, transparent 65%)',
+        border: '1px solid rgba(14,165,233,0.05)',
+        background: 'radial-gradient(circle, rgba(14,165,233,0.03) 0%, transparent 65%)',
       }} />
       <div style={{
         position: 'absolute', bottom: -150, left: -100, width: 500, height: 500,
         borderRadius: '50%', pointerEvents: 'none',
-        border: '1px solid rgba(40,121,191,0.04)',
+        border: '1px solid rgba(14,165,233,0.04)',
       }} />
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'radial-gradient(rgba(40,121,191,0.04) 1px, transparent 1px)',
+        backgroundImage: 'radial-gradient(rgba(14,165,233,0.04) 1px, transparent 1px)',
         backgroundSize: '40px 40px', pointerEvents: 'none',
       }} />
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
+      <div style={{ margin: '0 auto', padding: '0 48px', position: 'relative' }}>
         {/* Asymmetric header: heading left, stats right */}
         <div data-reveal className="products-header" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end', marginBottom: 64 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-              <div style={{ width: 32, height: 2, background: '#2879bf', borderRadius: 2 }} />
-              <span style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: '0.18em', color: '#2879bf', textTransform: 'uppercase' }}>What We Offer</span>
+              <div style={{ width: 32, height: 2, background: '#0ea5e9', borderRadius: 2 }} />
+              <span style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: '0.18em', color: '#0ea5e9', textTransform: 'uppercase' }}>What We Offer</span>
             </div>
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 700, fontSize: 'clamp(30px, 4.2vw, 52px)',
-              color: '#003d70', lineHeight: 1.1, letterSpacing: '-0.01em', marginBottom: 18,
+              color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.01em', marginBottom: 18,
             }}>
               Tailored Financial Solutions<br />
               <span className="text-gradient-product">for Every Rwandan</span>
@@ -318,13 +318,13 @@ export default function Products() {
             </p>
           </div>
           {/* Side stats panel */}
-          <div className="products-side-stats" style={{ display: 'flex', flexDirection: 'column', gap: 0, background: '#ffffff', borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(40,121,191,0.09)', boxShadow: '0 4px 20px rgba(40,121,191,0.07)', minWidth: 200 }}>
+          <div className="products-side-stats" style={{ display: 'flex', flexDirection: 'column', gap: 0, background: '#ffffff', borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(14,165,233,0.09)', boxShadow: '0 4px 20px rgba(14,165,233,0.07)', minWidth: 200 }}>
             {[
-              { value: '47+', label: 'Branches', color: '#2879bf' },
-              { value: '15+', label: 'Products', color: '#003d70' },
-              { value: '200K+', label: 'Customers', color: '#3a8fd0' },
+              { value: '47+', label: 'Branches', color: '#0ea5e9' },
+              { value: '15+', label: 'Products', color: '#0284c7' },
+              { value: '200K+', label: 'Customers', color: '#38bdf8' },
             ].map((s, i) => (
-              <div key={i} style={{ padding: '18px 24px', borderBottom: i < 2 ? '1px solid rgba(40,121,191,0.07)' : 'none', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div key={i} style={{ padding: '18px 24px', borderBottom: i < 2 ? '1px solid rgba(14,165,233,0.07)' : 'none', display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ width: 3, height: 32, background: s.color, borderRadius: 2, flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: 22, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</div>
@@ -340,8 +340,8 @@ export default function Products() {
           <div className="products-tabs" style={{
             display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center',
             padding: '6px', background: '#ffffff', borderRadius: 16,
-            border: '1.5px solid rgba(40,121,191,0.09)',
-            boxShadow: '0 4px 20px rgba(40,121,191,0.07)',
+            border: '1.5px solid rgba(14,165,233,0.09)',
+            boxShadow: '0 4px 20px rgba(14,165,233,0.07)',
           }}>
             {cats.map(cat => (
               <button key={cat} onClick={() => setActive(cat)} style={{
@@ -349,10 +349,10 @@ export default function Products() {
                 border: 'none', cursor: 'pointer', transition: 'all 0.22s ease',
                 display: 'flex', alignItems: 'center', gap: 7,
                 background: active === cat
-                  ? 'linear-gradient(135deg, #003d70, #2879bf)'
+                  ? 'linear-gradient(135deg, #0284c7, #0ea5e9)'
                   : 'transparent',
                 color: active === cat ? '#ffffff' : '#647080',
-                boxShadow: active === cat ? '0 6px 20px rgba(40,121,191,0.3)' : 'none',
+                boxShadow: active === cat ? '0 6px 20px rgba(14,165,233,0.3)' : 'none',
               }}>
                 {(() => { const CatIcon = catIcons[cat]; return <CatIcon size={14} color={active === cat ? '#ffffff' : '#647080'} strokeWidth={2} /> })()}
                 {cat}
@@ -373,7 +373,7 @@ export default function Products() {
         {/* CTA band */}
         <div data-reveal style={{
           marginTop: 60, borderRadius: 22, overflow: 'hidden',
-          background: 'linear-gradient(135deg, #021e3c 0%, #003d70 40%, #2879bf 70%, #3a8fd0 100%)',
+          background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 40%, #0ea5e9 70%, #38bdf8 100%)',
           position: 'relative',
         }}>
           <div style={{
@@ -384,7 +384,7 @@ export default function Products() {
           <div style={{
             position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
             width: '60%', height: '200%',
-            background: 'radial-gradient(ellipse, rgba(0,106,174,0.3) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(2,132,199,0.3) 0%, transparent 70%)',
             pointerEvents: 'none',
           }} />
           <div className="products-cta" style={{ position: 'relative', padding: '44px 56px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
@@ -392,14 +392,14 @@ export default function Products() {
               <p style={{ fontSize: 22, fontWeight: 900, color: '#ffffff', marginBottom: 8, letterSpacing: '-0.01em' }}>
                 Ready to get started?
               </p>
-              <p style={{ fontSize: 15, color: 'rgba(170,212,242,0.65)' }}>
-                Visit any of our 47+ branches or dial <strong style={{ color: '#aad4f2' }}>*540#</strong> to access eKash.
+              <p style={{ fontSize: 15, color: 'rgba(186,230,253,0.65)' }}>
+                Visit any of our 47+ branches or dial <strong style={{ color: '#bae6fd' }}>*540#</strong> to access eKash.
               </p>
             </div>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <a href="#branches" style={{
                 padding: '13px 30px', borderRadius: 11, background: '#ffffff',
-                color: '#003d70', fontWeight: 900, fontSize: 14, textDecoration: 'none',
+                color: '#0284c7', fontWeight: 900, fontSize: 14, textDecoration: 'none',
                 boxShadow: '0 8px 28px rgba(0,0,0,0.2)',
                 transition: 'transform 0.2s, box-shadow 0.2s',
               }}
@@ -418,20 +418,20 @@ export default function Products() {
               </a>
               <a href="#products" style={{
                 padding: '13px 30px', borderRadius: 11,
-                border: '1.5px solid rgba(170,212,242,0.35)', color: '#ffffff',
+                border: '1.5px solid rgba(186,230,253,0.35)', color: '#ffffff',
                 fontWeight: 700, fontSize: 14, textDecoration: 'none',
-                background: 'rgba(170,212,242,0.06)',
+                background: 'rgba(186,230,253,0.06)',
                 transition: 'border-color 0.2s, background 0.2s',
               }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLAnchorElement
-                  el.style.borderColor = 'rgba(170,212,242,0.6)'
-                  el.style.background = 'rgba(170,212,242,0.12)'
+                  el.style.borderColor = 'rgba(186,230,253,0.6)'
+                  el.style.background = 'rgba(186,230,253,0.12)'
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLAnchorElement
-                  el.style.borderColor = 'rgba(170,212,242,0.35)'
-                  el.style.background = 'rgba(170,212,242,0.06)'
+                  el.style.borderColor = 'rgba(186,230,253,0.35)'
+                  el.style.background = 'rgba(186,230,253,0.06)'
                 }}
               >
                 All Products →

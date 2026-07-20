@@ -2,10 +2,12 @@ import Ticker from './components/Ticker'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Products from './components/Products'
+import LoanCalculator from './components/LoanCalculator'
 import Services from './components/Services'
 import Campaign from './components/Campaign'
 import About from './components/About'
 import News from './components/News'
+import SocialFeed from './components/SocialFeed'
 import Contact from './components/Contact'
 import Branches from './components/Branches'
 
@@ -16,11 +18,13 @@ export default function App() {
       <Navbar />
       <Hero />
       <Products />
+      <LoanCalculator />
       <Services />
       <Campaign />
       <About />
       <Branches />
       <News />
+      <SocialFeed />
       <Contact />
     </div>
   )

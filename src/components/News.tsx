@@ -58,7 +58,7 @@ export default function News() {
 
   return (
     <section id="news" style={{ background: '#f8fbfe', padding: '100px 0' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px' }} ref={containerRef}>
+      <div style={{ margin: '0 auto', padding: '0 48px' }} ref={containerRef}>
 
         {/* Header */}
         <div data-reveal className="news-header" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 52 }}>
@@ -67,26 +67,26 @@ export default function News() {
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 700, fontSize: 'clamp(26px, 3.5vw, 44px)',
-              color: '#003d70', lineHeight: 1.1, letterSpacing: '-0.01em',
+              color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.01em',
             }}>
               Latest from AB Rwanda
             </h2>
           </div>
           <a href="#news" style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
-            fontSize: 14, fontWeight: 700, color: '#2879bf', textDecoration: 'none',
-            padding: '10px 20px', border: '2px solid #2879bf', borderRadius: 10,
+            fontSize: 14, fontWeight: 700, color: '#0ea5e9', textDecoration: 'none',
+            padding: '10px 20px', border: '2px solid #0ea5e9', borderRadius: 10,
             transition: 'background 0.2s, color 0.2s',
           }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLAnchorElement
-              el.style.background = '#2879bf'
+              el.style.background = '#0ea5e9'
               el.style.color = '#ffffff'
             }}
             onMouseLeave={e => {
               const el = e.currentTarget as HTMLAnchorElement
               el.style.background = 'transparent'
-              el.style.color = '#2879bf'
+              el.style.color = '#0ea5e9'
             }}
           >
             View all news
@@ -100,20 +100,20 @@ export default function News() {
         <div data-reveal style={{ marginBottom: 24 }}>
           <div className="news-featured" style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
-            background: '#ffffff', border: '1px solid rgba(40,121,191,0.12)',
+            background: '#ffffff', border: '1px solid rgba(14,165,233,0.12)',
             borderRadius: 20, overflow: 'hidden',
-            boxShadow: '0 8px 40px rgba(40,121,191,0.08)',
+            boxShadow: '0 8px 40px rgba(14,165,233,0.08)',
             transition: 'box-shadow 0.3s, border-color 0.3s',
           }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLDivElement
-              el.style.boxShadow = '0 20px 60px rgba(40,121,191,0.16)'
-              el.style.borderColor = 'rgba(40,121,191,0.3)'
+              el.style.boxShadow = '0 20px 60px rgba(14,165,233,0.16)'
+              el.style.borderColor = 'rgba(14,165,233,0.3)'
             }}
             onMouseLeave={e => {
               const el = e.currentTarget as HTMLDivElement
-              el.style.boxShadow = '0 8px 40px rgba(40,121,191,0.08)'
-              el.style.borderColor = 'rgba(40,121,191,0.12)'
+              el.style.boxShadow = '0 8px 40px rgba(14,165,233,0.08)'
+              el.style.borderColor = 'rgba(14,165,233,0.12)'
             }}
           >
             <div className="news-featured-image" style={{ position: 'relative', minHeight: 300, background: '#e6f2fa', overflow: 'hidden' }}>
@@ -131,14 +131,14 @@ export default function News() {
               {/* Blue category banner */}
               <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0,
-                background: '#2879bf', padding: '10px 20px',
+                background: '#0ea5e9', padding: '10px 20px',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em' }}>
                   {articles[0].category.toUpperCase()}
                 </span>
                 <span style={{
-                  background: '#ffffff', color: '#2879bf',
+                  background: '#ffffff', color: '#0ea5e9',
                   fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 4, letterSpacing: '0.06em',
                 }}>
                   {articles[0].tag.toUpperCase()}
@@ -148,11 +148,11 @@ export default function News() {
 
             <div className="news-featured-content" style={{ padding: '44px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
-                <div style={{ width: 40, height: 3, background: '#2879bf', borderRadius: 2 }} />
+                <div style={{ width: 40, height: 3, background: '#0ea5e9', borderRadius: 2 }} />
                 <span style={{ fontSize: 12, color: '#8fa0aa', fontWeight: 600 }}>{articles[0].date}</span>
               </div>
               <h3 style={{
-                fontWeight: 800, fontSize: 22, color: '#003d70',
+                fontWeight: 800, fontSize: 22, color: '#0284c7',
                 lineHeight: 1.35, marginBottom: 16, letterSpacing: '-0.01em',
               }}>
                 {articles[0].title}
@@ -162,7 +162,7 @@ export default function News() {
               </p>
               <a href="#news" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                fontSize: 13.5, fontWeight: 700, color: '#2879bf', textDecoration: 'none',
+                fontSize: 13.5, fontWeight: 700, color: '#0ea5e9', textDecoration: 'none',
                 transition: 'gap 0.2s',
               }}
                 onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '12px' }}
@@ -181,26 +181,26 @@ export default function News() {
         <div className="news-sub-articles" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           {articles.slice(1).map(article => (
             <div key={article.title} data-reveal style={{
-              background: '#ffffff', border: '1px solid rgba(40,121,191,0.1)',
+              background: '#ffffff', border: '1px solid rgba(14,165,233,0.1)',
               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
               transition: 'box-shadow 0.25s, border-color 0.25s, transform 0.25s',
-              boxShadow: '0 4px 20px rgba(40,121,191,0.06)',
+              boxShadow: '0 4px 20px rgba(14,165,233,0.06)',
             }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLDivElement
-                el.style.boxShadow = '0 16px 48px rgba(40,121,191,0.14)'
-                el.style.borderColor = 'rgba(40,121,191,0.3)'
+                el.style.boxShadow = '0 16px 48px rgba(14,165,233,0.14)'
+                el.style.borderColor = 'rgba(14,165,233,0.3)'
                 el.style.transform = 'translateY(-4px)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLDivElement
-                el.style.boxShadow = '0 4px 20px rgba(40,121,191,0.06)'
-                el.style.borderColor = 'rgba(40,121,191,0.1)'
+                el.style.boxShadow = '0 4px 20px rgba(14,165,233,0.06)'
+                el.style.borderColor = 'rgba(14,165,233,0.1)'
                 el.style.transform = 'none'
               }}
             >
               {/* Blue top bar */}
-              <div style={{ background: '#2879bf', padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ background: '#0ea5e9', padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 10.5, fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em' }}>
                   {article.category.toUpperCase()}
                 </span>
@@ -226,7 +226,7 @@ export default function News() {
                   {article.date}
                 </p>
                 <h3 style={{
-                  fontWeight: 800, fontSize: 17, color: '#003d70',
+                  fontWeight: 800, fontSize: 17, color: '#0284c7',
                   lineHeight: 1.35, marginBottom: 12, letterSpacing: '-0.01em',
                 }}>
                   {article.title}
@@ -234,7 +234,7 @@ export default function News() {
                 <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.65, margin: '0 0 18px' }}>
                   {article.excerpt.slice(0, 120)}…
                 </p>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#2879bf' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#0ea5e9' }}>
                   Read more →
                 </span>
               </div>

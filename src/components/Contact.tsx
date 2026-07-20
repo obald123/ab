@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X } from 'lucide-react'
+import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus } from 'lucide-react'
 import logo from '../imports/logo1-transparent.png'
 
 const smartValues = [
@@ -66,6 +66,11 @@ export default function Contact() {
     letterSpacing: false,
     readingMask: false,
     grayscale: false,
+    highlightLinks: false,
+    bigCursor: false,
+    pauseAnimations: false,
+    dyslexiaFriendly: false,
+    highlightFocus: false,
   })
 
   useEffect(() => {
@@ -86,6 +91,11 @@ export default function Contact() {
     root.classList.toggle('a11y-letter-spacing', state.letterSpacing)
     root.classList.toggle('a11y-reading-mask', state.readingMask)
     root.classList.toggle('a11y-grayscale', state.grayscale)
+    root.classList.toggle('a11y-highlight-links', state.highlightLinks)
+    root.classList.toggle('a11y-big-cursor', state.bigCursor)
+    root.classList.toggle('a11y-pause-animations', state.pauseAnimations)
+    root.classList.toggle('a11y-dyslexia-friendly', state.dyslexiaFriendly)
+    root.classList.toggle('a11y-highlight-focus', state.highlightFocus)
   }
 
   function toggleA11yOption(option: keyof typeof a11yState) {
@@ -107,6 +117,11 @@ export default function Contact() {
         letterSpacing: true,
         readingMask: false,
         grayscale: false,
+        highlightLinks: true,
+        bigCursor: false,
+        pauseAnimations: false,
+        dyslexiaFriendly: true,
+        highlightFocus: true,
       }
       setA11yState(next)
       localStorage.setItem('a11y-state', JSON.stringify(next))
@@ -121,6 +136,11 @@ export default function Contact() {
         letterSpacing: false,
         readingMask: true,
         grayscale: false,
+        highlightLinks: true,
+        bigCursor: true,
+        pauseAnimations: true,
+        dyslexiaFriendly: false,
+        highlightFocus: true,
       }
       setA11yState(next)
       localStorage.setItem('a11y-state', JSON.stringify(next))
@@ -135,6 +155,11 @@ export default function Contact() {
         letterSpacing: false,
         readingMask: true,
         grayscale: false,
+        highlightLinks: false,
+        bigCursor: false,
+        pauseAnimations: true,
+        dyslexiaFriendly: false,
+        highlightFocus: true,
       }
       setA11yState(next)
       localStorage.setItem('a11y-state', JSON.stringify(next))
@@ -147,10 +172,10 @@ export default function Contact() {
 
       {/* SMART Campaign band */}
       <div style={{
-        background: 'linear-gradient(135deg, #003d70 0%, #2879bf 50%, #3a8fd0 100%)',
-        padding: '72px 28px',
+        background: 'linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%)',
+        padding: '72px 48px',
       }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }} ref={containerRef}>
+        <div style={{ margin: '0 auto' }} ref={containerRef}>
           <div data-reveal style={{ textAlign: 'center', marginBottom: 52 }}>
             <div style={{
               display: 'inline-block', background: 'rgba(255,255,255,0.12)',
@@ -200,7 +225,7 @@ export default function Contact() {
                 <div style={{
                   fontSize: 38, fontWeight: 900, color: '#ffffff',
                   lineHeight: 1, letterSpacing: '-0.03em', marginBottom: 6,
-                  textShadow: '0 2px 12px rgba(40,121,191,0.4)',
+                  textShadow: '0 2px 12px rgba(14,165,233,0.4)',
                 }}>
                   {v.letter}
                 </div>
@@ -217,13 +242,13 @@ export default function Contact() {
       </div>
 
       {/* Contact info section */}
-      <div style={{ background: '#ffffff', padding: '80px 28px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <div style={{ background: '#ffffff', padding: '80px 48px' }}>
+        <div style={{ margin: '0 auto' }}>
           <div data-reveal style={{ textAlign: 'center', marginBottom: 52 }}>
             <span className="section-pill">Get in Touch</span>
             <h2 style={{
               fontWeight: 800, fontSize: 'clamp(24px, 3.5vw, 40px)',
-              color: '#003d70', lineHeight: 1.1, letterSpacing: '-0.02em',
+              color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.02em',
             }}>
               We Are Here for You
             </h2>
@@ -233,24 +258,24 @@ export default function Contact() {
 
             {/* Address */}
             <div data-reveal style={{
-              background: '#f8fbfe', border: '1px solid rgba(40,121,191,0.1)',
+              background: '#f8fbfe', border: '1px solid rgba(14,165,233,0.1)',
               borderRadius: 18, padding: '36px 32px',
               transition: 'box-shadow 0.25s, border-color 0.25s',
             }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLDivElement
-                el.style.boxShadow = '0 12px 40px rgba(40,121,191,0.1)'
-                el.style.borderColor = 'rgba(40,121,191,0.25)'
+                el.style.boxShadow = '0 12px 40px rgba(14,165,233,0.1)'
+                el.style.borderColor = 'rgba(14,165,233,0.25)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLDivElement
                 el.style.boxShadow = 'none'
-                el.style.borderColor = 'rgba(40,121,191,0.1)'
+                el.style.borderColor = 'rgba(14,165,233,0.1)'
               }}
             >
               <div style={{
                 width: 48, height: 48, borderRadius: 12,
-                background: 'linear-gradient(135deg, #2879bf, #3a8fd0)',
+                background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: 20,
               }}>
@@ -259,7 +284,7 @@ export default function Contact() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#003d70', marginBottom: 12 }}>Our Location</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>Our Location</h3>
               <p style={{ fontSize: 14, color: '#647080', lineHeight: 1.7 }}>
                 Nyarugenge Avenue<br />
                 KN 78 St<br />
@@ -270,24 +295,24 @@ export default function Contact() {
 
             {/* Phone & Email */}
             <div data-reveal style={{
-              background: '#f8fbfe', border: '1px solid rgba(40,121,191,0.1)',
+              background: '#f8fbfe', border: '1px solid rgba(14,165,233,0.1)',
               borderRadius: 18, padding: '36px 32px',
               transition: 'box-shadow 0.25s, border-color 0.25s',
             }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLDivElement
-                el.style.boxShadow = '0 12px 40px rgba(40,121,191,0.1)'
-                el.style.borderColor = 'rgba(40,121,191,0.25)'
+                el.style.boxShadow = '0 12px 40px rgba(14,165,233,0.1)'
+                el.style.borderColor = 'rgba(14,165,233,0.25)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLDivElement
                 el.style.boxShadow = 'none'
-                el.style.borderColor = 'rgba(40,121,191,0.1)'
+                el.style.borderColor = 'rgba(14,165,233,0.1)'
               }}
             >
               <div style={{
                 width: 48, height: 48, borderRadius: 12,
-                background: 'linear-gradient(135deg, #2879bf, #3a8fd0)',
+                background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: 20,
               }}>
@@ -295,11 +320,14 @@ export default function Contact() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#003d70', marginBottom: 12 }}>Call or Write</h3>
-              <p style={{ fontSize: 14.5, color: '#2879bf', fontWeight: 700, marginBottom: 6 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>Call or Write</h3>
+              <p style={{ fontSize: 15, color: '#0ea5e9', fontWeight: 800, marginBottom: 6 }}>
+                5500
+              </p>
+              <p style={{ fontSize: 14.5, color: '#0ea5e9', fontWeight: 700, marginBottom: 6 }}>
                 +(250) 78 819 83 00
               </p>
-              <p style={{ fontSize: 14.5, color: '#2879bf', fontWeight: 700, marginBottom: 14 }}>
+              <p style={{ fontSize: 14.5, color: '#0ea5e9', fontWeight: 700, marginBottom: 14 }}>
                 info@abr.rw
               </p>
               <p style={{ fontSize: 12.5, color: '#8fa0aa' }}>Mon – Fri: 8:00 – 17:00 · Sat: 9:00 – 13:00</p>
@@ -307,13 +335,13 @@ export default function Contact() {
 
             {/* Digital / eKash */}
             <div data-reveal style={{
-              background: 'linear-gradient(135deg, #2879bf, #3a8fd0)',
+              background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)',
               borderRadius: 18, padding: '36px 32px',
               transition: 'box-shadow 0.25s, transform 0.25s',
             }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLDivElement
-                el.style.boxShadow = '0 16px 48px rgba(40,121,191,0.3)'
+                el.style.boxShadow = '0 16px 48px rgba(14,165,233,0.3)'
                 el.style.transform = 'translateY(-4px)'
               }}
               onMouseLeave={e => {
@@ -360,7 +388,7 @@ export default function Contact() {
 
           {/* Contact form */}
           <div data-reveal style={{ marginTop: 40, display: 'flex', gap: 24, alignItems: 'flex-start' }}>
-            <form onSubmit={handleSubmit} style={{ flex: 1, background: '#ffffff', border: '1px solid rgba(40,121,191,0.06)', borderRadius: 12, padding: 22 }} aria-label="Contact form">
+            <form onSubmit={handleSubmit} style={{ flex: 1, background: '#ffffff', border: '1px solid rgba(14,165,233,0.06)', borderRadius: 12, padding: 22 }} aria-label="Contact form">
               <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
                 <label style={{ flex: 1 }}>
                   <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>Name</div>
@@ -376,7 +404,7 @@ export default function Contact() {
                 <textarea name="message" value={formState.message} onChange={handleChange} rows={5} required style={{ width: '100%', padding: '12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
               </label>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <button type="submit" style={{ background: '#2879bf', color: '#fff', padding: '10px 18px', borderRadius: 10, border: 'none', fontWeight: 800 }}>Send Message</button>
+                <button type="submit" style={{ background: '#0ea5e9', color: '#fff', padding: '10px 18px', borderRadius: 10, border: 'none', fontWeight: 800 }}>Send Message</button>
                 {submitted && <div role="status" aria-live="polite" style={{ color: '#2b7a3a', fontWeight: 700 }}>Message sent — thank you.</div>}
               </div>
             </form>
@@ -387,20 +415,20 @@ export default function Contact() {
 
           {/* Branch list */}
           <div data-reveal style={{ marginTop: 48 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#003d70', marginBottom: 20 }}>Key Branches</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0284c7', marginBottom: 20 }}>Key Branches</h3>
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               {branches.map(b => (
                 <div key={b.name} style={{
                   flex: '1 1 220px',
-                  background: '#f8fbfe', border: '1px solid rgba(40,121,191,0.08)',
+                  background: '#f8fbfe', border: '1px solid rgba(14,165,233,0.08)',
                   borderRadius: 12, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'flex-start',
                 }}>
                   <div style={{
-                    width: 8, height: 8, borderRadius: '50%', background: '#2879bf',
+                    width: 8, height: 8, borderRadius: '50%', background: '#0ea5e9',
                     flexShrink: 0, marginTop: 5,
                   }} />
                   <div>
-                    <div style={{ fontSize: 13.5, fontWeight: 700, color: '#003d70' }}>{b.name}</div>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0284c7' }}>{b.name}</div>
                     <div style={{ fontSize: 12.5, color: '#8fa0aa', marginTop: 3 }}>{b.address}<br />{b.city}</div>
                   </div>
                 </div>
@@ -411,8 +439,8 @@ export default function Contact() {
       </div>
 
       {/* Footer */}
-      <footer style={{ background: '#003d70', padding: '48px 28px 28px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <footer style={{ background: '#0284c7', padding: '48px 48px 28px' }}>
+        <div style={{ margin: '0 auto' }}>
           <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 40 }}>
 
             {/* Brand */}
@@ -422,6 +450,9 @@ export default function Contact() {
               </div>
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320 }}>
                 The Bank Which Cares For You. Providing accessible, responsible financial services to micro, small and medium entrepreneurs across Rwanda since 2014.
+              </p>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 800, marginTop: 12 }}>
+                Dial 5500
               </p>
 
               {/* Social icons */}
@@ -514,90 +545,141 @@ export default function Contact() {
       {/* Floating accessibility FAB + panel */}
       <div className="a11y-fab" aria-hidden={false}>
         <button aria-label="Toggle accessibility menu" onClick={() => setA11yOpen(s => !s)} className="a11y-fab-button">
-          <Accessibility size={24} />
+          <PersonStanding size={26} />
         </button>
         {a11yOpen && (
           <>
             <div className="a11y-backdrop" onClick={() => setA11yOpen(false)} />
             <div role="dialog" aria-modal="true" aria-label="Accessibility menu" className="a11y-panel" onClick={(e) => e.stopPropagation()}>
               <div className="a11y-panel-header">
-                <div>Accessibility Menu</div>
-                <button type="button" onClick={() => setA11yOpen(false)} aria-label="Close accessibility menu" className="a11y-panel-close">
-                  <X size={20} />
+                <div className="a11y-panel-header-title">
+                  <div className="a11y-panel-header-icon"><PersonStanding size={16} /></div>
+                  <span className="a11y-panel-header-text">Accessibility</span>
+                </div>
+                <button type="button" onClick={() => setA11yOpen(false)} aria-label="Close" className="a11y-panel-close">
+                  <X size={16} />
                 </button>
               </div>
-            <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Content</div>
-              <div className="a11y-panel-grid">
-                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('largeText')}>
-                  <div className="a11y-tile-icon"><Type size={18} /></div>
-                  <div>Bigger Text</div>
-                </button>
-                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('lineHeight')}>
-                  <div className="a11y-tile-icon"><AlignJustify size={18} /></div>
-                  <div>Line Height</div>
-                </button>
-                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('letterSpacing')}>
-                  <div className="a11y-tile-icon"><TextCursor size={18} /></div>
-                  <div>Letter Spacing</div>
-                </button>
-                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('hideImages')}>
-                  <div className="a11y-tile-icon"><ImageOff size={18} /></div>
-                  <div>Hide Images</div>
-                </button>
+
+              <div className="a11y-panel-section">
+                <div className="a11y-panel-section-title">Content</div>
+                {[
+                  { key: 'largeText' as const, label: 'Bigger Text', Icon: Type },
+                  { key: 'lineHeight' as const, label: 'Line Height', Icon: AlignJustify },
+                  { key: 'letterSpacing' as const, label: 'Letter Spacing', Icon: TextCursor },
+                  { key: 'hideImages' as const, label: 'Hide Images', Icon: ImageOff },
+                ].map(({ key, label, Icon }) => (
+                  <label key={key} className="a11y-toggle-row" data-active={String(a11yState[key])}>
+                    <div className="a11y-toggle-info">
+                      <div className="a11y-toggle-icon"><Icon size={16} /></div>
+                      <span className="a11y-toggle-label">{label}</span>
+                    </div>
+                    <div className="a11y-switch">
+                      <input type="checkbox" checked={a11yState[key]} onChange={() => toggleA11yOption(key)} />
+                      <div className="a11y-switch-track" />
+                      <div className="a11y-switch-thumb" />
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <div className="a11y-panel-section">
+                <div className="a11y-panel-section-title">Colors</div>
+                {[
+                  { key: 'highContrast' as const, label: 'High Contrast', Icon: Contrast },
+                  { key: 'grayscale' as const, label: 'Grayscale', Icon: Accessibility },
+                  { key: 'readingMask' as const, label: 'Reading Mask', Icon: Eye },
+                ].map(({ key, label, Icon }) => (
+                  <label key={key} className="a11y-toggle-row" data-active={String(a11yState[key])}>
+                    <div className="a11y-toggle-info">
+                      <div className="a11y-toggle-icon"><Icon size={16} /></div>
+                      <span className="a11y-toggle-label">{label}</span>
+                    </div>
+                    <div className="a11y-switch">
+                      <input type="checkbox" checked={a11yState[key]} onChange={() => toggleA11yOption(key)} />
+                      <div className="a11y-switch-track" />
+                      <div className="a11y-switch-thumb" />
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <div className="a11y-panel-section">
+                <div className="a11y-panel-section-title">Navigation & Motor</div>
+                {[
+                  { key: 'highlightLinks' as const, label: 'Highlight Links', Icon: Link },
+                  { key: 'bigCursor' as const, label: 'Big Cursor', Icon: MousePointer2 },
+                  { key: 'highlightFocus' as const, label: 'Focus Outlines', Icon: Focus },
+                  { key: 'pauseAnimations' as const, label: 'Pause Animations', Icon: PauseCircle },
+                ].map(({ key, label, Icon }) => (
+                  <label key={key} className="a11y-toggle-row" data-active={String(a11yState[key])}>
+                    <div className="a11y-toggle-info">
+                      <div className="a11y-toggle-icon"><Icon size={16} /></div>
+                      <span className="a11y-toggle-label">{label}</span>
+                    </div>
+                    <div className="a11y-switch">
+                      <input type="checkbox" checked={a11yState[key]} onChange={() => toggleA11yOption(key)} />
+                      <div className="a11y-switch-track" />
+                      <div className="a11y-switch-thumb" />
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <div className="a11y-panel-section">
+                <div className="a11y-panel-section-title">Reading</div>
+                <label className="a11y-toggle-row" data-active={String(a11yState.dyslexiaFriendly)}>
+                  <div className="a11y-toggle-info">
+                    <div className="a11y-toggle-icon"><BookOpen size={16} /></div>
+                    <span className="a11y-toggle-label">Dyslexia Friendly</span>
+                  </div>
+                  <div className="a11y-switch">
+                    <input type="checkbox" checked={a11yState.dyslexiaFriendly} onChange={() => toggleA11yOption('dyslexiaFriendly')} />
+                    <div className="a11y-switch-track" />
+                    <div className="a11y-switch-thumb" />
+                  </div>
+                </label>
+              </div>
+
+              <div className="a11y-panel-section">
+                <div className="a11y-panel-section-title">Quick Presets</div>
+                <div className="a11y-profiles">
+                  {[
+                    { id: 'vision' as const, label: 'Vision', Icon: Eye },
+                    { id: 'navigation' as const, label: 'Navigation', Icon: Compass },
+                    { id: 'focus' as const, label: 'Focus', Icon: Target },
+                  ].map(({ id, label, Icon }) => (
+                    <button key={id} type="button" className="a11y-profile-btn" onClick={() => applyProfile(id)}>
+                      <div className="a11y-profile-icon"><Icon size={14} /></div>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="a11y-panel-footer">
+                <button type="button" className="a11y-panel-reset" onClick={() => {
+                  const resetState = {
+                    highContrast: false,
+                    largeText: false,
+                    hideImages: false,
+                    lineHeight: false,
+                    letterSpacing: false,
+                    readingMask: false,
+                    grayscale: false,
+                    highlightLinks: false,
+                    bigCursor: false,
+                    pauseAnimations: false,
+                    dyslexiaFriendly: false,
+                    highlightFocus: false,
+                  }
+                  setA11yState(resetState)
+                  applyA11yClasses(resetState)
+                  localStorage.setItem('a11y-state', JSON.stringify(resetState))
+                }}>Reset All</button>
+                <span className="a11y-panel-status">12 options</span>
               </div>
             </div>
-            <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Colors</div>
-              <div className="a11y-panel-grid">
-                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('highContrast')}>
-                  <div className="a11y-tile-icon"><Contrast size={18} /></div>
-                  <div>High Contrast</div>
-                </button>
-                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('grayscale')}>
-                  <div className="a11y-tile-icon"><Accessibility size={18} /></div>
-                  <div>Grayscale</div>
-                </button>
-                <button type="button" className="a11y-tile" onClick={() => toggleA11yOption('readingMask')}>
-                  <div className="a11y-tile-icon"><Eye size={18} /></div>
-                  <div>Reading Mask</div>
-                </button>
-              </div>
-            </div>
-            <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Profiles</div>
-              <div className="a11y-panel-grid">
-                <button type="button" className="a11y-tile" onClick={() => applyProfile('vision')}>
-                  <div className="a11y-tile-icon"><Eye size={18} /></div>
-                  <div>Vision Friendly</div>
-                </button>
-                <button type="button" className="a11y-tile" onClick={() => applyProfile('navigation')}>
-                  <div className="a11y-tile-icon"><Compass size={18} /></div>
-                  <div>Easy Navigation</div>
-                </button>
-                <button type="button" className="a11y-tile" onClick={() => applyProfile('focus')}>
-                  <div className="a11y-tile-icon"><Target size={18} /></div>
-                  <div>Focus Assist</div>
-                </button>
-              </div>
-            </div>
-            <div className="a11y-panel-footer">
-              <button type="button" className="a11y-panel-reset" onClick={() => {
-                const resetState = {
-                  highContrast: false,
-                  largeText: false,
-                  hideImages: false,
-                  lineHeight: false,
-                  letterSpacing: false,
-                  readingMask: false,
-                  grayscale: false,
-                }
-                setA11yState(resetState)
-                applyA11yClasses(resetState)
-                localStorage.setItem('a11y-state', JSON.stringify(resetState))
-              }}>Reset</button>
-            </div>
-          </div>
           </>
         )}
       </div>

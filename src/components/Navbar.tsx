@@ -34,13 +34,13 @@ export default function Navbar() {
       position: 'fixed', top: 36, left: 0, right: 0, zIndex: 200,
       background: 'rgba(255,255,255,0.98)',
       boxShadow: scrolled
-        ? '0 1px 0 rgba(40,121,191,0.12), 0 4px 24px rgba(0,0,0,0.07)'
-        : '0 1px 0 rgba(40,121,191,0.08)',
+        ? '0 1px 0 rgba(14,165,233,0.12), 0 4px 24px rgba(0,0,0,0.07)'
+        : '0 1px 0 rgba(14,165,233,0.08)',
       backdropFilter: 'blur(20px) saturate(160%)',
       WebkitBackdropFilter: 'blur(20px) saturate(160%)',
       transition: 'box-shadow 0.3s',
     }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px' }}>
+      <div style={{ margin: '0 auto', padding: '0 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 76 }}>
 
           <ABLogo />
@@ -55,8 +55,8 @@ export default function Navbar() {
               }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLAnchorElement
-                  el.style.color = '#2879bf'
-                  el.style.background = 'rgba(40,121,191,0.06)'
+                  el.style.color = '#0ea5e9'
+                  el.style.background = 'rgba(14,165,233,0.06)'
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLAnchorElement
@@ -74,30 +74,30 @@ export default function Navbar() {
             <div style={{
               display: 'flex', alignItems: 'center', gap: 7,
               padding: '7px 14px', borderRadius: 100,
-              border: '1.5px solid rgba(40,121,191,0.2)',
-              background: 'rgba(40,121,191,0.04)',
+              border: '1.5px solid rgba(14,165,233,0.2)',
+              background: 'rgba(14,165,233,0.04)',
             }}>
               <span style={{
                 display: 'block', width: 6, height: 6, borderRadius: '50%',
-                background: '#2879bf', animation: 'blink 2s ease-in-out infinite',
+                background: '#0ea5e9', animation: 'blink 2s ease-in-out infinite',
               }} />
-              <span style={{ fontSize: 12, fontWeight: 800, color: '#2879bf', letterSpacing: '0.05em' }}>*540#</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#0ea5e9', letterSpacing: '0.05em' }}>*540#</span>
             </div>
             <a href="#products" style={{
               fontSize: 13.5, fontWeight: 700,
-              background: '#2879bf',
+              background: '#0ea5e9',
               color: '#ffffff', padding: '10px 22px', borderRadius: 8, textDecoration: 'none',
               transition: 'background 0.2s, transform 0.2s',
               letterSpacing: '0.01em',
             }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.background = '#003d70'
+                el.style.background = '#0284c7'
                 el.style.transform = 'translateY(-1px)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.background = '#2879bf'
+                el.style.background = '#0ea5e9'
                 el.style.transform = 'none'
               }}
             >
@@ -111,7 +111,7 @@ export default function Navbar() {
             {[0, 1, 2].map(i => (
               <div key={i} style={{
                 width: 22, height: 2.5, borderRadius: 2, marginBottom: i < 2 ? 5 : 0,
-                background: '#2879bf',
+                background: '#0ea5e9',
                 transform: open
                   ? i === 0 ? 'rotate(45deg) translate(5px, 5px)'
                   : i === 1 ? 'scaleX(0)'
@@ -127,7 +127,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {open && (
         <div className="nav-mobile-menu" style={{
-          background: '#fff', borderTop: '1px solid rgba(40,121,191,0.08)',
+          background: '#fff', borderTop: '1px solid rgba(14,165,233,0.08)',
           boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
         }}>
           <div style={{ padding: '12px 32px 24px' }}>
@@ -142,7 +142,7 @@ export default function Navbar() {
             ))}
             <a href="#products" style={{
               display: 'block', marginTop: 16, padding: '15px 0', textAlign: 'center',
-              background: '#2879bf', color: '#fff', borderRadius: 8,
+              background: '#0ea5e9', color: '#fff', borderRadius: 8,
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}>
               Open Account

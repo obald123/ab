@@ -34,12 +34,12 @@ function use3DTilt(strength = 10) {
     const x = (e.clientX - r.left) / r.width - 0.5
     const y = (e.clientY - r.top) / r.height - 0.5
     el.style.transform = `perspective(900px) rotateY(${x * strength}deg) rotateX(${y * -strength}deg) translateZ(10px) translateY(-6px)`
-    el.style.boxShadow = `${-x * 12}px ${-y * 6}px 48px rgba(40,121,191,0.14), 0 20px 48px rgba(40,121,191,0.08)`
+    el.style.boxShadow = `${-x * 12}px ${-y * 6}px 48px rgba(14,165,233,0.14), 0 20px 48px rgba(14,165,233,0.08)`
   }, [strength])
   const onLeave = useCallback(() => {
     const el = ref.current; if (!el) return
     el.style.transform = 'perspective(900px) rotateY(0) rotateX(0) translateZ(0) translateY(0)'
-    el.style.boxShadow = '0 4px 24px rgba(40,121,191,0.07)'
+    el.style.boxShadow = '0 4px 24px rgba(14,165,233,0.07)'
   }, [])
   return { ref, onMove, onLeave }
 }
@@ -51,11 +51,11 @@ function ServiceCard({ service }: { service: typeof services.Personal[0] }) {
       ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}
       style={{
         background: '#ffffff',
-        border: '1.5px solid rgba(40,121,191,0.08)',
+        border: '1.5px solid rgba(14,165,233,0.08)',
         borderRadius: 20, padding: '28px 26px',
         cursor: 'default',
         transition: 'transform 0.14s ease-out, box-shadow 0.14s ease-out',
-        boxShadow: '0 4px 24px rgba(40,121,191,0.07)',
+        boxShadow: '0 4px 24px rgba(14,165,233,0.07)',
         transformStyle: 'preserve-3d',
         position: 'relative', overflow: 'hidden',
       }}
@@ -63,13 +63,13 @@ function ServiceCard({ service }: { service: typeof services.Personal[0] }) {
       {/* Top accent stripe */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-        background: 'linear-gradient(90deg, #2879bf, #3a8fd0)',
+        background: 'linear-gradient(90deg, #0ea5e9, #38bdf8)',
         borderRadius: '20px 20px 0 0',
       }} />
       {/* Subtle dot grid */}
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'radial-gradient(rgba(40,121,191,0.035) 1px, transparent 1px)',
+        backgroundImage: 'radial-gradient(rgba(14,165,233,0.035) 1px, transparent 1px)',
         backgroundSize: '28px 28px', pointerEvents: 'none',
       }} />
 
@@ -77,19 +77,19 @@ function ServiceCard({ service }: { service: typeof services.Personal[0] }) {
         {/* Icon */}
         <div style={{
           width: 48, height: 48, borderRadius: 14, marginBottom: 18,
-          background: 'linear-gradient(135deg, rgba(40,121,191,0.08) 0%, rgba(58,143,208,0.12) 100%)',
-          border: '1px solid rgba(40,121,191,0.1)',
+          background: 'linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(58,143,208,0.12) 100%)',
+          border: '1px solid rgba(14,165,233,0.1)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transform: 'translateZ(12px)',
         }}>
-          <service.Icon size={22} color="#2879bf" strokeWidth={1.75} />
+          <service.Icon size={22} color="#0ea5e9" strokeWidth={1.75} />
         </div>
 
         {service.highlight && (
           <div style={{
             display: 'inline-block', fontSize: 10.5, fontWeight: 700,
-            color: '#2879bf', background: 'rgba(40,121,191,0.08)',
-            border: '1px solid rgba(40,121,191,0.14)',
+            color: '#0ea5e9', background: 'rgba(14,165,233,0.08)',
+            border: '1px solid rgba(14,165,233,0.14)',
             borderRadius: 100, padding: '2px 10px',
             letterSpacing: '0.04em', marginBottom: 10,
           }}>
@@ -99,7 +99,7 @@ function ServiceCard({ service }: { service: typeof services.Personal[0] }) {
 
         <h3 style={{
           fontFamily: 'var(--font-serif)',
-          fontSize: 18, fontWeight: 700, color: '#003d70',
+          fontSize: 18, fontWeight: 700, color: '#0284c7',
           marginBottom: 12, lineHeight: 1.3, letterSpacing: '-0.01em',
           transform: 'translateZ(8px)',
         }}>
@@ -111,7 +111,7 @@ function ServiceCard({ service }: { service: typeof services.Personal[0] }) {
 
         <div style={{
           marginTop: 20, display: 'flex', alignItems: 'center', gap: 6,
-          fontSize: 13, fontWeight: 700, color: '#2879bf',
+          fontSize: 13, fontWeight: 700, color: '#0ea5e9',
         }}>
           Learn more
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
@@ -135,11 +135,11 @@ export default function Services() {
       <div style={{
         position: 'absolute', top: -300, left: -200, width: 800, height: 800,
         borderRadius: '50%', pointerEvents: 'none',
-        border: '1px solid rgba(40,121,191,0.04)',
-        background: 'radial-gradient(circle, rgba(40,121,191,0.02) 0%, transparent 60%)',
+        border: '1px solid rgba(14,165,233,0.04)',
+        background: 'radial-gradient(circle, rgba(14,165,233,0.02) 0%, transparent 60%)',
       }} />
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 28px' }}>
+      <div style={{ margin: '0 auto', padding: '0 48px' }}>
 
         {/* Header */}
         <div className="services-header" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 64, alignItems: 'flex-end' }}>
@@ -148,11 +148,11 @@ export default function Services() {
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 700, fontSize: 'clamp(28px, 4vw, 52px)',
-              color: '#003d70', lineHeight: 1.1, letterSpacing: '-0.01em', marginBottom: 18,
+              color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.01em', marginBottom: 18,
             }}>
               Financial Solutions<br />
               <span style={{
-                backgroundImage: 'linear-gradient(100deg, #2879bf, #3a8fd0)',
+                backgroundImage: 'linear-gradient(100deg, #0ea5e9, #38bdf8)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
               }}>Built for Rwanda</span>
             </h2>
@@ -163,7 +163,7 @@ export default function Services() {
         </div>
 
         {/* Tabs */}
-        <div className="services-tabs" style={{ display: 'flex', borderBottom: '2px solid rgba(40,121,191,0.1)', marginBottom: 44, gap: 0 }}>
+        <div className="services-tabs" style={{ display: 'flex', borderBottom: '2px solid rgba(14,165,233,0.1)', marginBottom: 44, gap: 0 }}>
           {tabs.map(tab => (
             <button
               key={tab}
@@ -172,13 +172,13 @@ export default function Services() {
                 padding: '13px 36px', fontSize: 14, fontWeight: 700,
                 border: 'none', background: 'none', cursor: 'pointer',
                 letterSpacing: '0.01em',
-                borderBottom: activeTab === tab ? '3px solid #2879bf' : '3px solid transparent',
+                borderBottom: activeTab === tab ? '3px solid #0ea5e9' : '3px solid transparent',
                 marginBottom: -2,
-                color: activeTab === tab ? '#2879bf' : '#8fa0aa',
+                color: activeTab === tab ? '#0ea5e9' : '#8fa0aa',
                 transition: 'color 0.2s, border-color 0.2s',
               }}
               onMouseEnter={e => {
-                if (activeTab !== tab) (e.currentTarget as HTMLButtonElement).style.color = '#2879bf'
+                if (activeTab !== tab) (e.currentTarget as HTMLButtonElement).style.color = '#0ea5e9'
               }}
               onMouseLeave={e => {
                 if (activeTab !== tab) (e.currentTarget as HTMLButtonElement).style.color = '#8fa0aa'
@@ -200,12 +200,12 @@ export default function Services() {
         <div className="services-cta" style={{
           marginTop: 60, padding: '36px 48px',
           background: 'linear-gradient(135deg, #f0f7fd 0%, #e8f2fb 100%)',
-          border: '1.5px solid rgba(40,121,191,0.1)',
+          border: '1.5px solid rgba(14,165,233,0.1)',
           borderRadius: 20, display: 'flex', flexWrap: 'wrap',
           alignItems: 'center', justifyContent: 'space-between', gap: 20,
         }}>
           <div>
-            <p style={{ fontSize: 18, fontWeight: 800, color: '#003d70', marginBottom: 6 }}>
+            <p style={{ fontSize: 18, fontWeight: 800, color: '#0284c7', marginBottom: 6 }}>
               Not sure which product fits?
             </p>
             <p style={{ fontSize: 14, color: '#647080', margin: 0 }}>
@@ -215,36 +215,36 @@ export default function Services() {
           <div style={{ display: 'flex', gap: 12 }}>
             <a href="#contact" style={{
               padding: '12px 28px', borderRadius: 10,
-              background: '#2879bf', color: '#ffffff',
+              background: '#0ea5e9', color: '#ffffff',
               fontWeight: 800, fontSize: 14, textDecoration: 'none',
-              boxShadow: '0 6px 20px rgba(40,121,191,0.3)',
+              boxShadow: '0 6px 20px rgba(14,165,233,0.3)',
               transition: 'transform 0.2s, background 0.2s',
             }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.background = '#003d70'; el.style.transform = 'translateY(-2px)'
+                el.style.background = '#0284c7'; el.style.transform = 'translateY(-2px)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.background = '#2879bf'; el.style.transform = 'none'
+                el.style.background = '#0ea5e9'; el.style.transform = 'none'
               }}
             >
               Talk to an Advisor
             </a>
             <a href="#products" style={{
               padding: '12px 28px', borderRadius: 10,
-              border: '2px solid rgba(40,121,191,0.3)', color: '#2879bf',
+              border: '2px solid rgba(14,165,233,0.3)', color: '#0ea5e9',
               fontWeight: 700, fontSize: 14, textDecoration: 'none',
               background: 'transparent',
               transition: 'border-color 0.2s, background 0.2s',
             }}
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.borderColor = '#2879bf'; el.style.background = 'rgba(40,121,191,0.05)'
+                el.style.borderColor = '#0ea5e9'; el.style.background = 'rgba(14,165,233,0.05)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.borderColor = 'rgba(40,121,191,0.3)'; el.style.background = 'transparent'
+                el.style.borderColor = 'rgba(14,165,233,0.3)'; el.style.background = 'transparent'
               }}
             >
               View All Products →

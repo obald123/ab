@@ -9,11 +9,11 @@ import starFilled from '../imports/landing/Star 17 (1).png'
 
 /* ══════════════════════════════════════════════
    BRAND TOKENS  (from logo exactly)
-   AB blue  : #2879bf   Rwanda grey : #647080
-   Globe hi : #aad4f2   Globe deep  : #003d70
+   AB blue  : #0ea5e9   Rwanda grey : #647080
+   Globe hi : #bae6fd   Globe deep  : #0284c7
 ══════════════════════════════════════════════ */
-const B  = '#2879bf'
-const BD = '#003d70'
+const B  = '#0ea5e9'
+const BD = '#0284c7'
 const BM = '#1a5c96'
 const GL = '#9fa8b8'
 const AG = '#3ccc5f'
@@ -23,9 +23,9 @@ function MeshBg() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
       {/* Base gradient */}
-      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(145deg, ${BD} 0%, #102b55 40%, #020b18 100%)` }} />
+      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(145deg, #0ea5e9 0%, #0369a1 40%, #082f49 100%)` }} />
       {/* Radial light sources */}
-      <div style={{ position: 'absolute', top: '-20%', left: '-5%',  width: '70vw', height: '70vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(40,121,191,0.24) 0%, transparent 65%)` }} />
+      <div style={{ position: 'absolute', top: '-20%', left: '-5%',  width: '70vw', height: '70vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(14,165,233,0.24) 0%, transparent 65%)` }} />
       <div style={{ position: 'absolute', top: '30%',  right: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(140,170,210,0.12) 0%, transparent 65%)` }} />
       <div style={{ position: 'absolute', bottom: '-10%', left: '30%', width: '40vw', height: '40vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(120,135,160,0.18) 0%, transparent 65%)` }} />
       {/* Fine grid */}
@@ -99,7 +99,7 @@ function BalanceWidget({ style }: { style?: React.CSSProperties }) {
       ...style,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 10, background: `rgba(40,121,191,0.18)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 32, height: 32, borderRadius: 10, background: `rgba(14,165,233,0.18)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <IconTrendUp size={15} color={BD} />
         </div>
         <div>
@@ -112,7 +112,7 @@ function BalanceWidget({ style }: { style?: React.CSSProperties }) {
       </div>
       <div style={{ height: 44, display: 'flex', alignItems: 'flex-end', gap: 4 }}>
         {[0.4, 0.6, 0.5, 0.8, 0.7, 1.0, 0.9].map((h, i) => (
-          <div key={i} style={{ flex: 1, borderRadius: 3, height: `${h * 100}%`, background: i === 5 ? B : `rgba(40,121,191,0.3)`, transition: 'height 0.3s' }} />
+          <div key={i} style={{ flex: 1, borderRadius: 3, height: `${h * 100}%`, background: i === 5 ? B : `rgba(14,165,233,0.3)`, transition: 'height 0.3s' }} />
         ))}
       </div>
     </div>
@@ -126,13 +126,13 @@ function TxNotif({ icon, label, amount, positive, style }: { icon: React.ReactNo
       display: 'flex', alignItems: 'center', gap: 10,
       background: 'rgba(255,255,255,0.07)',
       backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid rgba(170,212,242,0.12)',
+      border: '1px solid rgba(186,230,253,0.12)',
       borderRadius: 14, padding: '12px 16px',
       boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
       minWidth: 220,
       ...style,
     }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: positive ? 'rgba(40,121,191,0.15)' : 'rgba(119,137,153,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: positive ? 'rgba(14,165,233,0.15)' : 'rgba(119,137,153,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         {icon}
       </div>
       <div style={{ flex: 1 }}>
@@ -369,7 +369,7 @@ export default function Hero() {
           pointerEvents: 'none',
           zIndex: 0,
           opacity: 0.76,
-          filter: 'drop-shadow(0 0 8px rgba(40,121,191,0.04))',
+          filter: 'drop-shadow(0 0 8px rgba(14,165,233,0.04))',
           transition: 'transform 0.2s ease-out',
         }}>
           <svg viewBox="0 0 350 1400" preserveAspectRatio="none" width="100%" height="100%">
@@ -403,8 +403,8 @@ export default function Hero() {
       {/* ── Main 2-col grid ── */}
       <div className="hero-grid" style={{
         position: 'relative', zIndex: 2, flex: 1,
-        maxWidth: 1280, margin: '0 auto', width: '100%',
-        padding: '48px 32px 80px',
+        margin: '0 auto', width: '100%',
+        padding: '48px 48px 80px',
         display: 'grid', gridTemplateColumns: '1fr 1fr',
         gap: 40, alignItems: 'center',
       }}>
@@ -424,7 +424,7 @@ export default function Hero() {
             viewport={{ once: true }}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'rgba(255,255,255,0.12)', border: `1px solid rgba(170,212,242,0.24)`,
+              background: 'rgba(255,255,255,0.12)', border: `1px solid rgba(186,230,253,0.24)`,
               borderRadius: 100, padding: '6px 18px', marginBottom: 24,
               boxShadow: '0 8px 24px rgba(0,0,0,0.16)',
             }}
@@ -509,7 +509,7 @@ export default function Hero() {
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '8px 12px', borderRadius: 999,
-                  background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(170,212,242,0.16)',
+                  background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(186,230,253,0.16)',
                   color: '#eaf5ff', fontSize: 12, fontWeight: 700,
                 }}
               >
@@ -544,14 +544,14 @@ export default function Hero() {
             </a>
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              border: `1px solid rgba(170,212,242,0.34)`, color: '#f5fbff',
+              border: `1px solid rgba(186,230,253,0.34)`, color: '#f5fbff',
               padding: '15px 30px', borderRadius: 999,
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
               background: 'rgba(255,255,255,0.08)',
               transition: 'border-color 0.2s, background 0.2s, transform 0.2s',
             }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(255,255,255,0.62)'; el.style.background = 'rgba(255,255,255,0.14)'; el.style.transform = 'translateY(-2px)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(170,212,242,0.34)'; el.style.background = 'rgba(255,255,255,0.08)'; el.style.transform = '' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(186,230,253,0.34)'; el.style.background = 'rgba(255,255,255,0.08)'; el.style.transform = '' }}
             >
               Explore Products
             </a>
@@ -567,7 +567,7 @@ export default function Hero() {
             style={{
               display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
               background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(170,212,242,0.16)',
+              border: '1px solid rgba(186,230,253,0.16)',
               borderRadius: 18, overflow: 'hidden',
               backdropFilter: 'blur(14px)',
               boxShadow: '0 16px 40px rgba(0,0,0,0.16)',
@@ -579,7 +579,7 @@ export default function Hero() {
               { v: 9,   s: '+',   l: 'Years' },
               { v: 15,  s: '+',   l: 'Products' },
             ].map((s, i) => (
-              <div key={i} style={{ padding: '18px 12px', textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(170,212,242,0.08)' : 'none', background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent' }}>
+              <div key={i} style={{ padding: '18px 12px', textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(186,230,253,0.08)' : 'none', background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1, marginBottom: 4 }}>
                   <Counter to={s.v} suffix={s.s} />
                 </div>
@@ -616,7 +616,7 @@ export default function Hero() {
           backdropFilter: 'blur(16px)',
         }}
       >
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
+        <div style={{ margin: '0 auto', padding: '0 48px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
             {quickLinks.map((q, i) => (
             <motion.a
               key={i}
@@ -633,7 +633,7 @@ export default function Hero() {
                 borderRight: i < quickLinks.length - 1 ? '1px solid rgba(140,170,210,0.08)' : 'none',
                 transition: 'background 0.2s',
               }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(40,121,191,0.12)' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(14,165,233,0.12)' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent' }}
             >
               <q.Icon size={18} color={GL} strokeWidth={1.75} />
