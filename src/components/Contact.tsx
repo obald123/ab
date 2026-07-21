@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus } from 'lucide-react'
-import logo from '../imports/logo1-transparent.png'
 
 const smartValues = [
   { letter: 'S', word: 'Simple', desc: 'Easy to understand products and processes' },
@@ -445,10 +444,7 @@ export default function Contact() {
 
             {/* Brand */}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 18 }}>
-                <img src={logo} alt="AB Bank Rwanda" style={{ height: 46, width: 'auto' }} />
-              </div>
-              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320 }}>
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320, marginTop: 0 }}>
                 The Bank Which Cares For You. Providing accessible, responsible financial services to micro, small and medium entrepreneurs across Rwanda since 2014.
               </p>
               <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 800, marginTop: 12 }}>

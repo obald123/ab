@@ -309,28 +309,39 @@ section[id] { scroll-margin-top: 100px; }
 
 /* ── Hero ── */
 @media (max-width: 1023px) {
-  .hero-grid { grid-template-columns: 1fr !important; }
+  .hero-grid { grid-template-columns: 1fr !important; padding: 20px 32px 12px !important; gap: 12px !important; }
   .hero-scene { display: none !important; }
+  .hero-grid h1 { font-size: clamp(26px, 5vw, 42px) !important; line-height: 1.08 !important; }
+  .hero-grid p { font-size: 15px !important; }
+  .hero-stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .hero-quick-links > div { padding: 0 20px !important; }
+  .hero-cta { margin-bottom: 12px !important; }
+  .hero-cta a { padding: 12px 24px !important; font-size: 14px !important; }
 }
 @media (max-width: 767px) {
   .hero-quick-links { overflow-x: auto !important; }
   .hero-quick-links > div { flex-wrap: nowrap !important; }
-}
-@media (max-width: 767px) {
-  .hero-grid { padding: 32px 20px 60px !important; gap: 24px !important; }
+  .hero-grid { padding: 16px 20px 12px !important; gap: 10px !important; }
+  .hero-grid h1 { font-size: clamp(24px, 8vw, 32px) !important; }
+  .hero-grid p { font-size: 13px !important; line-height: 1.55 !important; }
+  .hero-cta { gap: 8px !important; margin-bottom: 10px !important; }
+  .hero-cta a { padding: 10px 20px !important; font-size: 13px !important; }
+  .hero-stats { gap: 0 !important; margin-bottom: 0 !important; }
+  .hero-stats > div { padding: 10px 6px !important; }
+  .hero-stats > div > div:first-child { font-size: 18px !important; }
+  .hero-stats > div > div:last-child { font-size: 8px !important; }
 }
 @media (max-width: 639px) {
-  .hero-stats { grid-template-columns: repeat(2, 1fr) !important; }
-  .hero-card-3d { width: 260px !important; height: 160px !important; }
-  .hero-grid h1 { font-size: clamp(30px, 9vw, 42px) !important; }
-  .hero-grid p { font-size: 15px !important; }
-  .hero-cta { flex-direction: column !important; }
-  .hero-cta a { width: 100% !important; justify-content: center !important; text-align: center !important; }
+  .hero-stats { grid-template-columns: repeat(4, 1fr) !important; }
+  .hero-card-3d { width: 220px !important; height: 140px !important; }
+  .hero-cta { flex-direction: row !important; }
+  .hero-cta a { width: auto !important; flex: 1 !important; justify-content: center !important; text-align: center !important; }
   section[id] { scroll-margin-top: 80px !important; }
 }
 @media (max-width: 480px) {
-  .hero-card-3d { width: 220px !important; height: 140px !important; padding: 16px 18px !important; }
+  .hero-card-3d { width: 180px !important; height: 120px !important; padding: 14px 16px !important; }
   .hero-quick-link span { font-size: 9px !important; }
+  .hero-grid h1 { font-size: 26px !important; }
 }
 
 /* ── Products ── */

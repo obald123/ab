@@ -322,7 +322,22 @@ export default function Hero() {
   const [stackSpread, setStackSpread] = useState(1)
   const [lineProgress, setLineProgress] = useState(0)
   const [isCompact, setIsCompact] = useState(false)
+  const [heroSlide, setHeroSlide] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
+
+  const heroSlides = [
+    { line1: 'Banking Built', line2: 'for Rwanda', line3: '& Beyond', sub: 'Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling \u202a*540#\u202c.' },
+    { line1: 'Your Dreams,', line2: 'Our', line3: 'Mission', sub: 'From savings accounts to business loans, we provide flexible financial solutions tailored to help you achieve your goals.' },
+    { line1: 'Bank Anytime,', line3: 'Anywhere', sub: 'Manage your finances on the go with our secure mobile banking platform — transfers, bill payments, and account management at your fingertips.' },
+    { line1: 'Trusted for', line2: 'Over 9', line3: 'Years', sub: 'Serving over 200,000 customers across 47 branches with personalized service and innovative banking solutions.' },
+  ]
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroSlide(prev => (prev + 1) % heroSlides.length)
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => {
@@ -353,8 +368,8 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} onMouseMove={onMouseMove} style={{
-      position: 'relative', minHeight: '100vh',
-      paddingTop: 112, overflow: 'hidden',
+      position: 'relative', height: '100vh',
+      paddingTop: 5, overflow: 'hidden',
       display: 'flex', flexDirection: 'column',
     }}>
       <MeshBg />
@@ -380,7 +395,7 @@ export default function Hero() {
                 <stop offset="100%" stopColor={lineProgress < 0.7 ? '#e8f4ff' : `rgba(40, 121, 191, ${0.64 + lineProgress * 0.2})`} />
               </linearGradient>
             </defs>
-            <path d="M175 -20 C 320 120, 340 240, 100 360 C -80 440, -100 580, 200 720 C 340 800, 330 950, 50 1080 C -80 1150, -60 1280, 220 1380 C 300 1420, 175 1400, 175 1400"
+            <path d="M175 -20 C 280 100, 320 220, 200 340 C 80 460, 60 580, 180 700 C 300 820, 320 940, 180 1060 C 40 1180, 60 1300, 175 1400"
               fill="none"
               stroke="url(#hero-white-to-blue-gradient)"
               strokeWidth="12"
@@ -388,7 +403,7 @@ export default function Hero() {
               strokeLinejoin="round"
               style={{ transition: 'all 0.3s ease-out' }}
             />
-            <path d="M175 -20 C 320 120, 340 240, 100 360 C -80 440, -100 580, 200 720 C 340 800, 330 950, 50 1080 C -80 1150, -60 1280, 220 1380 C 300 1420, 175 1400, 175 1400"
+            <path d="M175 -20 C 280 100, 320 220, 200 340 C 80 460, 60 580, 180 700 C 300 820, 320 940, 180 1060 C 40 1180, 60 1300, 175 1400"
               fill="none"
               stroke="rgba(255,255,255,0.12)"
               strokeWidth="4"
@@ -402,11 +417,12 @@ export default function Hero() {
 
       {/* ── Main 2-col grid ── */}
       <div className="hero-grid" style={{
-        position: 'relative', zIndex: 2, flex: 1,
+        position: 'relative', zIndex: 2, flex: 1, minHeight: 0,
         margin: '0 auto', width: '100%',
         padding: '48px 48px 80px',
         display: 'grid', gridTemplateColumns: '1fr 1fr',
         gap: 40, alignItems: 'center',
+        overflowY: 'auto', overflowX: 'hidden',
       }}>
 
         {/* ── LEFT: copy ── */}
@@ -416,108 +432,74 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true, margin: '-200px' }}
         >
-          {/* Eyebrow */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            viewport={{ once: true }}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'rgba(255,255,255,0.12)', border: `1px solid rgba(186,230,253,0.24)`,
-              borderRadius: 100, padding: '6px 18px', marginBottom: 24,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.16)',
-            }}
-          >
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: GL, display: 'block', animation: 'blink 2s ease-in-out infinite' }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#f2f8ff', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Member of Access Group</span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            viewport={{ once: true }}
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(42px, 5.5vw, 74px)',
-              fontWeight: 700, lineHeight: 1.04,
-              color: '#ffffff', margin: '0 0 6px',
-              letterSpacing: '-0.025em',
-            }}
-          >Banking Built</motion.h1>
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            viewport={{ once: true }}
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(42px, 5.5vw, 74px)',
-              fontWeight: 700, lineHeight: 1.04,
-              margin: '0 0 6px', letterSpacing: '-0.025em',
-              backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
-              backgroundSize: '200% auto',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              animation: 'shimmer 4s linear 1s infinite',
-            } as React.CSSProperties}
-          >for Rwanda</motion.h1>
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            viewport={{ once: true }}
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(42px, 5.5vw, 74px)',
-              fontWeight: 700, lineHeight: 1.04,
-              color: 'rgba(255,255,255,0.75)', margin: '0 0 28px',
-              letterSpacing: '-0.025em',
-            }}
-          >& Beyond</motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            viewport={{ once: true }}
-            style={{
-              fontSize: 17, color: 'rgba(255,255,255,0.72)', lineHeight: 1.78,
-              maxWidth: 470, marginBottom: 18,
-            }}
-          >
-            Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling <strong style={{ color: '#ffffff' }}>*540#</strong>.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.35 }}
-            viewport={{ once: true }}
-            style={{
-              display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 28,
-            }}
-          >
-            {['24/7 digital access', '47 branches', 'Fast account opening'].map((item, i) => (
-              <motion.span
-                key={item}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.35 + i * 0.08 }}
-                viewport={{ once: true }}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '8px 12px', borderRadius: 999,
-                  background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(186,230,253,0.16)',
-                  color: '#eaf5ff', fontSize: 12, fontWeight: 700,
-                }}
-              >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: GL, display: 'block' }} />
-                {item}
-              </motion.span>
+          {/* Headline — rotating */}
+          <div style={{ position: 'relative', marginBottom: 4 }}>
+            {heroSlides.map((slide, i) => (
+              <div key={i} style={{
+                visibility: heroSlide === i ? 'visible' : 'hidden',
+                height: heroSlide === i ? 'auto' : 0,
+                overflow: 'hidden',
+                transition: 'visibility 0.6s, height 0.6s',
+              }}>
+                <h1 style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 'clamp(36px, 6vw, 80px)',
+                  fontWeight: 700, lineHeight: 1.05,
+                  color: '#ffffff', margin: 0,
+                  letterSpacing: '-0.025em',
+                }}>{slide.line1}</h1>
+                {slide.line2 && <h1 style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 'clamp(36px, 6vw, 80px)',
+                  fontWeight: 700, lineHeight: 1.05,
+                  margin: 0, letterSpacing: '-0.025em',
+                  backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                  animation: 'shimmer 4s linear 1s infinite',
+                } as React.CSSProperties}>{slide.line2}</h1>}
+                <h1 style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 'clamp(36px, 6vw, 80px)',
+                  fontWeight: 700, lineHeight: 1.05,
+                  color: 'rgba(255,255,255,0.75)', margin: 0,
+                  letterSpacing: '-0.025em',
+                }}>{slide.line3}</h1>
+              </div>
             ))}
-          </motion.div>
+          </div>
+
+          {/* Slide indicators */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>
+            {heroSlides.map((_, i) => (
+              <button key={i} aria-label={`Slide ${i + 1}`} onClick={() => setHeroSlide(i)} style={{
+                width: heroSlide === i ? 24 : 8,
+                height: 8, borderRadius: 4, border: 'none', cursor: 'pointer',
+                background: heroSlide === i ? '#ffffff' : 'rgba(255,255,255,0.25)',
+                transition: 'width 0.3s, background 0.3s',
+              }} />
+            ))}
+          </div>
+
+          {/* Subtitle — rotating */}
+          <div style={{ position: 'relative', minHeight: 50, marginBottom: 14 }}>
+            {heroSlides.map((slide, i) => (
+              <p key={i} style={{
+                position: 'absolute', inset: 0,
+                fontSize: 17, color: 'rgba(255,255,255,0.72)', lineHeight: 1.78,
+                maxWidth: 470, margin: 0,
+                opacity: heroSlide === i ? 1 : 0,
+                transform: heroSlide === i ? 'translateY(0)' : 'translateY(10px)',
+                transition: 'opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s',
+                pointerEvents: heroSlide === i ? 'auto' : 'none',
+              }}>
+                {slide.sub.includes('*540#')
+                  ? <>Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling <strong style={{ color: '#ffffff' }}>*540#</strong>.</>
+                  : slide.sub
+                }
+              </p>
+            ))}
+          </div>
 
           {/* CTA buttons */}
           <motion.div
@@ -526,7 +508,7 @@ export default function Hero() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 36 } as React.CSSProperties}
+            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 20 } as React.CSSProperties}
           >
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -610,7 +592,7 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 0.6 }}
         viewport={{ once: true }}
         style={{
-          position: 'relative', zIndex: 2,
+          position: 'relative', zIndex: 2, flexShrink: 0,
           borderTop: '1px solid rgba(140,170,210,0.10)',
           background: 'rgba(2, 10, 26, 0.32)',
           backdropFilter: 'blur(16px)',
