@@ -1,5 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
-import { IconCoin, IconTrendUp, IconLeaf, IconBank, IconCreditCard, IconExchange, IconGlobe, IconShield, IconMobile, IconZap, IconPercent, IconUsers } from './Icons'
+import { motion } from 'framer-motion'
+import { IconCoin, IconTrendUp, IconLeaf, IconBank, IconCreditCard, IconExchange, IconGlobe, IconShield, IconMobile, IconZap, IconPercent, IconUsers, IconMapPin, IconCalculator, IconPen } from './Icons'
+
+/* ── Quick access bar ── */
+const quickLinks = [
+  { label: 'Find Branch',  Icon: IconMapPin },
+  { label: 'Calculate',    Icon: IconCalculator },
+  { label: 'FX Rates',     Icon: IconExchange },
+  { label: 'Apply Online', Icon: IconPen },
+  { label: 'eKash',        Icon: IconMobile },
+  { label: 'Insurance',    Icon: IconShield },
+]
+
 type IconComp = React.FC<{size?:number;color?:string;strokeWidth?:number}>
 
 type Cat = 'Loans' | 'Accounts' | 'Banking Services' | 'Bancassurance' | 'Digital Solutions'
@@ -275,6 +287,46 @@ export default function Products() {
   }, [])
 
   return (
+    <>
+      {/* ── Quick access strip ── */}
+      <motion.div
+        className="hero-quick-links"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        viewport={{ once: true }}
+        style={{
+          position: 'relative', zIndex: 2, flexShrink: 0,
+          borderTop: '1px solid rgba(140,170,210,0.10)',
+          background: 'rgba(30, 35, 50, 0.88)',
+        }}
+      >
+        <div style={{ margin: '0 auto', padding: '0 48px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
+          {quickLinks.map((q, i) => (
+            <motion.a
+              key={i}
+              href="#products"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.4, delay: 0.3 + i * 0.06 }}
+              viewport={{ once: true }}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '18px 8px', textDecoration: 'none', minHeight: 86,
+                borderRight: i < quickLinks.length - 1 ? '1px solid rgba(140,170,210,0.08)' : 'none',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(14,165,233,0.12)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent' }}
+            >
+              <q.Icon size={18} color="#9fa8b8" strokeWidth={1.75} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{q.label}</span>
+            </motion.a>
+          ))}
+        </div>
+      </motion.div>
+
     <section ref={sectionRef} id="products" style={{
       background: '#f8fbfe', padding: '108px 0',
       position: 'relative', overflow: 'hidden',
@@ -441,5 +493,6 @@ export default function Products() {
         </div>
       </div>
     </section>
+    </>
   )
 }

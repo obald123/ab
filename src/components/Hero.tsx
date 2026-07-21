@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { IconMobile, IconMapPin, IconCalculator, IconExchange, IconPen, IconCheckCircle, IconTrendUp, IconShield } from './Icons'
+import { IconTrendUp } from './Icons'
 import cardTop from '../imports/landing/card.png'
 import cardMiddle from '../imports/landing/card (1).png'
 import cardBottom from '../imports/landing/card (2).png'
@@ -291,16 +291,6 @@ function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: numbe
   )
 }
 
-/* ── Quick access bar ── */
-const quickLinks = [
-  { label: 'Find Branch',  Icon: IconMapPin },
-  { label: 'Calculate',    Icon: IconCalculator },
-  { label: 'FX Rates',     Icon: IconExchange },
-  { label: 'Apply Online', Icon: IconPen },
-  { label: 'eKash',        Icon: IconMobile },
-  { label: 'Insurance',    Icon: IconShield },
-]
-
 /* ── Count-up ── */
 function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
   const [val, setVal] = useState(0)
@@ -433,7 +423,7 @@ export default function Hero() {
           viewport={{ once: true, margin: '-200px' }}
         >
           {/* Headline — rotating */}
-          <div style={{ position: 'relative', marginBottom: 2 }}>
+          <div style={{ position: 'relative', marginBottom: 16 }}>
             {heroSlides.map((slide, i) => (
               <div key={i} style={{
                 visibility: heroSlide === i ? 'visible' : 'hidden',
@@ -481,7 +471,7 @@ export default function Hero() {
           </div>
 
           {/* Subtitle — rotating */}
-          <div style={{ position: 'relative', minHeight: 44, marginBottom: 10 }}>
+          <div style={{ position: 'relative', minHeight: 44, marginBottom: 28 }}>
             {heroSlides.map((slide, i) => (
               <p key={i} style={{
                 position: 'absolute', inset: 0,
@@ -507,7 +497,7 @@ export default function Hero() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 } as React.CSSProperties}
+            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 28 } as React.CSSProperties}
           >
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -582,47 +572,6 @@ export default function Hero() {
           <LandingCards mouse={mouse} spread={stackSpread} compact={isCompact} />
         </motion.div>
       </div>
-
-      {/* ── Quick access strip ── */}
-      <motion.div
-        className="hero-quick-links"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-        viewport={{ once: true }}
-        style={{
-          position: 'relative', zIndex: 2, flexShrink: 0,
-          borderTop: '1px solid rgba(140,170,210,0.10)',
-          background: 'rgba(2, 10, 26, 0.32)',
-          backdropFilter: 'blur(16px)',
-        }}
-      >
-        <div style={{ margin: '0 auto', padding: '0 48px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
-            {quickLinks.map((q, i) => (
-            <motion.a
-              key={i}
-              href="#products"
-              className="hero-quick-link"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.4, delay: 0.6 + i * 0.06 }}
-              viewport={{ once: true }}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
-                padding: '18px 8px', textDecoration: 'none', minHeight: 86,
-                borderRight: i < quickLinks.length - 1 ? '1px solid rgba(140,170,210,0.08)' : 'none',
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(14,165,233,0.12)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent' }}
-            >
-              <q.Icon size={18} color={GL} strokeWidth={1.75} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{q.label}</span>
-            </motion.a>
-          ))}
-        </div>
-      </motion.div>
     </section>
   )
 }
