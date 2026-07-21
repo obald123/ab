@@ -433,25 +433,24 @@ export default function Hero() {
           viewport={{ once: true, margin: '-200px' }}
         >
           {/* Headline — rotating */}
-          <div style={{ position: 'relative', marginBottom: 4 }}>
+          <div style={{ position: 'relative', marginBottom: 2 }}>
             {heroSlides.map((slide, i) => (
               <div key={i} style={{
                 visibility: heroSlide === i ? 'visible' : 'hidden',
                 height: heroSlide === i ? 'auto' : 0,
                 overflow: 'hidden',
-                transition: 'visibility 0.6s, height 0.6s',
               }}>
                 <h1 style={{
                   fontFamily: 'var(--font-serif)',
-                  fontSize: 'clamp(36px, 6vw, 80px)',
-                  fontWeight: 700, lineHeight: 1.05,
+                  fontSize: 'clamp(32px, 5vw, 72px)',
+                  fontWeight: 700, lineHeight: 1,
                   color: '#ffffff', margin: 0,
                   letterSpacing: '-0.025em',
                 }}>{slide.line1}</h1>
                 {slide.line2 && <h1 style={{
                   fontFamily: 'var(--font-serif)',
-                  fontSize: 'clamp(36px, 6vw, 80px)',
-                  fontWeight: 700, lineHeight: 1.05,
+                  fontSize: 'clamp(32px, 5vw, 72px)',
+                  fontWeight: 700, lineHeight: 1,
                   margin: 0, letterSpacing: '-0.025em',
                   backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
                   backgroundSize: '200% auto',
@@ -460,8 +459,8 @@ export default function Hero() {
                 } as React.CSSProperties}>{slide.line2}</h1>}
                 <h1 style={{
                   fontFamily: 'var(--font-serif)',
-                  fontSize: 'clamp(36px, 6vw, 80px)',
-                  fontWeight: 700, lineHeight: 1.05,
+                  fontSize: 'clamp(32px, 5vw, 72px)',
+                  fontWeight: 700, lineHeight: 1,
                   color: 'rgba(255,255,255,0.75)', margin: 0,
                   letterSpacing: '-0.025em',
                 }}>{slide.line3}</h1>
@@ -470,7 +469,7 @@ export default function Hero() {
           </div>
 
           {/* Slide indicators */}
-          <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
             {heroSlides.map((_, i) => (
               <button key={i} aria-label={`Slide ${i + 1}`} onClick={() => setHeroSlide(i)} style={{
                 width: heroSlide === i ? 24 : 8,
@@ -482,7 +481,7 @@ export default function Hero() {
           </div>
 
           {/* Subtitle — rotating */}
-          <div style={{ position: 'relative', minHeight: 50, marginBottom: 14 }}>
+          <div style={{ position: 'relative', minHeight: 44, marginBottom: 10 }}>
             {heroSlides.map((slide, i) => (
               <p key={i} style={{
                 position: 'absolute', inset: 0,
@@ -508,7 +507,7 @@ export default function Hero() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 20 } as React.CSSProperties}
+            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 } as React.CSSProperties}
           >
             <a href="#products" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
