@@ -1,56 +1,56 @@
 import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, AnimatePresence, type MotionValue } from 'framer-motion'
 import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf } from './Icons'
 
-/* ── data ── */
+/* ── data — sourced & paraphrased from abr.rw/who-we-are/ "Our History" ── */
 const timeline = [
   {
     year: '2014', quarter: 'Q1', category: 'Founded', CategoryIcon: IconBank,
     headline: 'Born in Nyamirambo',
-    text: 'AB Rwanda opens its doors in Kigali, establishing three branches in Nyamirambo, Nyarugenge and Gisozi — bringing accessible credit to micro-entrepreneurs from day one.',
+    text: 'AB Rwanda opens its very first branch in Nyamirambo. Before the year is out, two more branches follow in Nyarugenge and Gisozi — bringing accessible credit to micro-entrepreneurs from day one.',
     stat: '3', statLabel: 'Branches', highlight: true,
   },
   {
     year: '2015', quarter: 'Q2', category: 'Expansion', CategoryIcon: IconMapPin,
     headline: 'Kimironko Opens',
-    text: 'The fourth branch launches in Kimironko, extending the AB Rwanda network across the eastern corridor of Kigali.',
+    text: 'The fourth branch launches in Kimironko, making AB Rwanda the fastest-growing microfinance bank in its segment.',
     stat: '4', statLabel: 'Branches', highlight: false,
   },
   {
     year: '2016', quarter: 'Q3', category: 'Growth', CategoryIcon: IconMap,
-    headline: 'First Upcountry Step',
-    text: "Musanze branch marks the bank's first expansion beyond Kigali — taking responsible financial services to the Northern Province.",
-    stat: '5', statLabel: 'Provinces', highlight: false,
+    headline: 'First Upcountry Branch',
+    text: "Musanze branch opens as the bank's fifth and first branch outside Kigali — extending responsible financial services to the Northern Province.",
+    stat: '5', statLabel: 'Branches', highlight: false,
   },
   {
     year: '2018', quarter: 'Q2', category: 'Network', CategoryIcon: IconBuilding,
-    headline: 'Nationwide Reach',
-    text: 'Nyabugogo flagship branch plus three rural credit outlets. AB Rwanda now spans multiple provinces serving thousands of entrepreneurs.',
-    stat: '9', statLabel: 'Outlets', highlight: true,
+    headline: 'Nyabugogo & First Outlets',
+    text: 'Nyabugogo branch opens in Kigali while the original Nyamirambo branch merges into Nyarugenge. The same year, AB Rwanda opens its first three credit outlets — Muhanga, Rwamagana and Kabarondo — beginning its rural push.',
+    stat: '3', statLabel: 'New Outlets', highlight: true,
   },
   {
     year: '2019', quarter: 'Q1', category: 'Rural', CategoryIcon: IconLeaf,
-    headline: 'Into the Heartland',
-    text: 'Credit outlets open in Nyagatare, Gicumbi and Huye — reaching rural entrepreneurs and agri-businesses across the Eastern, Northern and Southern Provinces.',
-    stat: '12', statLabel: 'Outlets', highlight: false,
+    headline: 'Reaching the Regions',
+    text: 'Three more credit outlets open in Nyagatare, Gicumbi and Huye, bringing the network to six outlets across the Eastern, Northern and Southern Provinces.',
+    stat: '6', statLabel: 'Outlets Total', highlight: false,
   },
   {
     year: '2020', quarter: 'Q3', category: 'Digital', CategoryIcon: IconMobile,
     headline: 'AB IBAKWE Goes Live',
-    text: 'Eight more outlets nationwide and the launch of AB IBAKWE with MTN Rwanda — push and pull funds via *182*4# anytime.',
-    stat: '*182*4#', statLabel: 'USSD Code', highlight: false,
+    text: 'Eight further credit outlets open nationwide (including Nyamagabe, Nyamata, Rubavu, Rusizi, Nyanza and Karongi) and AB IBAKWE launches with MTN Rwanda — a push-and-pull mobile transaction service. The bank also introduces new bancassurance products and agri-value-chain loans.',
+    stat: '*182*4#', statLabel: 'AB IBAKWE', highlight: false,
   },
   {
     year: '2021', quarter: 'Q2', category: 'Innovation', CategoryIcon: IconCpu,
-    headline: 'AI & Contact Centre',
-    text: 'A dedicated customer contact centre launches alongside AI-powered chatbot solutions, raising service standards dramatically.',
+    headline: 'Contact Centre & Chatbot',
+    text: 'A fully-fledged customer contact centre launches alongside a chatbot solution, as the bank explores further digital channels to widen its service reach and efficiency.',
     stat: '24/7', statLabel: 'Support', highlight: true,
   },
   {
     year: '2023', quarter: 'Q1', category: 'Digital', CategoryIcon: IconZap,
     headline: 'E-kash Platform Launches',
-    text: 'The E-kash digital payment platform goes live across all MNOs and partner banks in Rwanda — accessible via *540# on any handset.',
-    stat: '*540#', statLabel: 'eKash', highlight: false,
+    text: 'E-kash goes live — a digital payment system that transforms how customers send and receive funds between mobile network operators, banks and telcos, accessible via *540# on any handset.',
+    stat: '*540#', statLabel: 'E-kash', highlight: false,
   },
 ]
 
@@ -250,25 +250,37 @@ function OrbCanvas() {
 /* ── SVG curved journey path ── */
 const JOURNEY_PATH = 'M60,280 C180,100 320,460 480,280 C640,100 780,460 940,280 C1100,100 1240,460 1400,280 C1560,100 1700,460 1860,280'
 
-/* ── single milestone marker (hooks-safe) ── */
-function PathMarker({ pt, item, index, total, visible }: {
+/* ── single milestone marker — scroll-linked reveal + hover for full detail ── */
+function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave }: {
   pt: { x: number; y: number }
   item: typeof timeline[0]
   index: number
   total: number
-  visible: boolean
+  progress: MotionValue<number>
+  active: boolean
+  onEnter: () => void
+  onLeave: () => void
 }) {
-  const delay = 0.6 + (index / total) * 2.4
+  const start = (index / total) * 0.82
+  const end = start + 0.16
+  const opacity = useTransform(progress, [start, end], [0, 1])
+  const scale = useTransform(progress, [start, end], [0.25, 1])
   const isTop = index % 2 === 0
 
   return (
-    <g style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? 'scale(1)' : 'scale(0.3)',
-      transition: `opacity 0.5s ease ${delay}s, transform 0.5s ease ${delay}s`,
-      transformOrigin: `${pt.x}px ${pt.y}px`,
-    }}>
-      <circle cx={pt.x} cy={pt.y} r={item.highlight ? 18 : 14} fill="none" stroke={item.highlight ? 'rgba(14,165,233,0.2)' : 'rgba(14,165,233,0.1)'} strokeWidth={1} />
+    <motion.g
+      style={{ opacity, scale, transformOrigin: `${pt.x}px ${pt.y}px`, cursor: 'pointer' }}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+    >
+      {/* invisible larger hit-area for easier hover/tap */}
+      <circle cx={pt.x} cy={pt.y} r={26} fill="transparent" />
+      <motion.circle
+        cx={pt.x} cy={pt.y} r={item.highlight ? 18 : 14}
+        fill="none" stroke={item.highlight ? 'rgba(14,165,233,0.25)' : 'rgba(14,165,233,0.12)'} strokeWidth={1}
+        animate={active ? { r: (item.highlight ? 18 : 14) + 6, opacity: 0 } : { r: item.highlight ? 18 : 14, opacity: 1 }}
+        transition={active ? { duration: 1.1, repeat: Infinity, ease: 'easeOut' } : { duration: 0.3 }}
+      />
       <circle cx={pt.x} cy={pt.y} r={item.highlight ? 9 : 7} fill={item.highlight ? '#0ea5e9' : '#ffffff'} stroke="#0ea5e9" strokeWidth={2.5} />
       <circle cx={pt.x} cy={pt.y} r={item.highlight ? 3.5 : 3} fill={item.highlight ? '#bae6fd' : '#0ea5e9'} />
       <text x={pt.x} y={isTop ? pt.y - 28 : pt.y + 38} textAnchor="middle" fill="#0284c7" fontSize={14} fontWeight={900} letterSpacing="-0.02em">
@@ -280,7 +292,51 @@ function PathMarker({ pt, item, index, total, visible }: {
       <text x={pt.x} y={isTop ? pt.y - 64 : pt.y + 74} textAnchor="middle" fill="#0ea5e9" fontSize={9} fontWeight={800} letterSpacing="0.06em">
         {item.stat} {item.statLabel}
       </text>
-    </g>
+    </motion.g>
+  )
+}
+
+/* ── detail card shown on hover/tap of a marker, positioned via the SVG viewBox % ── */
+function JourneyDetailCard({ item, pt, isTop }: { item: typeof timeline[0]; pt: { x: number; y: number }; isTop: boolean }) {
+  const leftPct = Math.min(Math.max((pt.x / 1920) * 100, 12), 88)
+  const topPct = (pt.y / 560) * 100
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: isTop ? 10 : -10, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: isTop ? 10 : -10, scale: 0.94 }}
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+      style={{
+        position: 'absolute',
+        left: `${leftPct}%`,
+        top: isTop ? undefined : `calc(${topPct}% + 30px)`,
+        bottom: isTop ? `calc(${100 - topPct}% + 30px)` : undefined,
+        transform: 'translateX(-50%)',
+        width: 280, zIndex: 20, pointerEvents: 'none',
+      }}
+    >
+      <div style={{
+        background: '#ffffff', borderRadius: 16, padding: '16px 18px',
+        border: '1px solid rgba(14,165,233,0.14)',
+        boxShadow: '0 20px 48px rgba(2,30,60,0.18)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 26, height: 26, borderRadius: 8,
+            background: item.highlight ? '#0ea5e9' : 'rgba(14,165,233,0.1)',
+          }}>
+            <item.CategoryIcon size={14} color={item.highlight ? '#fff' : '#0284c7'} />
+          </span>
+          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0ea5e9' }}>
+            {item.category} · {item.year}
+          </span>
+        </div>
+        <div style={{ fontWeight: 900, fontSize: 15, color: '#0284c7', marginBottom: 6 }}>{item.headline}</div>
+        <p style={{ fontSize: 12.5, color: '#647080', lineHeight: 1.65, margin: 0 }}>{item.text}</p>
+      </div>
+    </motion.div>
   )
 }
 
@@ -288,24 +344,12 @@ function JourneyPath() {
   const containerRef = useRef<HTMLDivElement>(null)
   const pathRef = useRef<SVGPathElement>(null)
   const [points, setPoints] = useState<{ x: number; y: number }[]>([])
-  const [pathVisible, setPathVisible] = useState(false)
-  const [markersVisible, setMarkersVisible] = useState(false)
-  const [endVisible, setEndVisible] = useState(false)
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
-  /* animate when section enters viewport */
-  useEffect(() => {
-    const el = containerRef.current; if (!el) return
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setPathVisible(true)
-        setTimeout(() => setMarkersVisible(true), 400)
-        setTimeout(() => setEndVisible(true), 3200)
-        obs.disconnect()
-      }
-    }, { threshold: 0.15 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+  /* scroll through the section drives the path drawing + marker reveal */
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start 0.85', 'end 0.5'] })
+  const drawProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.6 })
+  const endOpacity = useTransform(drawProgress, [0.88, 1], [0, 1])
 
   /* position markers along the SVG path */
   useLayoutEffect(() => {
@@ -320,7 +364,7 @@ function JourneyPath() {
 
   return (
     <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'visible' }}>
         {/* Subtle grid background */}
         <div style={{
           position: 'absolute', inset: 0,
@@ -331,7 +375,7 @@ function JourneyPath() {
         <svg
           viewBox="0 0 1920 560"
           preserveAspectRatio="xMidYMid meet"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}
         >
           <defs>
             <linearGradient id="journey-path-grad" x1="0" y1="0" x2="1" y2="0">
@@ -351,8 +395,8 @@ function JourneyPath() {
           {/* Ghost path (full trail, very faint) */}
           <path d={JOURNEY_PATH} fill="none" stroke="rgba(14,165,233,0.08)" strokeWidth={3} strokeLinecap="round" />
 
-          {/* Animated drawing path */}
-          <path
+          {/* Animated drawing path — pathLength is scroll-linked via drawProgress */}
+          <motion.path
             ref={pathRef}
             d={JOURNEY_PATH}
             fill="none"
@@ -360,18 +404,32 @@ function JourneyPath() {
             strokeWidth={3.5}
             strokeLinecap="round"
             filter="url(#journey-glow)"
-            style={{
-              strokeDasharray: 4000,
-              strokeDashoffset: pathVisible ? 0 : 4000,
-              transition: 'stroke-dashoffset 3s ease-in-out',
-            }}
+            style={{ pathLength: drawProgress }}
           />
 
           {/* Milestone markers */}
           {points.map((pt, i) => (
-            <PathMarker key={i} pt={pt} item={timeline[i]} index={i} total={timeline.length} visible={markersVisible} />
+            <PathMarker
+              key={i} pt={pt} item={timeline[i]} index={i} total={timeline.length}
+              progress={drawProgress}
+              active={activeIndex === i}
+              onEnter={() => setActiveIndex(i)}
+              onLeave={() => setActiveIndex(null)}
+            />
           ))}
         </svg>
+
+        {/* Hover/tap detail card — full milestone description */}
+        <AnimatePresence>
+          {activeIndex !== null && points[activeIndex] && (
+            <JourneyDetailCard
+              key={activeIndex}
+              item={timeline[activeIndex]}
+              pt={points[activeIndex]}
+              isTop={activeIndex % 2 === 0}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Title overlay */}
         <div style={{ position: 'absolute', top: 28, left: 32, zIndex: 10, pointerEvents: 'none' }}>
@@ -384,13 +442,15 @@ function JourneyPath() {
           <h2 style={{ fontWeight: 900, fontSize: 'clamp(24px, 3.5vw, 42px)', color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.02em', marginTop: 10 }}>
             Tracing Our<br /><span style={{ color: '#0ea5e9' }}>Growth & Impact</span>
           </h2>
+          <p style={{ fontSize: 12.5, color: '#647080', marginTop: 8, maxWidth: 220 }}>
+            Hover or tap a milestone to read the full story.
+          </p>
         </div>
 
-        {/* End cap pill */}
-        <div style={{
+        {/* End cap pill — fades in as the path finishes drawing */}
+        <motion.div style={{
           position: 'absolute', bottom: 32, right: 32, zIndex: 10,
-          opacity: endVisible ? 1 : 0, transform: endVisible ? 'translateY(0)' : 'translateY(10px)',
-          transition: 'opacity 0.6s ease, transform 0.6s ease',
+          opacity: endOpacity,
         }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 10, padding: '11px 22px',
@@ -401,7 +461,7 @@ function JourneyPath() {
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#bae6fd', animation: 'blink 2s ease-in-out infinite' }} />
             <span style={{ fontSize: 12, fontWeight: 800, color: '#ffffff' }}>47+ branches today</span>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

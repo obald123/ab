@@ -311,9 +311,18 @@ export default function Hero() {
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
   const [stackSpread, setStackSpread] = useState(1)
   const [lineProgress, setLineProgress] = useState(0)
+  const [scrollFade, setScrollFade] = useState(1)
   const [isCompact, setIsCompact] = useState(false)
   const [heroSlide, setHeroSlide] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
+
+  // Scroll-driven targets — updated instantly on scroll, then eased toward
+  // in a rAF loop below so the visuals glide instead of snapping 1:1 with
+  // the scroll position (which reads as jittery on trackpads/fast wheels).
+  const targetSpread = useRef(1)
+  const targetLine = useRef(0)
+  const targetFade = useRef(1)
+  const mouseTarget = useRef({ x: 0.5, y: 0.5 })
 
   const heroSlides = [
     { line1: 'Banking Built', line2: 'for Rwanda', line3: '& Beyond', sub: 'Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling \u202a*540#\u202c.' },
@@ -329,18 +338,48 @@ export default function Hero() {
     return () => clearInterval(timer)
   }, [])
 
+  // Compute scroll targets on every scroll event (cheap: just refs, no render)
   useEffect(() => {
     const onScroll = () => {
       const rect = sectionRef.current?.getBoundingClientRect()
       if (!rect) return
       const progress = Math.min(Math.max(-rect.top / 220, 0), 1)
       const lineReveal = Math.min(Math.max((window.scrollY + 260 - rect.top) / (rect.height + 260), 0), 1)
-      setStackSpread(0.2 + 0.8 * (1 - progress))
-      setLineProgress(lineReveal)
+      const fadeOut = Math.min(Math.max(1 - Math.max(-rect.top, 0) / (rect.height * 0.85), 0), 1)
+      targetSpread.current = 0.2 + 0.8 * (1 - progress)
+      targetLine.current = lineReveal
+      targetFade.current = fadeOut
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('resize', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
+  // Single rAF loop eases every animated value toward its latest target.
+  // This is what makes the stack-spread / line-reveal / parallax feel like
+  // a smooth glide rather than a value snapping straight to scrollY.
+  useEffect(() => {
+    let raf = 0
+    const ease = (current: number, target: number, rate: number) => {
+      const next = current + (target - current) * rate
+      return Math.abs(next - target) < 0.0006 ? target : next
+    }
+    const tick = () => {
+      setStackSpread(prev => ease(prev, targetSpread.current, 0.09))
+      setLineProgress(prev => ease(prev, targetLine.current, 0.09))
+      setScrollFade(prev => ease(prev, targetFade.current, 0.12))
+      setMouse(prev => ({
+        x: ease(prev.x, mouseTarget.current.x, 0.14),
+        y: ease(prev.y, mouseTarget.current.y, 0.14),
+      }))
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
   }, [])
 
   useEffect(() => {
@@ -353,7 +392,7 @@ export default function Hero() {
 
   const onMouseMove = useCallback((e: React.MouseEvent) => {
     const r = sectionRef.current?.getBoundingClientRect(); if (!r) return
-    setMouse({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height })
+    mouseTarget.current = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height }
   }, [])
 
   return (
@@ -375,7 +414,6 @@ export default function Hero() {
           zIndex: 0,
           opacity: 0.76,
           filter: 'drop-shadow(0 0 8px rgba(14,165,233,0.04))',
-          transition: 'transform 0.2s ease-out',
         }}>
           <svg viewBox="0 0 350 1400" preserveAspectRatio="none" width="100%" height="100%">
             <defs>
@@ -391,7 +429,6 @@ export default function Hero() {
               strokeWidth="12"
               strokeLinecap="round"
               strokeLinejoin="round"
-              style={{ transition: 'all 0.3s ease-out' }}
             />
             <path d="M175 -20 C 280 100, 320 220, 200 340 C 80 460, 60 580, 180 700 C 300 820, 320 940, 180 1060 C 40 1180, 60 1300, 175 1400"
               fill="none"
@@ -405,7 +442,7 @@ export default function Hero() {
         </div>
       )}
 
-      {/* ── Main 2-col grid ── */}
+      {/* ── Main 2-col grid — eases out (fade + gentle rise) as the hero scrolls past ── */}
       <div className="hero-grid" style={{
         position: 'relative', zIndex: 2, flex: 1, minHeight: 0,
         margin: '0 auto', width: '100%',
@@ -413,6 +450,8 @@ export default function Hero() {
         display: 'grid', gridTemplateColumns: '1fr 1fr',
         gap: 40, alignItems: 'center',
         overflowY: 'auto', overflowX: 'hidden',
+        opacity: 0.35 + 0.65 * scrollFade,
+        transform: `translateY(${(1 - scrollFade) * -28}px)`,
       }}>
 
         {/* ── LEFT: copy ── */}

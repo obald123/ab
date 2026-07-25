@@ -1,78 +1,107 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { motion } from 'framer-motion'
+import pinBlueUrl from '../imports/icons/pin-blue.svg'
+import pinGreyUrl from '../imports/icons/pin-grey.svg'
 
-type Branch = { name: string; addr: string; lat: number; lng: number; isHQ?: boolean }
+/* ══════════════════════════════════════════════
+   Branch data — sourced from abr.rw/our-branches/
+   Coordinates are approximate town/city centers.
+   The site publishes one central line for all
+   locations (no per-branch phone numbers), so
+   every marker shares the same bank contact.
+══════════════════════════════════════════════ */
+const BANK_CONTACT = {
+  phone: '+250 788 198 300',
+  phoneHref: 'tel:+250788198300',
+  whatsapp: '+250 788 319 108',
+  whatsappHref: 'https://wa.me/250788319108',
+  email: 'info@abr.rw',
+}
 
-// Approximate coordinates (city/town centers) — one-time hardcoded values
+type Branch = {
+  name: string
+  addr: string
+  lat: number
+  lng: number
+  isHQ?: boolean
+  kind: 'Branch' | 'Credit Outlet'
+  hours: string
+}
+
 const branches: Branch[] = [
-  { name: 'Nyarugenge (HQ)', addr: 'BCK Building, KN 78 St, Kigali Town', lat: -1.9441, lng: 30.0619, isHQ: true },
-  { name: 'Gisozi', addr: 'APARWA Building, KG 33 Ave, Gakinjiro', lat: -1.929, lng: 30.064 },
-  { name: 'Musanze', addr: 'Nova Market Complex, Musanze Town', lat: -1.504, lng: 29.632 },
-  { name: 'Kimironko', addr: 'Kimironko Market area, Kigali', lat: -1.943, lng: 30.083 },
-  { name: 'Nyabugogo', addr: 'Nyabugogo Bus Park area, Kigali', lat: -1.979, lng: 30.085 },
-  { name: 'Gicumbi', addr: 'Gicumbi Town', lat: -1.583, lng: 30.051 },
-  { name: 'Karongi', addr: 'Karongi Town', lat: -2.070, lng: 29.046 },
-  { name: 'Huye', addr: 'Huye Town', lat: -2.607, lng: 29.739 },
-  { name: 'Kabarondo', addr: 'Kabarondo Town', lat: -2.063, lng: 30.345 },
-  { name: 'Rwamagana', addr: 'Rwamagana Town', lat: -1.945, lng: 30.434 },
-  { name: 'Gatsibo', addr: 'Gatsibo Town', lat: -1.619, lng: 30.567 },
-  { name: 'Muhanga', addr: 'Muhanga Town', lat: -2.102, lng: 29.756 },
-  { name: 'Nyagatare', addr: 'Nyagatare Town', lat: -1.291, lng: 30.329 },
-  { name: 'Nyamagabe', addr: 'Nyamagabe Town', lat: -2.488, lng: 29.397 },
-  { name: 'Nyamata', addr: 'Nyamata Town', lat: -2.005, lng: 30.238 },
-  { name: 'Nyanza', addr: 'Nyanza Town', lat: -2.351, lng: 29.745 },
-  { name: 'Rubavu', addr: 'Rubavu Town', lat: -1.710, lng: 29.276 },
-  { name: 'Rusizi', addr: 'Rusizi (Kamembe)', lat: -2.478, lng: 28.860 },
-  { name: 'Rulindo', addr: 'Rulindo Town', lat: -1.678, lng: 29.764 },
-  { name: 'Nyabihu', addr: 'Nyabihu Town', lat: -1.567, lng: 29.546 },
-  { name: 'Kirehe', addr: 'Kirehe Town', lat: -2.024, lng: 30.666 },
-  { name: 'Nyamasheke', addr: 'Nyamasheke Town', lat: -2.463, lng: 29.121 },
-  { name: 'Rutsiro', addr: 'Rutsiro Town', lat: -1.806, lng: 29.343 },
-  { name: 'Burera', addr: 'Burera Town', lat: -1.482, lng: 29.776 },
-  { name: 'Ngoma', addr: 'Ngoma Town', lat: -2.103, lng: 30.183 },
+  { name: 'Nyarugenge (HQ)', addr: 'BCK Building, KN 78 St, Kigali Town', lat: -1.9441, lng: 30.0619, isHQ: true, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
+  { name: 'Gisozi', addr: 'APARWA Building, KG 33 Ave, Gakinjiro', lat: -1.929, lng: 30.064, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
+  { name: 'Musanze', addr: 'Nova Market Complex, NM 11 St, Musanze Town', lat: -1.504, lng: 29.632, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
+  { name: 'Kimironko', addr: 'House No 93, KG 11 Ave, near Kimironko & Kibagabaga junction', lat: -1.943, lng: 30.083, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
+  { name: 'Nyabugogo', addr: 'Inkundamahoro Building, KN 20 Ave', lat: -1.979, lng: 30.085, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
+  { name: 'Gicumbi', addr: 'GANA House, Gicumbi Town, near 7th Day Adventist Church, opposite ENGEN Station', lat: -1.583, lng: 30.051, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Karongi', addr: 'Building opposite Hotel Kivu Plazza (Floor 2), Karongi Town', lat: -2.070, lng: 29.046, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Huye', addr: 'INTASHYA House, opposite Rubis Station', lat: -2.607, lng: 29.739, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Kabarondo', addr: 'Opposite Kabarondo Market', lat: -2.063, lng: 30.345, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Rwamagana', addr: 'Building opposite MEREZ Station (Floor 1), Rwamagana Town', lat: -1.945, lng: 30.434, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Gatsibo', addr: 'Cactus Hotel Building (Ground Floor), Kabarore Sector', lat: -1.619, lng: 30.567, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Muhanga', addr: 'Commercial Complex House, near ADEPER Gahogo', lat: -2.102, lng: 29.756, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Nyagatare', addr: 'Opposite Rapha Clinic, EN 14 Ave, Nyagatare Town', lat: -1.291, lng: 30.329, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Nyamagabe', addr: 'Kanimba Building (Floor 1), Nyamagabe Town', lat: -2.488, lng: 29.397, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Nyamata', addr: 'Ndahiro Building (Floor 2), opposite the market, Nyamata Town', lat: -2.005, lng: 30.238, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Nyanza', addr: 'Rubangura House (Floor 1), opposite Nyanza Market', lat: -2.351, lng: 29.745, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Rubavu', addr: 'Ubuntu House, main avenue, Rubavu Town', lat: -1.710, lng: 29.276, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Rusizi', addr: 'Former COGEBANQUE Building (Ground floor), Kamembe Town', lat: -2.478, lng: 28.860, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Rulindo', addr: 'Near Base Market, opposite BPR', lat: -1.678, lng: 29.764, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Nyabihu', addr: 'Kora Sector, next to BK/Kora Branch', lat: -1.567, lng: 29.546, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Kirehe', addr: 'Opposite BARAKA Medical Clinic', lat: -2.024, lng: 30.666, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Nyamasheke', addr: 'Tyazo Sector, opposite the taxi park', lat: -2.463, lng: 29.121, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Rutsiro', addr: 'Congo Nil Cell, Gihango Sector, near the district building', lat: -1.806, lng: 29.343, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Burera', addr: 'Rusumo Sector, opposite BK Burera Branch', lat: -1.482, lng: 29.776, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+  { name: 'Ngoma', addr: 'Ngoma District, opposite the market', lat: -2.103, lng: 30.183, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
 ]
+
+function popupHtml(b: Branch) {
+  const badgeColor = b.isHQ ? '#647080' : '#0ea5e9'
+  return `
+    <div style="font-family:inherit;min-width:220px;padding:2px 2px 4px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="display:inline-block;padding:2px 9px;border-radius:999px;background:${badgeColor}1a;color:${badgeColor};font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase">${b.isHQ ? 'Headquarters' : b.kind}</span>
+      </div>
+      <div style="font-weight:800;font-size:14.5px;color:#0284c7;margin-bottom:4px">${b.name}</div>
+      <div style="font-size:12.5px;color:#647080;line-height:1.5;margin-bottom:8px">${b.addr}</div>
+      <div style="font-size:11.5px;color:#0ea5e9;font-weight:700;margin-bottom:8px">${b.hours}</div>
+      <div style="border-top:1px solid rgba(14,165,233,0.15);padding-top:8px;font-size:12px;color:#647080;line-height:1.7">
+        <div>📞 <a href="${BANK_CONTACT.phoneHref}" style="color:#0284c7;font-weight:700;text-decoration:none">${BANK_CONTACT.phone}</a></div>
+        <div>✉️ <a href="mailto:${BANK_CONTACT.email}" style="color:#0284c7;font-weight:700;text-decoration:none">${BANK_CONTACT.email}</a></div>
+      </div>
+    </div>
+  `
+}
 
 export default function Branches() {
   // center roughly on Rwanda
   const center: [number, number] = [-1.95, 30.06]
   const mapRef = useRef<HTMLDivElement | null>(null)
+  const [hovered, setHovered] = useState<Branch | null>(null)
 
   useEffect(() => {
     if (!mapRef.current) return
-    const map = L.map(mapRef.current, { center, zoom: 8 })
+    const map = L.map(mapRef.current, { center, zoom: 8, scrollWheelZoom: false })
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map)
 
-    // prepare custom icons (serve from src/imports so Vite will serve them)
-    const blueIcon = L.icon({ iconUrl: '/src/imports/icons/pin-blue.svg', iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -36] })
-    const greyIcon = L.icon({ iconUrl: '/src/imports/icons/pin-grey.svg', iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -36] })
+    // Bundled SVG icons (imported as URLs so they survive the production build)
+    const blueIcon = L.icon({ iconUrl: pinBlueUrl, iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -32] })
+    const greyIcon = L.icon({ iconUrl: pinGreyUrl, iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -32] })
 
     branches.forEach((b) => {
       const icon = b.isHQ ? greyIcon : blueIcon
-      const marker = L.marker([b.lat, b.lng], { icon }).addTo(map)
+      const marker = L.marker([b.lat, b.lng], { icon, riseOnHover: true }).addTo(map)
+      marker.bindPopup(popupHtml(b), { closeButton: false, maxWidth: 260 })
 
-      // try to show a local image on hover/popup if available
-      const slug = b.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-      const imageUrl = `/src/imports/branches/${slug}.jpg`
-      let popupContent = `<div style="font-weight:700">${b.name}</div><div style="font-size:13px">${b.addr}</div>`
-
-      const img = new Image()
-      img.onload = () => {
-        const html = `<div style=\"display:flex;gap:12px;align-items:center\"><img src=\"${imageUrl}\" alt=\"${b.name}\" style=\"width:120px;height:80px;object-fit:cover;border-radius:8px;\"/><div><div style=\"font-weight:700\">${b.name}</div><div style=\"font-size:13px\">${b.addr}</div></div></div>`
-        marker.bindPopup(html)
-      }
-      img.onerror = () => {
-        marker.bindPopup(popupContent)
-      }
-      // start loading; browser will fetch if file exists
-      img.src = imageUrl
-
-      // open popup on hover for quick preview, close on mouseout
-      marker.on('mouseover', () => marker.openPopup())
-      marker.on('mouseout', () => marker.closePopup())
+      marker.on('mouseover', () => { marker.openPopup(); setHovered(b) })
+      marker.on('mouseout', () => { marker.closePopup(); setHovered(null) })
+      marker.on('click', () => setHovered(b))
     })
 
     return () => {
@@ -81,15 +110,73 @@ export default function Branches() {
   }, [])
 
   return (
-    <section id="branches" style={{ padding: '48px 0', background: '#f6fbff' }}>
-      <div style={{ margin: '0 auto', padding: '0 48px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 18 }}>
+    <section id="branches" style={{ padding: '64px 0', background: '#f6fbff' }}>
+      <div style={{ margin: '0 auto', padding: '0 48px', maxWidth: 1400 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true, margin: '-100px' }}
+          style={{ textAlign: 'center', marginBottom: 28 }}
+        >
           <span className="section-pill">Locations</span>
-          <h2 style={{ fontWeight: 900, fontSize: 28, color: '#0284c7' }}>Our Branch Network</h2>
-          <p style={{ color: '#647080', marginTop: 8 }}>Interactive map showing all branch locations. Click a marker for details.</p>
-        </div>
+          <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', color: '#0284c7', letterSpacing: '-0.02em' }}>Our Branch Network</h2>
+          <p style={{ color: '#647080', marginTop: 8, maxWidth: 560, marginInline: 'auto' }}>
+            {branches.length} branches and credit outlets across Rwanda. Hover a marker to see the branch name, address and contact details.
+          </p>
+        </motion.div>
 
-        <div ref={mapRef as any} style={{ width: '100%', height: 520, borderRadius: 12, overflow: 'hidden' }} />
+        {/* Map — inset with side gutters so it doesn't run edge-to-edge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true, margin: '-80px' }}
+          style={{
+            padding: '0 clamp(4px, 3vw, 56px)',
+          }}
+        >
+          <div style={{
+            position: 'relative',
+            borderRadius: 18,
+            overflow: 'hidden',
+            border: '1px solid rgba(14,165,233,0.14)',
+            boxShadow: '0 24px 60px rgba(14,165,233,0.12)',
+          }}>
+            <div ref={mapRef as any} style={{ width: '100%', height: 480 }} />
+
+            {/* Hovered branch info card */}
+            <div style={{
+              position: 'absolute', top: 14, left: 14, zIndex: 500,
+              maxWidth: 260,
+              opacity: hovered ? 1 : 0,
+              transform: hovered ? 'translateY(0)' : 'translateY(-8px)',
+              transition: 'opacity 0.2s ease, transform 0.2s ease',
+              pointerEvents: 'none',
+              background: 'rgba(255,255,255,0.96)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 14,
+              padding: '14px 16px',
+              boxShadow: '0 12px 32px rgba(2,30,60,0.18)',
+              border: '1px solid rgba(14,165,233,0.14)',
+            }}>
+              {hovered && (
+                <>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: hovered.isHQ ? '#647080' : '#0ea5e9', marginBottom: 4 }}>
+                    {hovered.isHQ ? 'Headquarters' : hovered.kind}
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: '#0284c7', marginBottom: 4 }}>{hovered.name}</div>
+                  <div style={{ fontSize: 12, color: '#647080', lineHeight: 1.5, marginBottom: 6 }}>{hovered.addr}</div>
+                  <div style={{ fontSize: 11.5, color: '#647080' }}>{BANK_CONTACT.phone}</div>
+                </>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        <p style={{ textAlign: 'center', fontSize: 12, color: '#94a3b8', marginTop: 14 }}>
+          Addresses and hours sourced from abr.rw. All locations share the bank's central line — {BANK_CONTACT.phone} — as individual branch numbers aren't published.
+        </p>
       </div>
     </section>
   )
