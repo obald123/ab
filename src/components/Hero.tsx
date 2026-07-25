@@ -311,6 +311,7 @@ export default function Hero() {
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
   const [stackSpread, setStackSpread] = useState(1)
   const [lineProgress, setLineProgress] = useState(0)
+  const [lineHover, setLineHover] = useState(0)
   const [scrollFade, setScrollFade] = useState(1)
   const [isCompact, setIsCompact] = useState(false)
   const [heroSlide, setHeroSlide] = useState(0)
@@ -321,6 +322,7 @@ export default function Hero() {
   // the scroll position (which reads as jittery on trackpads/fast wheels).
   const targetSpread = useRef(1)
   const targetLine = useRef(0)
+  const targetLineHover = useRef(0)
   const targetFade = useRef(1)
   const mouseTarget = useRef({ x: 0.5, y: 0.5 })
 
@@ -344,7 +346,10 @@ export default function Hero() {
       const rect = sectionRef.current?.getBoundingClientRect()
       if (!rect) return
       const progress = Math.min(Math.max(-rect.top / 220, 0), 1)
-      const lineReveal = Math.min(Math.max((window.scrollY + 260 - rect.top) / (rect.height + 260), 0), 1)
+      // Ramp the line over the first half of the hero starting from 0px of
+      // scroll, so the very first wheel tick already moves it.
+      const scrolled = Math.max(-rect.top, 0)
+      const lineReveal = Math.min(scrolled / Math.max(rect.height * 0.5, 1), 1)
       const fadeOut = Math.min(Math.max(1 - Math.max(-rect.top, 0) / (rect.height * 0.85), 0), 1)
       targetSpread.current = 0.2 + 0.8 * (1 - progress)
       targetLine.current = lineReveal
@@ -370,7 +375,10 @@ export default function Hero() {
     }
     const tick = () => {
       setStackSpread(prev => ease(prev, targetSpread.current, 0.09))
-      setLineProgress(prev => ease(prev, targetLine.current, 0.09))
+      // Faster rate than the card stack: the line should feel like it reacts
+      // on the first scroll tick rather than trailing behind it.
+      setLineProgress(prev => ease(prev, targetLine.current, 0.2))
+      setLineHover(prev => ease(prev, targetLineHover.current, 0.08))
       setScrollFade(prev => ease(prev, targetFade.current, 0.12))
       setMouse(prev => ({
         x: ease(prev.x, mouseTarget.current.x, 0.14),
@@ -393,10 +401,21 @@ export default function Hero() {
   const onMouseMove = useCallback((e: React.MouseEvent) => {
     const r = sectionRef.current?.getBoundingClientRect(); if (!r) return
     mouseTarget.current = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height }
+    targetLineHover.current = 1
   }, [])
 
+  const onMouseLeave = useCallback(() => {
+    targetLineHover.current = 0
+    mouseTarget.current = { x: 0.5, y: 0.5 }
+  }, [])
+
+  // Scroll drives the bulk of the travel; hovering the hero adds its own
+  // drift that follows the cursor vertically, so the line slides either way.
+  const lineShift = lineProgress * 96 + lineHover * (mouse.y - 0.5) * 64
+  const lineDash = lineProgress * 780 + lineHover * 140
+
   return (
-    <section ref={sectionRef} onMouseMove={onMouseMove} style={{
+    <section ref={sectionRef} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} style={{
       position: 'relative', height: '100vh',
       paddingTop: 5, overflow: 'hidden',
       display: 'flex', flexDirection: 'column',
@@ -408,12 +427,12 @@ export default function Hero() {
           top: 0,
           bottom: 0,
           left: '52%',
-          transform: `translateX(-50%) translateY(${lineProgress * 12}px)`,
+          transform: `translateX(-50%) translateY(${lineShift}px)`,
           width: 240,
           pointerEvents: 'none',
           zIndex: 0,
-          opacity: 0.76,
-          filter: 'drop-shadow(0 0 8px rgba(14,165,233,0.04))',
+          opacity: 0.76 + lineHover * 0.16,
+          filter: `drop-shadow(0 0 ${8 + lineHover * 10}px rgba(14,165,233,${0.04 + lineHover * 0.1}))`,
         }}>
           <svg viewBox="0 0 350 1400" preserveAspectRatio="none" width="100%" height="100%">
             <defs>
@@ -432,11 +451,12 @@ export default function Hero() {
             />
             <path d="M175 -20 C 280 100, 320 220, 200 340 C 80 460, 60 580, 180 700 C 300 820, 320 940, 180 1060 C 40 1180, 60 1300, 175 1400"
               fill="none"
-              stroke="rgba(255,255,255,0.12)"
+              stroke={`rgba(255,255,255,${0.12 + lineHover * 0.14})`}
               strokeWidth="4"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeDasharray="24 20"
+              strokeDashoffset={-lineDash}
             />
           </svg>
         </div>
@@ -498,7 +518,7 @@ export default function Hero() {
           </div>
 
           {/* Slide indicators */}
-          <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
             {heroSlides.map((_, i) => (
               <button key={i} aria-label={`Slide ${i + 1}`} onClick={() => setHeroSlide(i)} style={{
                 width: heroSlide === i ? 24 : 8,
@@ -509,8 +529,10 @@ export default function Hero() {
             ))}
           </div>
 
-          {/* Subtitle — rotating */}
-          <div style={{ position: 'relative', minHeight: 44, marginBottom: 28 }}>
+          {/* Subtitle — rotating. The slides are absolutely positioned, so this
+              wrapper has to reserve the height of the tallest one (3 lines at
+              17px/1.78) or the CTA row rides up over the last line. */}
+          <div style={{ position: 'relative', minHeight: 'clamp(92px, 8vw, 108px)', marginBottom: 34 }}>
             {heroSlides.map((slide, i) => (
               <p key={i} style={{
                 position: 'absolute', inset: 0,

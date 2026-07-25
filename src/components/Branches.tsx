@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { motion } from 'framer-motion'
+import { IconMapPin } from './Icons'
 import pinBlueUrl from '../imports/icons/pin-blue.svg'
 import pinGreyUrl from '../imports/icons/pin-grey.svg'
 
@@ -58,19 +59,39 @@ const branches: Branch[] = [
   { name: 'Ngoma', addr: 'Ngoma District, opposite the market', lat: -2.103, lng: 30.183, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
 ]
 
+/* Inline SVG icons for the Leaflet popup — Leaflet takes an HTML string, so
+   these mirror the stroke style of the shared <Icons /> set as raw markup. */
+function svgIcon(paths: string, color = '#0ea5e9', size = 13) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px">${paths}</svg>`
+}
+
+const ICON_PATHS = {
+  pin: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+}
+
 function popupHtml(b: Branch) {
   const badgeColor = b.isHQ ? '#647080' : '#0ea5e9'
+  const row = (icon: string, content: string, color = '#647080') =>
+    `<div style="display:flex;align-items:flex-start;gap:7px;color:${color}">${icon}<span>${content}</span></div>`
+
   return `
     <div style="font-family:inherit;min-width:220px;padding:2px 2px 4px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <span style="display:inline-block;padding:2px 9px;border-radius:999px;background:${badgeColor}1a;color:${badgeColor};font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase">${b.isHQ ? 'Headquarters' : b.kind}</span>
       </div>
-      <div style="font-weight:800;font-size:14.5px;color:#0284c7;margin-bottom:4px">${b.name}</div>
-      <div style="font-size:12.5px;color:#647080;line-height:1.5;margin-bottom:8px">${b.addr}</div>
-      <div style="font-size:11.5px;color:#0ea5e9;font-weight:700;margin-bottom:8px">${b.hours}</div>
-      <div style="border-top:1px solid rgba(14,165,233,0.15);padding-top:8px;font-size:12px;color:#647080;line-height:1.7">
-        <div>📞 <a href="${BANK_CONTACT.phoneHref}" style="color:#0284c7;font-weight:700;text-decoration:none">${BANK_CONTACT.phone}</a></div>
-        <div>✉️ <a href="mailto:${BANK_CONTACT.email}" style="color:#0284c7;font-weight:700;text-decoration:none">${BANK_CONTACT.email}</a></div>
+      <div style="font-weight:800;font-size:14.5px;color:#0284c7;margin-bottom:6px">${b.name}</div>
+      <div style="font-size:12.5px;line-height:1.5;margin-bottom:6px">
+        ${row(svgIcon(ICON_PATHS.pin, '#94a3b8'), b.addr)}
+      </div>
+      <div style="font-size:11.5px;font-weight:700;margin-bottom:8px">
+        ${row(svgIcon(ICON_PATHS.clock), b.hours, '#0ea5e9')}
+      </div>
+      <div style="border-top:1px solid rgba(14,165,233,0.15);padding-top:8px;font-size:12px;line-height:1.7;display:flex;flex-direction:column;gap:4px">
+        ${row(svgIcon(ICON_PATHS.phone), `<a href="${BANK_CONTACT.phoneHref}" style="color:#0284c7;font-weight:700;text-decoration:none">${BANK_CONTACT.phone}</a>`)}
+        ${row(svgIcon(ICON_PATHS.mail), `<a href="mailto:${BANK_CONTACT.email}" style="color:#0284c7;font-weight:700;text-decoration:none">${BANK_CONTACT.email}</a>`)}
       </div>
     </div>
   `
@@ -162,8 +183,11 @@ export default function Branches() {
             }}>
               {hovered && (
                 <>
-                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: hovered.isHQ ? '#647080' : '#0ea5e9', marginBottom: 4 }}>
-                    {hovered.isHQ ? 'Headquarters' : hovered.kind}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <IconMapPin size={12} color={hovered.isHQ ? '#647080' : '#0ea5e9'} strokeWidth={2.2} />
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: hovered.isHQ ? '#647080' : '#0ea5e9' }}>
+                      {hovered.isHQ ? 'Headquarters' : hovered.kind}
+                    </span>
                   </div>
                   <div style={{ fontWeight: 800, fontSize: 15, color: '#0284c7', marginBottom: 4 }}>{hovered.name}</div>
                   <div style={{ fontSize: 12, color: '#647080', lineHeight: 1.5, marginBottom: 6 }}>{hovered.addr}</div>
@@ -173,10 +197,6 @@ export default function Branches() {
             </div>
           </div>
         </motion.div>
-
-        <p style={{ textAlign: 'center', fontSize: 12, color: '#94a3b8', marginTop: 14 }}>
-          Addresses and hours sourced from abr.rw. All locations share the bank's central line — {BANK_CONTACT.phone} — as individual branch numbers aren't published.
-        </p>
       </div>
     </section>
   )

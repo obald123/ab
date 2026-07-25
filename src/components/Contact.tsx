@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus } from 'lucide-react'
+import { OPEN_EVENT } from './CookieConsent'
 
 const smartValues = [
   { letter: 'S', word: 'Simple', desc: 'Easy to understand products and processes' },
@@ -504,12 +505,26 @@ export default function Contact() {
               <h4 style={{ fontSize: 13, fontWeight: 800, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
                 Regulated By
               </h4>
-              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7 }}>
-                National Bank of Rwanda (BNR)<br />
-                Licence No. BNR/D&LIC/000020<br /><br />
-                Rwanda Financial Intelligence Unit<br />
-                (RFICA Member)
-              </p>
+              {[
+                { href: 'https://www.bnr.rw/', lines: ['National Bank of Rwanda (BNR)', 'Licence No. BNR/D&LIC/000020'] },
+                { href: 'https://www.fic.gov.rw/', lines: ['Rwanda Financial Intelligence Unit', '(RFICA Member)'] },
+              ].map(({ href, lines }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.55)',
+                    lineHeight: 1.7, textDecoration: 'none', marginBottom: 16,
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#ffffff' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.55)' }}
+                >
+                  {lines[0]}<br />{lines[1]}
+                </a>
+              ))}
               <div style={{ marginTop: 16, display: 'inline-block', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, padding: '8px 14px' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Member</div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)' }}>AccessGroup · SMART Campaign</div>
@@ -526,8 +541,9 @@ export default function Contact() {
               © {new Date().getFullYear()} AB Bank Rwanda Ltd. All rights reserved.
             </p>
             <div style={{ display: 'flex', gap: 20 }}>
-              {['Privacy Policy', 'Terms of Use', 'Cookie Policy'].map(t => (
+              {['Privacy Policy', 'Terms of Use', 'Cookie Policy', 'Cookie Settings'].map(t => (
                 <span key={t} style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', cursor: 'pointer', transition: 'color 0.2s' }}
+                  onClick={t === 'Cookie Settings' ? () => window.dispatchEvent(new Event(OPEN_EVENT)) : undefined}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)' }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)' }}
                 >

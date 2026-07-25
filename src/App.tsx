@@ -10,6 +10,7 @@ import News from './components/News'
 import SocialFeed from './components/SocialFeed'
 import Contact from './components/Contact'
 import Branches from './components/Branches'
+import CookieConsent from './components/CookieConsent'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
       <News />
       <SocialFeed />
       <Contact />
+      <CookieConsent />
     </div>
   )
 }

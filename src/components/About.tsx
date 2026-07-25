@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
-import { motion, useScroll, useTransform, useSpring, AnimatePresence, type MotionValue } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, useMotionValue, animate, AnimatePresence, type MotionValue } from 'framer-motion'
 import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf } from './Icons'
 
 /* ── data — sourced & paraphrased from abr.rw/who-we-are/ "Our History" ── */
@@ -296,75 +296,233 @@ function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave
   )
 }
 
-/* ── detail card shown on hover/tap of a marker, positioned via the SVG viewBox % ── */
-function JourneyDetailCard({ item, pt, isTop }: { item: typeof timeline[0]; pt: { x: number; y: number }; isTop: boolean }) {
-  const leftPct = Math.min(Math.max((pt.x / 1920) * 100, 12), 88)
-  const topPct = (pt.y / 560) * 100
+/* Fixed navbar sits at top:36 and is 76 tall — cards must clear it. */
+const NAV_SAFE = 120
+const CARD_GAP = 34
+const EDGE_MARGIN = 14
+
+/* ── detail card shown on hover/tap of a marker. `pt` is in pixels relative to
+   `boundsRef`. The card measures itself before paint and clamps into both its
+   container and the visible viewport, so it can never render off-screen or
+   underneath the fixed navbar regardless of which marker was hovered. ── */
+function JourneyDetailCard({ item, pt, boundsRef }: {
+  item: typeof timeline[0]
+  pt: { x: number; y: number }
+  boundsRef: React.RefObject<HTMLDivElement | null>
+}) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ left: number; top: number }>({ left: pt.x - 150, top: pt.y + CARD_GAP })
+
+  useLayoutEffect(() => {
+    const place = () => {
+      const el = cardRef.current
+      const box = boundsRef.current?.getBoundingClientRect()
+      if (!el || !box) return
+      const w = el.offsetWidth
+      const h = el.offsetHeight
+
+      // Horizontal: centre on the marker, then clamp inside the container.
+      const maxLeft = Math.max(EDGE_MARGIN, box.width - w - EDGE_MARGIN)
+      const left = Math.min(Math.max(pt.x - w / 2, EDGE_MARGIN), maxLeft)
+
+      // Vertical: put the card on whichever side of the marker has more room
+      // in the viewport, counting the navbar as unusable space at the top.
+      const markerViewportY = box.top + pt.y
+      const roomAbove = markerViewportY - NAV_SAFE - CARD_GAP
+      const roomBelow = window.innerHeight - markerViewportY - CARD_GAP - EDGE_MARGIN
+      const below = roomBelow >= h || roomBelow >= roomAbove
+      let top = below ? pt.y + CARD_GAP : pt.y - h - CARD_GAP
+
+      // Clamp into container ∩ viewport (both expressed in container coords).
+      const minTop = Math.max(EDGE_MARGIN, NAV_SAFE - box.top + EDGE_MARGIN)
+      const maxTop = Math.min(box.height - h - EDGE_MARGIN, window.innerHeight - box.top - h - EDGE_MARGIN)
+      top = Math.min(Math.max(top, minTop), Math.max(minTop, maxTop))
+
+      setPos({ left, top })
+    }
+
+    place()
+    window.addEventListener('scroll', place, { passive: true })
+    window.addEventListener('resize', place, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', place)
+      window.removeEventListener('resize', place)
+    }
+  }, [pt.x, pt.y, boundsRef, item])
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: isTop ? 10 : -10, scale: 0.94 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: isTop ? 10 : -10, scale: 0.94 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      ref={cardRef}
+      initial={{ opacity: 0, scale: 0.94 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.94 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       style={{
         position: 'absolute',
-        left: `${leftPct}%`,
-        top: isTop ? undefined : `calc(${topPct}% + 30px)`,
-        bottom: isTop ? `calc(${100 - topPct}% + 30px)` : undefined,
-        transform: 'translateX(-50%)',
-        width: 280, zIndex: 20, pointerEvents: 'none',
+        left: pos.left,
+        top: pos.top,
+        width: 'min(300px, 78vw)', zIndex: 20, pointerEvents: 'none',
       }}
     >
       <div style={{
-        background: '#ffffff', borderRadius: 16, padding: '16px 18px',
+        background: '#ffffff', borderRadius: 18, padding: '18px 20px',
         border: '1px solid rgba(14,165,233,0.14)',
         boxShadow: '0 20px 48px rgba(2,30,60,0.18)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
           <span style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 26, height: 26, borderRadius: 8,
-            background: item.highlight ? '#0ea5e9' : 'rgba(14,165,233,0.1)',
+            width: 46, height: 46, borderRadius: 14, flexShrink: 0,
+            background: item.highlight
+              ? 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)'
+              : 'linear-gradient(135deg, rgba(14,165,233,0.14) 0%, rgba(56,189,248,0.20) 100%)',
+            boxShadow: item.highlight
+              ? '0 8px 20px rgba(14,165,233,0.35)'
+              : 'inset 0 0 0 1px rgba(14,165,233,0.18)',
           }}>
-            <item.CategoryIcon size={14} color={item.highlight ? '#fff' : '#0284c7'} />
+            <item.CategoryIcon size={24} strokeWidth={2} color={item.highlight ? '#fff' : '#0284c7'} />
           </span>
-          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0ea5e9' }}>
-            {item.category} · {item.year}
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0ea5e9', marginBottom: 2 }}>
+              {item.category}
+            </div>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 700, color: '#0284c7', lineHeight: 1 }}>
+              {item.year}
+            </div>
+          </div>
+          <span style={{
+            marginLeft: 'auto', textAlign: 'right', flexShrink: 0,
+            paddingLeft: 10, borderLeft: '1px solid rgba(14,165,233,0.14)',
+          }}>
+            <span style={{ display: 'block', fontSize: 17, fontWeight: 900, color: '#0284c7', lineHeight: 1.1 }}>{item.stat}</span>
+            <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#94a3b8' }}>{item.statLabel}</span>
           </span>
         </div>
-        <div style={{ fontWeight: 900, fontSize: 15, color: '#0284c7', marginBottom: 6 }}>{item.headline}</div>
+        <div style={{ fontWeight: 900, fontSize: 15, color: '#0f172a', marginBottom: 6 }}>{item.headline}</div>
         <p style={{ fontSize: 12.5, color: '#647080', lineHeight: 1.65, margin: 0 }}>{item.text}</p>
       </div>
     </motion.div>
   )
 }
 
+/* fraction along the path each milestone sits at */
+const MARKER_FRACS = timeline.length > 1
+  ? timeline.map((_, i) => (i / (timeline.length - 1)) * 0.92 + 0.04)
+  : [0.5]
+
 function JourneyPath() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const pathRef = useRef<SVGPathElement>(null)
   const [points, setPoints] = useState<{ x: number; y: number }[]>([])
+  const [pointsPx, setPointsPx] = useState<{ x: number; y: number }[]>([])
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
+  /* pre-sampled points along the path, for cheap nearest-point lookup on hover */
+  const samples = useRef<{ x: number; y: number; frac: number }[]>([])
 
   /* scroll through the section drives the path drawing + marker reveal */
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start 0.85', 'end 0.5'] })
-  const drawProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.6 })
-  const endOpacity = useTransform(drawProgress, [0.88, 1], [0, 1])
+  const scrollDraw = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.6 })
 
-  /* position markers along the SVG path */
+  /* Hovering seeks the line to whatever point is under the cursor — forwards if
+     that point is ahead of where scrolling left off, backwards if it's behind.
+     `hoverBlend` cross-fades between the scroll position and the hover target,
+     so letting go hands control straight back to the scroll animation. */
+  const hoverTarget = useMotionValue(0)
+  const hoverDraw = useSpring(hoverTarget, { stiffness: 130, damping: 22, mass: 0.5 })
+  const hoverBlend = useMotionValue(0)
+  const seeking = useRef(false)
+  const pathDraw = useTransform(
+    [scrollDraw, hoverDraw, hoverBlend] as MotionValue<number>[],
+    ([scrolled, hovered, blend]: number[]) => scrolled + (hovered - scrolled) * blend,
+  )
+  /* Markers take whichever is further along, so seeking *backwards* along the
+     line never hides the milestones ahead that you might want to hover next. */
+  const markerProgress = useTransform(
+    [scrollDraw, pathDraw] as MotionValue<number>[],
+    ([scrolled, drawn]: number[]) => Math.max(scrolled, drawn),
+  )
+  const endOpacity = useTransform(pathDraw, [0.88, 1], [0, 1])
+
+  const seekTo = useCallback((frac: number) => {
+    if (!seeking.current) {
+      seeking.current = true
+      // Start from what's currently drawn, not from 0 — otherwise the blend
+      // drags the line backwards before it springs toward the hovered point.
+      // Using pathDraw (rather than scrollDraw) also keeps it seamless when
+      // re-engaging mid-release, e.g. moving off a marker back onto the line.
+      hoverDraw.jump(pathDraw.get())
+      animate(hoverBlend, 1, { duration: 0.25, ease: 'easeOut' })
+    }
+    // Setting a spring target is cheap enough to do on every mousemove.
+    hoverTarget.set(Math.min(Math.max(frac, 0), 1))
+  }, [hoverDraw, hoverTarget, hoverBlend, pathDraw])
+
+  const releaseSeek = useCallback(() => {
+    if (!seeking.current) return
+    seeking.current = false
+    animate(hoverBlend, 0, { duration: 0.5, ease: 'easeOut' })
+  }, [hoverBlend])
+
+  /* Follow the cursor along the line itself */
+  const onLineMove = useCallback((e: React.MouseEvent) => {
+    const svg = svgRef.current
+    if (!svg || !samples.current.length) return
+    const ctm = svg.getScreenCTM()
+    if (!ctm) return
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse())
+    let best = samples.current[0]
+    let bestD = Infinity
+    for (const s of samples.current) {
+      const d = (s.x - p.x) ** 2 + (s.y - p.y) ** 2
+      if (d < bestD) { bestD = d; best = s }
+    }
+    seekTo(best.frac)
+  }, [seekTo])
+
+  /* position markers along the SVG path — both in viewBox units (for the SVG
+     itself) and in container pixels (so the detail card can be placed exactly) */
   useLayoutEffect(() => {
     const path = pathRef.current
-    if (!path) return
-    const total = path.getTotalLength()
-    const pct = timeline.length > 1
-      ? timeline.map((_, i) => (i / (timeline.length - 1)) * 0.92 + 0.04)
-      : [0.5]
-    setPoints(pct.map(p => path.getPointAtLength(total * p)))
+    const inner = innerRef.current
+    if (!path || !inner) return
+
+    const measure = () => {
+      const total = path.getTotalLength()
+      const vb = MARKER_FRACS.map(p => {
+        const q = path.getPointAtLength(total * p)
+        return { x: q.x, y: q.y }
+      })
+      setPoints(vb)
+
+      const STEPS = 160
+      samples.current = Array.from({ length: STEPS + 1 }, (_, i) => {
+        const frac = i / STEPS
+        const q = path.getPointAtLength(total * frac)
+        return { x: q.x, y: q.y, frac }
+      })
+
+      const ctm = path.getScreenCTM()
+      const box = inner.getBoundingClientRect()
+      if (ctm) {
+        setPointsPx(vb.map(p => {
+          const sp = new DOMPoint(p.x, p.y).matrixTransform(ctm)
+          return { x: sp.x - box.left, y: sp.y - box.top }
+        }))
+      }
+    }
+
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(inner)
+    return () => ro.disconnect()
   }, [])
 
   return (
     <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'visible' }}>
+      <div ref={innerRef} style={{ position: 'relative', minHeight: '100vh', overflow: 'visible' }}>
         {/* Subtle grid background */}
         <div style={{
           position: 'absolute', inset: 0,
@@ -373,6 +531,7 @@ function JourneyPath() {
         }} />
 
         <svg
+          ref={svgRef}
           viewBox="0 0 1920 560"
           preserveAspectRatio="xMidYMid meet"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}
@@ -395,7 +554,7 @@ function JourneyPath() {
           {/* Ghost path (full trail, very faint) */}
           <path d={JOURNEY_PATH} fill="none" stroke="rgba(14,165,233,0.08)" strokeWidth={3} strokeLinecap="round" />
 
-          {/* Animated drawing path — pathLength is scroll-linked via drawProgress */}
+          {/* Animated drawing path — driven by scroll, overridden while seeking */}
           <motion.path
             ref={pathRef}
             d={JOURNEY_PATH}
@@ -404,29 +563,42 @@ function JourneyPath() {
             strokeWidth={3.5}
             strokeLinecap="round"
             filter="url(#journey-glow)"
-            style={{ pathLength: drawProgress }}
+            style={{ pathLength: pathDraw }}
+          />
+
+          {/* Invisible fat stroke over the same curve: gives the line a hover
+              target so the draw can follow the cursor along it. */}
+          <path
+            d={JOURNEY_PATH}
+            fill="none"
+            stroke="transparent"
+            strokeWidth={70}
+            strokeLinecap="round"
+            style={{ pointerEvents: 'stroke', cursor: 'pointer' }}
+            onMouseMove={onLineMove}
+            onMouseLeave={releaseSeek}
           />
 
           {/* Milestone markers */}
           {points.map((pt, i) => (
             <PathMarker
               key={i} pt={pt} item={timeline[i]} index={i} total={timeline.length}
-              progress={drawProgress}
+              progress={markerProgress}
               active={activeIndex === i}
-              onEnter={() => setActiveIndex(i)}
-              onLeave={() => setActiveIndex(null)}
+              onEnter={() => { setActiveIndex(i); seekTo(MARKER_FRACS[i]) }}
+              onLeave={() => { setActiveIndex(null); releaseSeek() }}
             />
           ))}
         </svg>
 
         {/* Hover/tap detail card — full milestone description */}
         <AnimatePresence>
-          {activeIndex !== null && points[activeIndex] && (
+          {activeIndex !== null && pointsPx[activeIndex] && (
             <JourneyDetailCard
               key={activeIndex}
               item={timeline[activeIndex]}
-              pt={points[activeIndex]}
-              isTop={activeIndex % 2 === 0}
+              pt={pointsPx[activeIndex]}
+              boundsRef={innerRef}
             />
           )}
         </AnimatePresence>
