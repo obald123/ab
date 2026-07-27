@@ -719,6 +719,9 @@ section[id] { scroll-margin-top: 100px; }
 /* ── About ── */
 @media (max-width: 1023px) {
   .about-vm { grid-template-columns: 1fr !important; }
+  /* Once the cards stack, the deliberate desktop offset would just read as
+     a stray gap — the vertical stagger only means something side by side. */
+  .about-vm-slot { margin-top: 0 !important; }
   .about-photo-copy { grid-template-columns: 1fr !important; }
   .about-photo-copy img { position: relative !important; height: 240px !important; }
   .about-stat-blocks { flex-direction: column !important; }

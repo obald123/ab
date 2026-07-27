@@ -911,13 +911,24 @@ function VisionMissionCard({ item, index }: { item: VMItem; index: number }) {
     my.set(0.5)
   }
 
+  // Vision enters from the left and sits high; Mission enters from the
+  // right and sits low. They are not peers on a shelf — you read one, then
+  // the other, and the offset plus the opposed travel says so.
+  const fromLeft = index % 2 === 0
+
   return (
-    <div style={{ perspective: 1500 }}>
+    <div className="about-vm-slot" style={{ perspective: 1500, marginTop: fromLeft ? 0 : 92 }}>
       <motion.div
-        initial={{ opacity: 0, y: 54, rotateX: -14 }}
-        whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-        viewport={{ once: true, margin: '-70px' }}
-        transition={{ duration: 0.85, delay: index * 0.16, ease: [0.22, 1, 0.36, 1] }}
+        initial={{
+          opacity: 0,
+          x: fromLeft ? -120 : 120,
+          y: 28,
+          rotateY: fromLeft ? 18 : -18,
+          rotateX: -8,
+        }}
+        whileInView={{ opacity: 1, x: 0, y: 0, rotateY: 0, rotateX: 0 }}
+        viewport={{ once: true, margin: '-90px' }}
+        transition={{ duration: 0.95, delay: index * 0.2, ease: [0.22, 1, 0.36, 1] }}
         style={{ transformStyle: 'preserve-3d' }}
       >
         <motion.div
@@ -937,7 +948,6 @@ function VisionMissionCard({ item, index }: { item: VMItem; index: number }) {
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 28px 60px rgba(0,10,30,0.26)',
-            height: '100%',
           }}
         >
           {/* Cursor-tracked sheen */}
@@ -1060,7 +1070,7 @@ function VisionMissionCard({ item, index }: { item: VMItem; index: number }) {
                   initial={{ opacity: 0, x: -14 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.5, delay: 0.4 + index * 0.16 + pi * 0.12, ease: 'easeOut' }}
+                  transition={{ duration: 0.5, delay: 0.55 + index * 0.2 + pi * 0.12, ease: 'easeOut' }}
                   style={{
                     display: 'flex',
                     gap: 12,
@@ -1130,7 +1140,7 @@ function VisionMission() {
   return (
     <div
       className="about-vm"
-      style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 40, alignItems: 'stretch' }}
+      style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, marginBottom: 40, alignItems: 'start' }}
     >
       {VISION_MISSION.map((item, i) => (
         <VisionMissionCard key={item.label} item={item} index={i} />
