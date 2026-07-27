@@ -1,6 +1,14 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { motion } from 'framer-motion'
-import { IconTrendUp } from './Icons'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion'
 import cardTop from '../imports/landing/card.png'
 import cardMiddle from '../imports/landing/card (1).png'
 import cardBottom from '../imports/landing/card (2).png'
@@ -12,26 +20,47 @@ import starFilled from '../imports/landing/Star 17 (1).png'
    AB blue  : #0ea5e9   Rwanda grey : #647080
    Globe hi : #bae6fd   Globe deep  : #0284c7
 ══════════════════════════════════════════════ */
-const B  = '#0ea5e9'
 const BD = '#0284c7'
-const BM = '#1a5c96'
 const GL = '#9fa8b8'
-const AG = '#3ccc5f'
 
-/* ── Animated mesh background ── */
-function MeshBg() {
+/* ══════════════════════════════════════════════
+   SCROLL CHOREOGRAPHY
+   One normalised progress value (0 → 1 across the
+   hero) drives everything. These are its phase
+   boundaries:
+
+     0.00 → 0.30   ASSEMBLE  cards converge into a stack
+     0.30 → 0.45   LOCKED    one solid object
+     0.45 → 0.85   REVEAL    fans open into three views
+
+   Every animated property is keyed to these same four
+   stops so the whole scene moves as one system.
+══════════════════════════════════════════════ */
+const STOPS = [0, 0.3, 0.45, 0.85] as const
+type Quad = [number, number, number, number]
+
+/* ── The living sky ──
+   Four stacked layers, all animated by CSS keyframes in index.css.
+   No JS touches this: it runs on the compositor and keeps drifting
+   whether or not React ever renders again. */
+function SkyBg() {
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-      {/* Base gradient */}
-      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(145deg, #0ea5e9 0%, #0369a1 40%, #082f49 100%)` }} />
-      {/* Radial light sources */}
-      <div style={{ position: 'absolute', top: '-20%', left: '-5%',  width: '70vw', height: '70vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(14,165,233,0.24) 0%, transparent 65%)` }} />
-      <div style={{ position: 'absolute', top: '30%',  right: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(140,170,210,0.12) 0%, transparent 65%)` }} />
-      <div style={{ position: 'absolute', bottom: '-10%', left: '30%', width: '40vw', height: '40vw', borderRadius: '50%', background: `radial-gradient(circle, rgba(120,135,160,0.18) 0%, transparent 65%)` }} />
-      {/* Fine grid */}
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'linear-gradient(rgba(140,170,210,1) 1px, transparent 1px), linear-gradient(90deg, rgba(140,170,210,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-      {/* Diagonal lines */}
-      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.03 }} preserveAspectRatio="none">
+    <div className="hero-sky" aria-hidden="true">
+      <div className="hero-sky__base" />
+      <div className="hero-sky__cloud hero-sky__cloud--a" />
+      <div className="hero-sky__cloud hero-sky__cloud--b" />
+      <div className="hero-sky__cloud hero-sky__cloud--c" />
+      <div className="hero-sky__stars">
+        <div className="hero-sky__twinkle" />
+      </div>
+      <div className="hero-sky__grid" />
+      {/* Scrim sits above the sky and below the copy — it is what keeps
+          white text legible through the light phase of the cycle. */}
+      <div className="hero-sky__scrim" />
+      <svg
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.035 }}
+        preserveAspectRatio="none"
+      >
         {Array.from({ length: 8 }, (_, i) => (
           <line key={i} x1={`${i * 15}%`} y1="0" x2={`${i * 15 + 40}%`} y2="100%" stroke={GL} strokeWidth="1" />
         ))}
@@ -40,237 +69,241 @@ function MeshBg() {
   )
 }
 
-/* ── Floating debit card ── */
-function DebitCard3D({ style }: { style?: React.CSSProperties }) {
+/* ── One card of the 3D stack ──
+   Receives the shared progress value and maps it onto its own
+   depth, offset and rotation. Every property below is either a
+   transform or a filter, so no frame ever triggers layout. */
+type CardConfig = {
+  src: string
+  alt: string
+  width: number
+  height: number
+  widthPct: string
+  zIndex: number
+  x: Quad
+  y: Quad
+  z: Quad
+  rotateY: Quad
+  rotateZ: Quad
+  brightness: Quad
+  shadowY: Quad
+  shadowBlur: Quad
+  shadowAlpha: Quad
+}
+
+function StackCard({ p, config }: { p: MotionValue<number>; config: CardConfig }) {
+  const stops = STOPS as unknown as number[]
+  const x = useTransform(p, stops, config.x)
+  const y = useTransform(p, stops, config.y)
+  const z = useTransform(p, stops, config.z)
+  const rotateY = useTransform(p, stops, config.rotateY)
+  const rotateZ = useTransform(p, stops, config.rotateZ)
+
+  // Depth-linked brightness. Cheap fake ambient occlusion — it does
+  // more for perceived depth than the transforms themselves.
+  const brightness = useTransform(p, stops, config.brightness)
+  const filter = useMotionTemplate`grayscale(1) brightness(${brightness}) contrast(1.08)`
+
+  // Shadow tightens as the stack closes and softens as it opens.
+  const shadowY = useTransform(p, stops, config.shadowY)
+  const shadowBlur = useTransform(p, stops, config.shadowBlur)
+  const shadowAlpha = useTransform(p, stops, config.shadowAlpha)
+  const boxShadow = useMotionTemplate`0 ${shadowY}px ${shadowBlur}px rgba(2, 14, 28, ${shadowAlpha})`
+
+  // Specular sweep driven by the card's own rotation, so light reads
+  // as catching a real surface as it turns rather than as a decal.
+  const sheenX = useTransform(rotateY, [-40, 0, 40], ['10%', '120%', '250%'])
+  const sheenOpacity = useTransform(rotateY, [-40, -10, 0, 10, 40], [0.95, 0.3, 0.16, 0.3, 0.95])
+
   return (
-    <div className="hero-card-3d" style={{
-      width: 320, height: 190,
-      borderRadius: 20,
-      background: `linear-gradient(135deg, ${BD} 0%, ${BM} 45%, ${B} 100%)`,
-      padding: '24px 26px',
-      boxShadow: `0 40px 80px rgba(0,10,30,0.6), 0 0 0 1px rgba(140,170,210,0.12), inset 0 1px 0 rgba(255,255,255,0.1)`,
-      position: 'relative', overflow: 'hidden',
-      ...style,
-    }}>
-      {/* Card sheen */}
-      <div style={{ position: 'absolute', top: '-60%', left: '-20%', width: '60%', height: '200%', background: 'linear-gradient(105deg, transparent, rgba(255,255,255,0.07), transparent)', transform: 'rotate(20deg)', pointerEvents: 'none' }} />
-      {/* Logo area */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
-        {/* EMV chip */}
-        <div style={{ width: 38, height: 28, borderRadius: 5, background: 'linear-gradient(135deg, rgba(102,132,184,1), rgba(78,109,170,1))', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.24)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 26, height: 18, borderRadius: 3, border: '1px solid rgba(255,255,255,0.12)', background: 'linear-gradient(135deg, rgba(148,176,221,1), rgba(110,142,206,1))', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, padding: 3 }}>
-            {[0,1,2,3].map(i => <div key={i} style={{ background: 'rgba(0,0,0,0.12)', borderRadius: 1 }} />)}
-          </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 700, color: '#fff', fontSize: 15, letterSpacing: '0.04em' }}>AB</div>
-          <div style={{ fontSize: 8, color: GL, letterSpacing: '0.12em', fontWeight: 600 }}>RWANDA</div>
-        </div>
-      </div>
-      {/* Card number */}
-      <div style={{ fontSize: 14, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.85)', fontWeight: 700, marginBottom: 18, fontFamily: 'monospace' }}>
-        •••• &nbsp;&nbsp;•••• &nbsp;&nbsp;•••• &nbsp;&nbsp;4821
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <div>
-          <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em', marginBottom: 2 }}>CARD HOLDER</div>
-          <div style={{ fontSize: 12, color: '#fff', fontWeight: 700 }}>Marie Claire Uwase</div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em', marginBottom: 2 }}>EXPIRES</div>
-          <div style={{ fontSize: 12, color: '#fff', fontWeight: 700 }}>09 / 30</div>
-        </div>
-        <div style={{ fontStyle: 'italic', fontWeight: 900, color: 'rgba(255,255,255,0.9)', fontSize: 20 }}>VISA</div>
-      </div>
+    <div className="hero-stack__layer" style={{ zIndex: config.zIndex }}>
+      <motion.div
+        className="hero-stack__card"
+        style={{ x, y, z, rotateY, rotateZ, filter, boxShadow, width: config.widthPct }}
+      >
+        <img
+          src={config.src}
+          alt={config.alt}
+          width={config.width}
+          height={config.height}
+          decoding="async"
+        />
+        <motion.div className="hero-stack__sheen" style={{ x: sheenX, opacity: sheenOpacity }} />
+      </motion.div>
     </div>
   )
 }
 
-/* ── Balance widget ── */
-function BalanceWidget({ style }: { style?: React.CSSProperties }) {
-  return (
-    <div style={{
-      width: 220,
-      background: 'rgba(255,255,255,0.06)',
-      backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-      border: '1px solid rgba(140,170,210,0.18)',
-      borderRadius: 18, padding: '18px 20px',
-      boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
-      ...style,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 10, background: `rgba(14,165,233,0.18)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IconTrendUp size={15} color={BD} />
-        </div>
-        <div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.08em' }}>SAVINGS BALANCE</div>
-          <div style={{ fontSize: 9, color: '#9fcaff', fontWeight: 700 }}>↑ 8.2% this month</div>
-        </div>
-      </div>
-      <div style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 12, letterSpacing: '-0.01em' }}>
-        RWF 482,500
-      </div>
-      <div style={{ height: 44, display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-        {[0.4, 0.6, 0.5, 0.8, 0.7, 1.0, 0.9].map((h, i) => (
-          <div key={i} style={{ flex: 1, borderRadius: 3, height: `${h * 100}%`, background: i === 5 ? B : `rgba(14,165,233,0.3)`, transition: 'height 0.3s' }} />
-        ))}
-      </div>
-    </div>
-  )
-}
+const CARDS: CardConfig[] = [
+  {
+    // Back card — rests high-right, swings out to the right on the reveal.
+    src: cardBottom,
+    alt: '',
+    width: 552,
+    height: 302,
+    widthPct: '74%',
+    zIndex: 1,
+    x: [34, 12, 12, 238],
+    y: [-124, -28, -28, -44],
+    z: [-230, -55, -55, -95],
+    rotateY: [3, 1.5, 1.5, -38],
+    rotateZ: [-7, -3.5, -3.5, 3],
+    brightness: [0.6, 0.7, 0.7, 0.88],
+    shadowY: [40, 20, 20, 34],
+    shadowBlur: [92, 44, 44, 80],
+    shadowAlpha: [0.34, 0.5, 0.5, 0.3],
+  },
+  {
+    // Middle card — stays centred and comes forward on the reveal.
+    src: cardMiddle,
+    alt: '',
+    width: 530,
+    height: 261,
+    widthPct: '76%',
+    zIndex: 2,
+    x: [0, 0, 0, 0],
+    y: [-14, -2, -2, 8],
+    z: [-110, -26, -26, 34],
+    rotateY: [0, 0, 0, 0],
+    rotateZ: [-4.5, -2, -2, 0],
+    brightness: [0.8, 0.86, 0.86, 1.02],
+    shadowY: [38, 20, 20, 40],
+    shadowBlur: [88, 46, 46, 86],
+    shadowAlpha: [0.34, 0.46, 0.46, 0.32],
+  },
+  {
+    // Front card — rests low-left, swings out to the left, mirroring the back.
+    src: cardTop,
+    alt: '',
+    width: 530,
+    height: 261,
+    widthPct: '78%',
+    zIndex: 3,
+    x: [-30, -10, -10, -238],
+    y: [112, 26, 26, -36],
+    z: [0, 0, 0, -95],
+    rotateY: [-3, -1.5, -1.5, 38],
+    rotateZ: [-2, -1, -1, -3],
+    brightness: [1.02, 1.04, 1.04, 0.9],
+    shadowY: [42, 22, 22, 34],
+    shadowBlur: [96, 48, 48, 80],
+    shadowAlpha: [0.38, 0.52, 0.52, 0.3],
+  },
+]
 
-/* ── Transaction notification ── */
-function TxNotif({ icon, label, amount, positive, style }: { icon: React.ReactNode; label: string; amount: string; positive: boolean; style?: React.CSSProperties }) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 10,
-      background: 'rgba(255,255,255,0.07)',
-      backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid rgba(186,230,253,0.12)',
-      borderRadius: 14, padding: '12px 16px',
-      boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
-      minWidth: 220,
-      ...style,
-    }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: positive ? 'rgba(14,165,233,0.15)' : 'rgba(119,137,153,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        {icon}
-      </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 1 }}>{label}</div>
-        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>Just now</div>
-      </div>
-      <div style={{ fontSize: 13, fontWeight: 800, color: positive ? '#9fcaff' : '#c5d2de' }}>{amount}</div>
-    </div>
-  )
-}
-
-/* ── 3D right panel scene ── */
-function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: number }; spread: number; compact: boolean }) {
-  const rx = (mouse.y - 0.5) * -6
-  const ry = (mouse.x - 0.5) * 10
-  const size = compact ? 0.95 : 1.3
-  const topOffset = compact ? 14 + spread * 18 : 10 + spread * 20
-  const middleOffset = compact ? 34 + spread * 30 : 30 + spread * 35
-  const bottomOffset = compact ? 54 + spread * 43 : 52 + spread * 50
-  const cardWidth = compact ? '94%' : '84%'
-  const leftBase = compact ? 12 : 24
-  const leftStep = compact ? 0 : 6
-  const topStep = compact ? 0 : 2
+/* ── 3D right-hand scene ── */
+function LandingCards({
+  p,
+  rotateX,
+  rotateY,
+}: {
+  p: MotionValue<number>
+  rotateX: MotionValue<number>
+  rotateY: MotionValue<number>
+}) {
+  // The small guide line draws itself just after the cards settle, so
+  // the line and the stack read as one connected system.
+  const innerDraw = useTransform(p, [0.08, 0.6], [0, 1])
 
   return (
-    <div style={{
-      position: 'relative', width: '100%', minHeight: compact ? 520 : 620,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: compact ? 12 : 32,
-      perspective: 1400, perspectiveOrigin: '50% 50%',
-      flexWrap: 'wrap',
-      marginTop: 18,
-    }}>
-      <div style={{
-        position: 'relative', width: compact ? '100%' : 'calc(55% - 16px)', minWidth: compact ? 0 : 320, minHeight: compact ? 420 : 520,
-        transformStyle: 'preserve-3d',
-        transform: `scale(${size}) rotateX(${rx}deg) rotateY(${ry}deg)`,
-        transition: 'transform 0.12s ease-out',
-      }}>
-        {!compact && (
-          <svg viewBox="0 0 80 520" width={8} height="100%" style={{
-            position: 'absolute', top: '10%', left: '18%', bottom: '10%',
-            pointerEvents: 'none', overflow: 'visible', zIndex: 6,
+    <div
+      className="hero-stack"
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: 620,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Sits low in the column on purpose: the fan-out happens late in the
+        // scroll, and starting lower keeps it inside the viewport long enough
+        // to actually read.
+        marginTop: 76,
+      }}
+    >
+      <motion.div
+        style={{
+          position: 'relative',
+          width: '100%',
+          minHeight: 520,
+          transformStyle: 'preserve-3d',
+          rotateX,
+          rotateY,
+        }}
+      >
+        <svg
+          viewBox="0 0 80 520"
+          width={8}
+          height="100%"
+          style={{
+            position: 'absolute',
+            top: '10%',
+            left: '18%',
+            bottom: '10%',
+            pointerEvents: 'none',
+            overflow: 'visible',
+            zIndex: 6,
             filter: 'drop-shadow(0 0 18px rgba(255,255,255,0.14))',
-          }}>
-            <path d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
-              fill="none"
-              stroke="rgba(255,255,255,0.96)"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
-              fill="none"
-              stroke="rgba(255,255,255,0.28)"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray="8 16"
-            />
-          </svg>
-        )}
-        <img
-          src={starOutline}
-          alt="Decorative white star"
-          style={{
-            display: compact ? 'none' : 'block',
-            position: 'absolute', top: '14%', left: '19.4%', width: 30,
-            filter: 'brightness(0) invert(1)',
-            opacity: 0.95,
-            zIndex: 4,
           }}
-        />
-        <img
-          src={starFilled}
-          alt="Decorative white star"
-          style={{
-            display: compact ? 'none' : 'block',
-            position: 'absolute', top: '44%', left: '19.4%', width: 26,
-            filter: 'brightness(0) invert(1)',
-            opacity: 0.9,
-            zIndex: 4,
-          }}
-        />
-        <img
-          src={starOutline}
-          alt="Decorative white star"
-          style={{
-            display: compact ? 'none' : 'block',
-            position: 'absolute', top: '72%', left: '19.4%', width: 22,
-            filter: 'brightness(0) invert(1)',
-            opacity: 0.9,
-            zIndex: 4,
-          }}
-        />
-        <img
-          src={cardBottom}
-          alt="Bottom card stack"
-          style={{
-            position: 'absolute', top: `${bottomOffset}%`, left: `${leftBase + spread * leftStep}%`, width: cardWidth, height: 'auto',
-            transform: `rotate(${6 + spread * 2}deg)`,
-            boxShadow: '0 40px 90px rgba(0,0,0,0.35)',
-            borderRadius: 28,
-            filter: 'grayscale(1) brightness(1.04) contrast(1.08)',
-            zIndex: 1,
-          }}
-        />
-        <img
-          src={cardMiddle}
-          alt="Middle card stack"
-          style={{
-            position: 'absolute', top: `${middleOffset}%`, left: `${14 + spread * 6}%`, width: compact ? '92%' : '86%', height: 'auto',
-            transform: `rotate(${4 + spread * 1.5}deg)`,
-            boxShadow: '0 44px 88px rgba(0,0,0,0.34)',
-            borderRadius: 28,
-            filter: 'grayscale(1) brightness(1.06) contrast(1.1)',
-            zIndex: 2,
-          }}
-        />
-        <img
-          src={cardTop}
-          alt="Top card stack"
-          style={{
-            position: 'absolute', top: `${topOffset}%`, left: `${12 + spread * 8}%`, width: compact ? '96%' : '88%', height: 'auto',
-            transform: `rotate(${2 + spread * 1}deg)`,
-            boxShadow: '0 50px 96px rgba(0,0,0,0.38)',
-            borderRadius: 28,
-            filter: 'grayscale(1) brightness(1.08) contrast(1.12)',
-            zIndex: 3,
-          }}
-        />
-      </div>
+          aria-hidden="true"
+        >
+          <motion.path
+            d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
+            fill="none"
+            stroke="rgba(255,255,255,0.96)"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ pathLength: innerDraw }}
+          />
+          <motion.path
+            d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
+            fill="none"
+            stroke="rgba(255,255,255,0.28)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="8 16"
+            style={{ pathLength: innerDraw }}
+          />
+        </svg>
+
+        {[
+          { src: starOutline, top: '14%', size: 30, opacity: 0.95 },
+          { src: starFilled, top: '44%', size: 26, opacity: 0.9 },
+          { src: starOutline, top: '72%', size: 22, opacity: 0.9 },
+        ].map((s, i) => (
+          <img
+            key={i}
+            src={s.src}
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: s.top,
+              left: '19.4%',
+              width: s.size,
+              filter: 'brightness(0) invert(1)',
+              opacity: s.opacity,
+              zIndex: 4,
+            }}
+          />
+        ))}
+
+        {CARDS.map((config) => (
+          <StackCard key={config.src} p={p} config={config} />
+        ))}
+      </motion.div>
 
       <img
         src={starOutline}
-        alt="Decorative star"
+        alt=""
+        aria-hidden="true"
         style={{
-          display: compact ? 'none' : 'block',
-          position: 'absolute', top: '12%', right: '-6%', width: 88,
+          position: 'absolute',
+          top: '12%',
+          right: '-6%',
+          width: 88,
           opacity: 0.75,
           animation: 'floatY 6s ease-in-out infinite',
           zIndex: 4,
@@ -278,10 +311,13 @@ function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: numbe
       />
       <img
         src={starFilled}
-        alt="Decorative star"
+        alt=""
+        aria-hidden="true"
         style={{
-          display: compact ? 'none' : 'block',
-          position: 'absolute', bottom: '8%', left: '-8%', width: 80,
+          position: 'absolute',
+          bottom: '8%',
+          left: '-8%',
+          width: 80,
           opacity: 0.85,
           animation: 'floatY2 7s ease-in-out 0.5s infinite',
           zIndex: 4,
@@ -295,258 +331,369 @@ function LandingCards({ mouse, spread, compact }: { mouse: { x: number; y: numbe
 function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
   const [val, setVal] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
+  const reduce = useReducedMotion()
+
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return; obs.disconnect()
-      let cur = 0; const step = to / (1100 / 16)
-      const id = setInterval(() => { cur += step; if (cur >= to) { setVal(to); clearInterval(id) } else setVal(Math.floor(cur)) }, 16)
-    }, { threshold: 0.5 })
-    if (ref.current) obs.observe(ref.current)
-    return () => obs.disconnect()
-  }, [to])
-  return <span ref={ref}>{val}{suffix}</span>
+    // Reduced motion renders the final value directly — no counting, and
+    // no setState from an effect just to skip the animation.
+    if (reduce) return
+    const node = ref.current
+    if (!node) return
+
+    let raf = 0
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        obs.disconnect()
+        const start = performance.now()
+        const duration = 1100
+        const tick = (now: number) => {
+          const t = Math.min((now - start) / duration, 1)
+          // easeOutCubic — lands softly instead of stopping dead
+          setVal(Math.round(to * (1 - Math.pow(1 - t, 3))))
+          if (t < 1) raf = requestAnimationFrame(tick)
+        }
+        raf = requestAnimationFrame(tick)
+      },
+      { threshold: 0.5 },
+    )
+    obs.observe(node)
+    return () => {
+      obs.disconnect()
+      cancelAnimationFrame(raf)
+    }
+  }, [to, reduce])
+
+  return (
+    <span ref={ref}>
+      {reduce ? to : val}
+      {suffix}
+    </span>
+  )
+}
+
+const HERO_SLIDES = [
+  {
+    line1: 'Banking Built',
+    line2: 'for Rwanda',
+    line3: '& Beyond',
+    sub: (
+      <>
+        Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any
+        branch or by dialling <strong style={{ color: '#ffffff' }}>*540#</strong>.
+      </>
+    ),
+  },
+  {
+    line1: 'Your Dreams,',
+    line2: 'Our',
+    line3: 'Mission',
+    sub: 'From savings accounts to business loans, we provide flexible financial solutions tailored to help you achieve your goals.',
+  },
+  {
+    line1: 'Bank Anytime,',
+    line2: '',
+    line3: 'Anywhere',
+    sub: 'Manage your finances on the go with our secure mobile banking platform — transfers, bill payments, and account management at your fingertips.',
+  },
+  {
+    line1: 'Trusted for',
+    line2: 'Over 9',
+    line3: 'Years',
+    sub: 'Serving over 200,000 customers across 47 branches with personalized service and innovative banking solutions.',
+  },
+]
+
+const HEADLINE_STYLE: React.CSSProperties = {
+  fontFamily: 'var(--font-serif)',
+  fontSize: 'clamp(32px, 5vw, 72px)',
+  fontWeight: 700,
+  lineHeight: 1,
+  margin: 0,
+  letterSpacing: '-0.025em',
 }
 
 export default function Hero() {
-  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
-  const [stackSpread, setStackSpread] = useState(1)
-  const [lineProgress, setLineProgress] = useState(0)
-  const [lineHover, setLineHover] = useState(0)
-  const [scrollFade, setScrollFade] = useState(1)
-  const [isCompact, setIsCompact] = useState(false)
   const [heroSlide, setHeroSlide] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
+  const rectRef = useRef<DOMRect | null>(null)
+  const reduce = useReducedMotion()
 
-  // Scroll-driven targets — updated instantly on scroll, then eased toward
-  // in a rAF loop below so the visuals glide instead of snapping 1:1 with
-  // the scroll position (which reads as jittery on trackpads/fast wheels).
-  const targetSpread = useRef(1)
-  const targetLine = useRef(0)
-  const targetLineHover = useRef(0)
-  const targetFade = useRef(1)
-  const mouseTarget = useRef({ x: 0.5, y: 0.5 })
+  /* ── The engine ──
+     One scroll MotionValue, smoothed by a spring, feeds every
+     animated property in this component. MotionValues write
+     straight to the DOM, so none of this causes a React render —
+     the component renders when `heroSlide` changes and at no
+     other time. */
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  })
+  const smoothed = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.35 })
+  // Reduced motion: pin the scene to its assembled state.
+  const frozen = useMotionValue(0.36)
+  const p = reduce ? frozen : smoothed
 
-  const heroSlides = [
-    { line1: 'Banking Built', line2: 'for Rwanda', line3: '& Beyond', sub: 'Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling \u202a*540#\u202c.' },
-    { line1: 'Your Dreams,', line2: 'Our', line3: 'Mission', sub: 'From savings accounts to business loans, we provide flexible financial solutions tailored to help you achieve your goals.' },
-    { line1: 'Bank Anytime,', line3: 'Anywhere', sub: 'Manage your finances on the go with our secure mobile banking platform — transfers, bill payments, and account management at your fingertips.' },
-    { line1: 'Trusted for', line2: 'Over 9', line3: 'Years', sub: 'Serving over 200,000 customers across 47 branches with personalized service and innovative banking solutions.' },
-  ]
+  // Pointer parallax. Setting a MotionValue never re-renders.
+  const pointerX = useMotionValue(0.5)
+  const pointerY = useMotionValue(0.5)
+  const px = useSpring(pointerX, { stiffness: 90, damping: 20, mass: 0.3 })
+  const py = useSpring(pointerY, { stiffness: 90, damping: 20, mass: 0.3 })
+  const sceneRotateX = useTransform(py, [0, 1], [5, -5])
+  const sceneRotateY = useTransform(px, [0, 1], [-8, 8])
+
+  // Content easing out as the hero leaves. The scene holds its
+  // opacity far longer than the copy so the card reveal — which
+  // happens late in the scroll — is actually visible.
+  const textOpacity = useTransform(p, [0, 0.5, 0.95], [1, 1, 0.12])
+  const textY = useTransform(p, [0, 1], [0, -46])
+  const sceneOpacity = useTransform(p, [0, 0.86, 1], [1, 1, 0.35])
+
+  // Background line: draws itself on, drifts down, and cross-fades
+  // white → blue. A comet segment rides the same path.
+  const lineDraw = useTransform(p, [0, 0.55], [0, 1])
+  const lineBlue = useTransform(p, [0.15, 0.7], [0, 1])
+  const cometOffset = useTransform(p, [0, 1], [0.12, 0.94])
+  const cometOpacity = useTransform(p, [0, 0.06, 0.9, 1], [0, 1, 1, 0])
+  const lineY = useTransform<number, number>([p, py], ([pv, pyv]) => pv * 110 + (pyv - 0.5) * 54)
+  const lineOpacity = useTransform(p, [0, 0.9], [0.8, 0.55])
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setHeroSlide(prev => (prev + 1) % heroSlides.length)
+      setHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)
     }, 4000)
     return () => clearInterval(timer)
   }, [])
 
-  // Compute scroll targets on every scroll event (cheap: just refs, no render)
+  // Cache the section rect so pointer moves never force a layout read.
   useEffect(() => {
-    const onScroll = () => {
-      const rect = sectionRef.current?.getBoundingClientRect()
-      if (!rect) return
-      const progress = Math.min(Math.max(-rect.top / 220, 0), 1)
-      // Ramp the line over the first half of the hero starting from 0px of
-      // scroll, so the very first wheel tick already moves it.
-      const scrolled = Math.max(-rect.top, 0)
-      const lineReveal = Math.min(scrolled / Math.max(rect.height * 0.5, 1), 1)
-      const fadeOut = Math.min(Math.max(1 - Math.max(-rect.top, 0) / (rect.height * 0.85), 0), 1)
-      targetSpread.current = 0.2 + 0.8 * (1 - progress)
-      targetLine.current = lineReveal
-      targetFade.current = fadeOut
+    const measure = () => {
+      rectRef.current = sectionRef.current?.getBoundingClientRect() ?? null
     }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll, { passive: true })
+    measure()
+    window.addEventListener('resize', measure, { passive: true })
+    window.addEventListener('scroll', measure, { passive: true })
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      window.removeEventListener('resize', measure)
+      window.removeEventListener('scroll', measure)
     }
   }, [])
 
-  // Single rAF loop eases every animated value toward its latest target.
-  // This is what makes the stack-spread / line-reveal / parallax feel like
-  // a smooth glide rather than a value snapping straight to scrollY.
-  useEffect(() => {
-    let raf = 0
-    const ease = (current: number, target: number, rate: number) => {
-      const next = current + (target - current) * rate
-      return Math.abs(next - target) < 0.0006 ? target : next
-    }
-    const tick = () => {
-      setStackSpread(prev => ease(prev, targetSpread.current, 0.09))
-      // Faster rate than the card stack: the line should feel like it reacts
-      // on the first scroll tick rather than trailing behind it.
-      setLineProgress(prev => ease(prev, targetLine.current, 0.2))
-      setLineHover(prev => ease(prev, targetLineHover.current, 0.08))
-      setScrollFade(prev => ease(prev, targetFade.current, 0.12))
-      setMouse(prev => ({
-        x: ease(prev.x, mouseTarget.current.x, 0.14),
-        y: ease(prev.y, mouseTarget.current.y, 0.14),
-      }))
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  useEffect(() => {
-    const query = window.matchMedia('(max-width: 900px)')
-    const update = () => setIsCompact(query.matches)
-    update()
-    query.addEventListener('change', update)
-    return () => query.removeEventListener('change', update)
-  }, [])
-
-  const onMouseMove = useCallback((e: React.MouseEvent) => {
-    const r = sectionRef.current?.getBoundingClientRect(); if (!r) return
-    mouseTarget.current = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height }
-    targetLineHover.current = 1
-  }, [])
+  const onMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      const r = rectRef.current
+      if (!r) return
+      pointerX.set((e.clientX - r.left) / r.width)
+      pointerY.set((e.clientY - r.top) / r.height)
+    },
+    [pointerX, pointerY],
+  )
 
   const onMouseLeave = useCallback(() => {
-    targetLineHover.current = 0
-    mouseTarget.current = { x: 0.5, y: 0.5 }
-  }, [])
+    pointerX.set(0.5)
+    pointerY.set(0.5)
+  }, [pointerX, pointerY])
 
-  // Scroll drives the bulk of the travel; hovering the hero adds its own
-  // drift that follows the cursor vertically, so the line slides either way.
-  const lineShift = lineProgress * 96 + lineHover * (mouse.y - 0.5) * 64
-  const lineDash = lineProgress * 780 + lineHover * 140
+  const linePath =
+    'M175 -20 C 280 100, 320 220, 200 340 C 80 460, 60 580, 180 700 C 300 820, 320 940, 180 1060 C 40 1180, 60 1300, 175 1400'
 
   return (
-    <section ref={sectionRef} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} style={{
-      position: 'relative', height: '100vh',
-      paddingTop: 5, overflow: 'hidden',
-      display: 'flex', flexDirection: 'column',
-    }}>
-      <MeshBg />
-      {!isCompact && (
-        <div aria-hidden="true" style={{
+    <section
+      ref={sectionRef}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={{
+        position: 'relative',
+        minHeight: '100vh',
+        paddingTop: 5,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <SkyBg />
+
+      <motion.div
+        className="hero-line"
+        aria-hidden="true"
+        style={{
           position: 'absolute',
           top: 0,
           bottom: 0,
           left: '52%',
-          transform: `translateX(-50%) translateY(${lineShift}px)`,
+          x: '-50%',
+          y: lineY,
           width: 240,
           pointerEvents: 'none',
           zIndex: 0,
-          opacity: 0.76 + lineHover * 0.16,
-          filter: `drop-shadow(0 0 ${8 + lineHover * 10}px rgba(14,165,233,${0.04 + lineHover * 0.1}))`,
-        }}>
-          <svg viewBox="0 0 350 1400" preserveAspectRatio="none" width="100%" height="100%">
-            <defs>
-              <linearGradient id="hero-white-to-blue-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor={lineProgress < 0.3 ? '#ffffff' : `rgba(${Math.round(255 - lineProgress * 255 * 1.5)}, ${Math.round(200 - lineProgress * 100)}, 255, 0.8)`} />
-                <stop offset="40%" stopColor={lineProgress < 0.5 ? '#f5fbff' : `rgba(${Math.round(180 - lineProgress * 100)}, ${Math.round(190 - lineProgress * 80)}, 255, 0.72)`} />
-                <stop offset="100%" stopColor={lineProgress < 0.7 ? '#e8f4ff' : `rgba(40, 121, 191, ${0.64 + lineProgress * 0.2})`} />
-              </linearGradient>
-            </defs>
-            <path d="M175 -20 C 280 100, 320 220, 200 340 C 80 460, 60 580, 180 700 C 300 820, 320 940, 180 1060 C 40 1180, 60 1300, 175 1400"
-              fill="none"
-              stroke="url(#hero-white-to-blue-gradient)"
-              strokeWidth="12"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path d="M175 -20 C 280 100, 320 220, 200 340 C 80 460, 60 580, 180 700 C 300 820, 320 940, 180 1060 C 40 1180, 60 1300, 175 1400"
-              fill="none"
-              stroke={`rgba(255,255,255,${0.12 + lineHover * 0.14})`}
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray="24 20"
-              strokeDashoffset={-lineDash}
-            />
-          </svg>
-        </div>
-      )}
+          opacity: lineOpacity,
+        }}
+      >
+        <svg viewBox="0 0 350 1400" preserveAspectRatio="none" width="100%" height="100%">
+          <defs>
+            <linearGradient id="hero-line-white" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#ffffff" />
+              <stop offset="45%" stopColor="#f5fbff" />
+              <stop offset="100%" stopColor="#e8f4ff" />
+            </linearGradient>
+            <linearGradient id="hero-line-blue" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#bae6fd" />
+              <stop offset="45%" stopColor="#60b8ec" />
+              <stop offset="100%" stopColor="#2879bf" />
+            </linearGradient>
+          </defs>
 
-      {/* ── Main 2-col grid — eases out (fade + gentle rise) as the hero scrolls past ── */}
-      <div className="hero-grid" style={{
-        position: 'relative', zIndex: 2, flex: 1, minHeight: 0,
-        margin: '0 auto', width: '100%',
-        padding: '48px 48px 80px',
-        display: 'grid', gridTemplateColumns: '1fr 1fr',
-        gap: 40, alignItems: 'center',
-        overflowY: 'auto', overflowX: 'hidden',
-        opacity: 0.35 + 0.65 * scrollFade,
-        transform: `translateY(${(1 - scrollFade) * -28}px)`,
-      }}>
+          {/* White pass — draws itself on as you scroll */}
+          <motion.path
+            d={linePath}
+            fill="none"
+            stroke="url(#hero-line-white)"
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ pathLength: lineDraw }}
+          />
+          {/* Blue pass — cross-fades over the white one. Two static
+              gradients beat recomputing stop colours every frame. */}
+          <motion.path
+            d={linePath}
+            fill="none"
+            stroke="url(#hero-line-blue)"
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ pathLength: lineDraw, opacity: lineBlue }}
+          />
+          {/* Comet — a short lit segment travelling the path */}
+          <motion.path
+            d={linePath}
+            fill="none"
+            stroke="rgba(255,255,255,0.95)"
+            strokeWidth="5"
+            strokeLinecap="round"
+            style={{ pathLength: 0.05, pathOffset: cometOffset, opacity: cometOpacity }}
+          />
+        </svg>
+      </motion.div>
 
+      {/* ── Main 2-col grid ── */}
+      <div
+        className="hero-grid"
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          flex: 1,
+          minHeight: 0,
+          margin: '0 auto',
+          width: '100%',
+          // Top padding clears the fixed chrome: 36px ticker + 76px navbar
+          // = 112px, plus breathing room. The rotating headline was sliding
+          // under the navbar at the old 48px.
+          padding: '140px 48px 80px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 40,
+          alignItems: 'center',
+        }}
+      >
         {/* ── LEFT: copy ── */}
+        {/* Outer element owns the one-shot entrance; the inner one owns the
+            scroll-linked MotionValues. Keeping them on separate nodes stops
+            `whileInView` from trying to write into a derived MotionValue. */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true, margin: '-200px' }}
         >
-          {/* Headline — rotating */}
-          <div style={{ position: 'relative', marginBottom: 16 }}>
-            {heroSlides.map((slide, i) => (
-              <div key={i} style={{
-                visibility: heroSlide === i ? 'visible' : 'hidden',
-                height: heroSlide === i ? 'auto' : 0,
-                overflow: 'hidden',
-              }}>
-                <h1 style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: 'clamp(32px, 5vw, 72px)',
-                  fontWeight: 700, lineHeight: 1,
-                  color: '#ffffff', margin: 0,
-                  letterSpacing: '-0.025em',
-                }}>{slide.line1}</h1>
-                {slide.line2 && <h1 style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: 'clamp(32px, 5vw, 72px)',
-                  fontWeight: 700, lineHeight: 1,
-                  margin: 0, letterSpacing: '-0.025em',
-                  backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
-                  backgroundSize: '200% auto',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                  animation: 'shimmer 4s linear 1s infinite',
-                } as React.CSSProperties}>{slide.line2}</h1>}
-                <h1 style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: 'clamp(32px, 5vw, 72px)',
-                  fontWeight: 700, lineHeight: 1,
-                  color: 'rgba(255,255,255,0.75)', margin: 0,
-                  letterSpacing: '-0.025em',
-                }}>{slide.line3}</h1>
+          <motion.div style={{ opacity: textOpacity, y: textY }}>
+          {/* Headline — rotating, crossfaded to match the subtitle */}
+          <div
+            style={{
+              position: 'relative',
+              minHeight: 'clamp(112px, 15.5vw, 224px)',
+              marginBottom: 16,
+            }}
+          >
+            {HERO_SLIDES.map((slide, i) => (
+              <div
+                key={i}
+                aria-hidden={heroSlide !== i}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  opacity: heroSlide === i ? 1 : 0,
+                  transform: heroSlide === i ? 'translateY(0)' : 'translateY(12px)',
+                  transition: 'opacity 0.5s ease, transform 0.5s ease',
+                  pointerEvents: heroSlide === i ? 'auto' : 'none',
+                }}
+              >
+                <h1 style={{ ...HEADLINE_STYLE, color: '#ffffff' }}>{slide.line1}</h1>
+                {slide.line2 && (
+                  <h1
+                    style={{
+                      ...HEADLINE_STYLE,
+                      backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
+                      backgroundSize: '200% auto',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      animation: 'shimmer 4s linear 1s infinite',
+                    }}
+                  >
+                    {slide.line2}
+                  </h1>
+                )}
+                <h1 style={{ ...HEADLINE_STYLE, color: 'rgba(255,255,255,0.78)' }}>{slide.line3}</h1>
               </div>
             ))}
           </div>
 
           {/* Slide indicators */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
-            {heroSlides.map((_, i) => (
-              <button key={i} aria-label={`Slide ${i + 1}`} onClick={() => setHeroSlide(i)} style={{
-                width: heroSlide === i ? 24 : 8,
-                height: 8, borderRadius: 4, border: 'none', cursor: 'pointer',
-                background: heroSlide === i ? '#ffffff' : 'rgba(255,255,255,0.25)',
-                transition: 'width 0.3s, background 0.3s',
-              }} />
+            {HERO_SLIDES.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Show slide ${i + 1}`}
+                aria-current={heroSlide === i}
+                onClick={() => setHeroSlide(i)}
+                style={{
+                  width: heroSlide === i ? 24 : 8,
+                  height: 8,
+                  borderRadius: 4,
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  background: heroSlide === i ? '#ffffff' : 'rgba(255,255,255,0.3)',
+                  transition: 'width 0.3s, background 0.3s',
+                }}
+              />
             ))}
           </div>
 
-          {/* Subtitle — rotating. The slides are absolutely positioned, so this
-              wrapper has to reserve the height of the tallest one (3 lines at
-              17px/1.78) or the CTA row rides up over the last line. */}
+          {/* Subtitle — rotating. Absolutely positioned, so the wrapper
+              reserves the height of the tallest slide or the CTA row
+              rides up over the last line. */}
           <div style={{ position: 'relative', minHeight: 'clamp(92px, 8vw, 108px)', marginBottom: 34 }}>
-            {heroSlides.map((slide, i) => (
-              <p key={i} style={{
-                position: 'absolute', inset: 0,
-                fontSize: 17, color: 'rgba(255,255,255,0.72)', lineHeight: 1.78,
-                maxWidth: 470, margin: 0,
-                opacity: heroSlide === i ? 1 : 0,
-                transform: heroSlide === i ? 'translateY(0)' : 'translateY(10px)',
-                transition: 'opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s',
-                pointerEvents: heroSlide === i ? 'auto' : 'none',
-              }}>
-                {slide.sub.includes('*540#')
-                  ? <>Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any branch or by dialling <strong style={{ color: '#ffffff' }}>*540#</strong>.</>
-                  : slide.sub
-                }
+            {HERO_SLIDES.map((slide, i) => (
+              <p
+                key={i}
+                aria-hidden={heroSlide !== i}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  fontSize: 17,
+                  color: 'rgba(255,255,255,0.82)',
+                  lineHeight: 1.78,
+                  maxWidth: 470,
+                  margin: 0,
+                  opacity: heroSlide === i ? 1 : 0,
+                  transform: heroSlide === i ? 'translateY(0)' : 'translateY(10px)',
+                  transition: 'opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s',
+                  pointerEvents: heroSlide === i ? 'auto' : 'none',
+                }}
+              >
+                {slide.sub}
               </p>
             ))}
           </div>
@@ -558,32 +705,68 @@ export default function Hero() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 28 } as React.CSSProperties}
+            style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 28 }}
           >
-            <a href="#products" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'linear-gradient(135deg, #ffffff 0%, #f2f8ff 100%)', color: BD,
-              padding: '15px 30px', borderRadius: 999,
-              fontWeight: 800, fontSize: 15, textDecoration: 'none',
-              boxShadow: '0 12px 35px rgba(0,0,0,0.22)',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-            }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'translateY(-3px)'; el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.28)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = ''; el.style.boxShadow = '0 12px 35px rgba(0,0,0,0.22)' }}
+            <a
+              href="#products"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'linear-gradient(135deg, #ffffff 0%, #f2f8ff 100%)',
+                color: BD,
+                padding: '15px 30px',
+                borderRadius: 999,
+                fontWeight: 800,
+                fontSize: 15,
+                textDecoration: 'none',
+                boxShadow: '0 12px 35px rgba(0,0,0,0.22)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget
+                el.style.transform = 'translateY(-3px)'
+                el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.28)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget
+                el.style.transform = ''
+                el.style.boxShadow = '0 12px 35px rgba(0,0,0,0.22)'
+              }}
             >
               Open an Account
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke={BD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke={BD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </a>
-            <a href="#products" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              border: `1px solid rgba(186,230,253,0.34)`, color: '#f5fbff',
-              padding: '15px 30px', borderRadius: 999,
-              fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              background: 'rgba(255,255,255,0.08)',
-              transition: 'border-color 0.2s, background 0.2s, transform 0.2s',
-            }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(255,255,255,0.62)'; el.style.background = 'rgba(255,255,255,0.14)'; el.style.transform = 'translateY(-2px)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(186,230,253,0.34)'; el.style.background = 'rgba(255,255,255,0.08)'; el.style.transform = '' }}
+            <a
+              href="#products"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                border: '1px solid rgba(186,230,253,0.34)',
+                color: '#f5fbff',
+                padding: '15px 30px',
+                borderRadius: 999,
+                fontWeight: 700,
+                fontSize: 15,
+                textDecoration: 'none',
+                background: 'rgba(255,255,255,0.08)',
+                transition: 'border-color 0.2s, background 0.2s, transform 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget
+                el.style.borderColor = 'rgba(255,255,255,0.62)'
+                el.style.background = 'rgba(255,255,255,0.14)'
+                el.style.transform = 'translateY(-2px)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget
+                el.style.borderColor = 'rgba(186,230,253,0.34)'
+                el.style.background = 'rgba(255,255,255,0.08)'
+                el.style.transform = ''
+              }}
             >
               Explore Products
             </a>
@@ -597,27 +780,57 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.5 }}
             viewport={{ once: true }}
             style={{
-              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(186,230,253,0.16)',
-              borderRadius: 18, overflow: 'hidden',
+              borderRadius: 18,
+              overflow: 'hidden',
               backdropFilter: 'blur(14px)',
               boxShadow: '0 16px 40px rgba(0,0,0,0.16)',
-            } as React.CSSProperties}
+            }}
           >
             {[
-              { v: 47,  s: '+',   l: 'Branches' },
-              { v: 200, s: 'K+',  l: 'Customers' },
-              { v: 9,   s: '+',   l: 'Years' },
-              { v: 15,  s: '+',   l: 'Products' },
+              { v: 47, s: '+', l: 'Branches' },
+              { v: 200, s: 'K+', l: 'Customers' },
+              { v: 9, s: '+', l: 'Years' },
+              { v: 15, s: '+', l: 'Products' },
             ].map((s, i) => (
-              <div key={i} style={{ padding: '18px 12px', textAlign: 'center', borderRight: i < 3 ? '1px solid rgba(186,230,253,0.08)' : 'none', background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent' }}>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1, marginBottom: 4 }}>
+              <div
+                key={i}
+                style={{
+                  padding: '18px 12px',
+                  textAlign: 'center',
+                  borderRight: i < 3 ? '1px solid rgba(186,230,253,0.08)' : 'none',
+                  background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 26,
+                    fontWeight: 700,
+                    color: '#fff',
+                    lineHeight: 1,
+                    marginBottom: 4,
+                  }}
+                >
                   <Counter to={s.v} suffix={s.s} />
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(220,237,255,0.7)', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{s.l}</div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: 'rgba(220,237,255,0.7)',
+                    fontWeight: 700,
+                    letterSpacing: '0.07em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {s.l}
+                </div>
               </div>
             ))}
+          </motion.div>
           </motion.div>
         </motion.div>
 
@@ -628,9 +841,11 @@ export default function Hero() {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           viewport={{ once: true }}
-          style={{ position: 'relative', zIndex: 2 } as React.CSSProperties}
+          style={{ position: 'relative', zIndex: 2 }}
         >
-          <LandingCards mouse={mouse} spread={stackSpread} compact={isCompact} />
+          <motion.div style={{ opacity: sceneOpacity }}>
+            <LandingCards p={p} rotateX={sceneRotateX} rotateY={sceneRotateY} />
+          </motion.div>
         </motion.div>
       </div>
     </section>

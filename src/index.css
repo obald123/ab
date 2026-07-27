@@ -160,6 +160,206 @@ section[id] { scroll-margin-top: 100px; }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   HERO SKY
+   A four-layer living sky behind the hero. Everything here is
+   a compositor-only CSS animation (transform / opacity /
+   background-position) so it keeps running off the main thread
+   and costs nothing while React is idle.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Layer 1 — the sky itself. An oversized gradient whose *position*
+   is animated, sweeping dawn → day → dusk without ever having to
+   interpolate an unresolvable background-image. */
+@keyframes hero-sky-cycle {
+  0%   { background-position: 50% 0%; }
+  50%  { background-position: 50% 100%; }
+  100% { background-position: 50% 0%; }
+}
+
+/* Layer 2 — cloud masses drifting at three different speeds. */
+@keyframes hero-cloud-a {
+  from { transform: translate3d(-45vw, 0, 0); }
+  to   { transform: translate3d(115vw, 0, 0); }
+}
+@keyframes hero-cloud-b {
+  from { transform: translate3d(115vw, 0, 0); }
+  to   { transform: translate3d(-55vw, 0, 0); }
+}
+@keyframes hero-cloud-c {
+  from { transform: translate3d(-60vw, 0, 0); }
+  to   { transform: translate3d(120vw, 0, 0); }
+}
+
+/* Layer 3 — stars, tied to the same 64s clock as the sky so they
+   surface only while the gradient is in its deep phase. */
+@keyframes hero-stars-fade {
+  0%, 26%  { opacity: 0; }
+  52%      { opacity: 0.55; }
+  76%      { opacity: 0.8; }
+  92%, 100% { opacity: 0; }
+}
+@keyframes hero-twinkle {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+/* Layer 4 — the fintech grid, drifting exactly one cell so it loops seamlessly. */
+@keyframes hero-grid-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(60px, 60px, 0); }
+}
+
+.hero-sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-sky__base {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #0ea5e9 0%,
+    #0284c7 18%,
+    #0369a1 38%,
+    #075985 58%,
+    #0c4a6e 78%,
+    #082f49 100%
+  );
+  background-size: 100% 220%;
+  animation: hero-sky-cycle 64s ease-in-out infinite;
+}
+
+/* Contrast guarantee: the sky ramps through some genuinely light
+   blues, so this scrim sits between it and the copy to keep white
+   text legible in every phase of the cycle. */
+.hero-sky__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 47, 73, 0.46) 0%, rgba(8, 47, 73, 0.6) 55%, rgba(4, 26, 43, 0.78) 100%);
+}
+
+.hero-sky__cloud {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.06) 40%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  will-change: transform;
+}
+.hero-sky__cloud--a { top: 2%;  width: 64vw; height: 34vw; animation: hero-cloud-a 78s linear infinite; }
+.hero-sky__cloud--b { top: 38%; width: 46vw; height: 26vw; animation: hero-cloud-b 104s linear infinite; opacity: 0.75; }
+.hero-sky__cloud--c { top: 62%; width: 76vw; height: 40vw; animation: hero-cloud-c 136s linear infinite; opacity: 0.55; }
+
+.hero-sky__stars {
+  position: absolute;
+  inset: 0;
+  animation: hero-stars-fade 64s ease-in-out infinite;
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 14%,  rgba(255,255,255,0.95), transparent),
+    radial-gradient(1.2px 1.2px at 17% 42%, rgba(226,244,255,0.8),  transparent),
+    radial-gradient(1.6px 1.6px at 26% 9%,  rgba(255,255,255,0.9),  transparent),
+    radial-gradient(1px 1px     at 34% 63%, rgba(226,244,255,0.7),  transparent),
+    radial-gradient(1.4px 1.4px at 45% 22%, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1.1px 1.1px at 57% 52%, rgba(226,244,255,0.75), transparent),
+    radial-gradient(1.7px 1.7px at 63% 12%, rgba(255,255,255,0.95), transparent),
+    radial-gradient(1px 1px     at 71% 38%, rgba(226,244,255,0.7),  transparent),
+    radial-gradient(1.5px 1.5px at 79% 68%, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1.2px 1.2px at 86% 26%, rgba(226,244,255,0.8),  transparent),
+    radial-gradient(1.3px 1.3px at 92% 55%, rgba(255,255,255,0.9),  transparent),
+    radial-gradient(1px 1px     at 96% 8%,  rgba(226,244,255,0.7),  transparent);
+}
+
+/* Nested so the twinkle multiplies against the star layer's fade
+   instead of fighting it for the same opacity channel. */
+.hero-sky__twinkle {
+  position: absolute;
+  inset: 0;
+  animation: hero-twinkle 4.5s ease-in-out infinite;
+  background-image:
+    radial-gradient(2px 2px at 22% 28%, rgba(255,255,255,1), transparent),
+    radial-gradient(2px 2px at 68% 74%, rgba(186,230,253,1), transparent),
+    radial-gradient(1.8px 1.8px at 88% 40%, rgba(255,255,255,1), transparent);
+}
+
+.hero-sky__grid {
+  position: absolute;
+  inset: -60px;
+  opacity: 0.045;
+  background-image:
+    linear-gradient(rgba(186, 230, 253, 1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186, 230, 253, 1) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: hero-grid-drift 36s linear infinite;
+  will-change: transform;
+}
+
+/* ── Hero 3D card stack ── */
+.hero-stack {
+  perspective: 1200px;
+  perspective-origin: 50% 45%;
+}
+.hero-stack__layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.hero-stack__card {
+  position: relative;
+  width: 78%;
+  max-width: 430px;
+  border-radius: 28px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, filter;
+}
+.hero-stack__card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 28px;
+}
+/* Specular highlight — its X position is driven by the card's own
+   rotateY, so light appears to catch the surface as the card turns. */
+.hero-stack__sheen {
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 40%;
+  height: 160%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.24) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ── Motion preferences ──
+   Freeze every ambient loop. The scroll-linked choreography is
+   pinned to its assembled state in JS via useReducedMotion(). */
+@media (prefers-reduced-motion: reduce) {
+  .hero-sky__base,
+  .hero-sky__cloud,
+  .hero-sky__stars,
+  .hero-sky__twinkle,
+  .hero-sky__grid,
+  .text-shimmer-hero,
+  .float,
+  .float2,
+  .float-delay {
+    animation: none !important;
+  }
+  .hero-sky__stars { opacity: 0.5; }
+  html { scroll-behavior: auto; }
+}
+
 /* ── Utility classes ── */
 .float        { animation: floatY  5s ease-in-out infinite; }
 .float2       { animation: floatY2 6s ease-in-out 1.5s infinite; }
@@ -232,6 +432,10 @@ section[id] { scroll-margin-top: 100px; }
   background: #0ea5e9;
   animation: blink 2s ease-in-out infinite;
 }
+
+/* Pills that lead with a real icon suppress the generic dot. */
+.section-pill--icon::before { display: none; }
+.section-pill--icon svg { animation: blink 2.6s ease-in-out infinite; }
 
 .blue-bar {
   display: block;
@@ -309,8 +513,13 @@ section[id] { scroll-margin-top: 100px; }
 
 /* ── Hero ── */
 @media (max-width: 1023px) {
-  .hero-grid { grid-template-columns: 1fr !important; padding: 20px 32px 12px !important; gap: 12px !important; }
+  /* 112px of fixed chrome (36 ticker + 76 navbar) has to be cleared here too —
+     the navbar keeps its full height on mobile, it only swaps to a hamburger. */
+  .hero-grid { grid-template-columns: 1fr !important; padding: 128px 32px 24px !important; gap: 12px !important; }
   .hero-scene { display: none !important; }
+  /* Was a JS `isCompact` check at 900px while this rule hid the scene at
+     1023px — the two disagreed for 123px of viewport. Now CSS owns it. */
+  .hero-line { display: none !important; }
   .hero-grid h1 { font-size: clamp(22px, 4.5vw, 36px) !important; line-height: 1.05 !important; }
   .hero-grid p { font-size: 15px !important; }
   .hero-stats { grid-template-columns: repeat(2, 1fr) !important; }
@@ -321,7 +530,7 @@ section[id] { scroll-margin-top: 100px; }
 @media (max-width: 767px) {
   .hero-quick-links { overflow-x: auto !important; }
   .hero-quick-links > div { flex-wrap: nowrap !important; }
-  .hero-grid { padding: 16px 20px 12px !important; gap: 10px !important; }
+  .hero-grid { padding: 124px 20px 20px !important; gap: 10px !important; }
   .hero-grid h1 { font-size: clamp(22px, 7vw, 28px) !important; }
   .hero-grid p { font-size: 13px !important; line-height: 1.55 !important; }
   .hero-cta { gap: 8px !important; margin-bottom: 10px !important; }

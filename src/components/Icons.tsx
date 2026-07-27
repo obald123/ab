@@ -40,3 +40,6 @@ export const IconSend       = (p: IconProps) => <D {...p}><line x1="22" y1="2" x
 export const IconNetwork    = (p: IconProps) => <D {...p}><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><path d="M12 8v3M8.5 17l-3 0M19 16v-3M12 11l-3.5 6M12 11l3.5 6"/></D>
 export const IconPercent    = (p: IconProps) => <D {...p}><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></D>
 export const IconClock      = (p: IconProps) => <D {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></D>
+/* Destination — two map pins joined by a dotted route. Used as the marker
+   for the "Our Journey" section in place of the generic section-pill dot. */
+export const IconRoute      = (p: IconProps) => <D {...p}><path d="M17.5 12.5s3.5-3.9 3.5-6.5a3.5 3.5 0 1 0-7 0c0 2.6 3.5 6.5 3.5 6.5z"/><circle cx="17.5" cy="6" r="1.4"/><path d="M6.5 21.5s5.5-5.8 5.5-9a5.5 5.5 0 1 0-11 0c0 3.2 5.5 9 5.5 9z"/><circle cx="6.5" cy="12.5" r="2.2"/><path d="M10.2 19.6c3.4.5 6-.9 6.9-3.4" strokeDasharray="0.1 2.4"/></D>

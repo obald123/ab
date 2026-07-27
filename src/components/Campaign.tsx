@@ -2,11 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { IconMobile, IconTrendUp, IconHeart } from './Icons'
 
 const B = '#0ea5e9'
-const BD = '#0284c7'
-const BM = '#1a5c96'
 const GL = '#9fa8b8'
-const BG = '#eef4fb'
-const TEXT = '#647080'
 
 /* ── Countdown ── */
 function useCountdown(target: Date) {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue, animate, AnimatePresence, type MotionValue } from 'framer-motion'
-import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf } from './Icons'
+import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf, IconRoute } from './Icons'
 
 /* ── data — sourced & paraphrased from abr.rw/who-we-are/ "Our History" ── */
 const timeline = [
@@ -292,6 +292,25 @@ function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave
       <text x={pt.x} y={isTop ? pt.y - 64 : pt.y + 74} textAnchor="middle" fill="#0ea5e9" fontSize={9} fontWeight={800} letterSpacing="0.06em">
         {item.stat} {item.statLabel}
       </text>
+
+      {/* Category badge — the same icon the detail card shows, repeated out
+          here beside the year/headline so it reads at a glance and gives the
+          text stack its own hover target. Sits inside the marker's <g>, so
+          hovering it opens the very same card. */}
+      <g transform={`translate(${pt.x}, ${isTop ? pt.y - 90 : pt.y + 98})`}>
+        <circle r={24} fill="transparent" />
+        <motion.circle
+          r={16}
+          fill={item.highlight ? '#0ea5e9' : '#ffffff'}
+          stroke={item.highlight ? 'rgba(14,165,233,0.4)' : 'rgba(14,165,233,0.28)'}
+          strokeWidth={1.5}
+          animate={active ? { scale: 1.14 } : { scale: 1 }}
+          transition={{ duration: 0.24, ease: 'easeOut' }}
+        />
+        <g transform="translate(-11, -11)" style={{ pointerEvents: 'none' }}>
+          <item.CategoryIcon size={22} strokeWidth={2} color={item.highlight ? '#ffffff' : '#0284c7'} />
+        </g>
+      </g>
     </motion.g>
   )
 }
@@ -605,10 +624,11 @@ function JourneyPath() {
 
         {/* Title overlay */}
         <div style={{ position: 'absolute', top: 28, left: 32, zIndex: 10, pointerEvents: 'none' }}>
-          <span className="section-pill" style={{
+          <span className="section-pill section-pill--icon" style={{
             background: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(14,165,233,0.15)', color: '#0284c7',
             boxShadow: '0 2px 12px rgba(14,165,233,0.08)',
           }}>
+            <IconRoute size={15} strokeWidth={2} color="#0ea5e9" />
             Our Journey
           </span>
           <h2 style={{ fontWeight: 900, fontSize: 'clamp(24px, 3.5vw, 42px)', color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.02em', marginTop: 10 }}>
@@ -980,9 +1000,10 @@ export default function About() {
 
           <div style={{ margin: '0 auto', padding: '0 48px', position: 'relative' }}>
             <R>
-              <span className="section-pill" style={{
+              <span className="section-pill section-pill--icon" style={{
                 background: 'rgba(186,230,253,0.1)', border: '1.5px solid rgba(186,230,253,0.22)', color: '#bae6fd',
               }}>
+                <IconRoute size={15} strokeWidth={2} color="#bae6fd" />
                 Our Journey
               </span>
               <h2 style={{
