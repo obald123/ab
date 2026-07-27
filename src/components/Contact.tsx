@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus } from 'lucide-react'
-import { OPEN_EVENT } from './CookieConsent'
+import { IconSend } from './Icons'
 
 const smartValues = [
   { letter: 'S', word: 'Simple', desc: 'Easy to understand products and processes' },
@@ -245,7 +245,7 @@ export default function Contact() {
       <div style={{ background: '#ffffff', padding: '80px 48px' }}>
         <div style={{ margin: '0 auto' }}>
           <div data-reveal style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span className="section-pill">Get in Touch</span>
+            <span className="section-pill section-pill--icon"><IconSend size={14} strokeWidth={2} color="#0ea5e9" />Get in Touch</span>
             <h2 style={{
               fontWeight: 800, fontSize: 'clamp(24px, 3.5vw, 40px)',
               color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.02em',
@@ -438,122 +438,6 @@ export default function Contact() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer style={{ background: '#0284c7', padding: '48px 48px 28px' }}>
-        <div style={{ margin: '0 auto' }}>
-          <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 40 }}>
-
-            {/* Brand */}
-            <div>
-              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320, marginTop: 0 }}>
-                The Bank Which Cares For You. Providing accessible, responsible financial services to micro, small and medium entrepreneurs across Rwanda since 2014.
-              </p>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 800, marginTop: 12 }}>
-                Dial 5500
-              </p>
-
-              {/* Social icons */}
-              <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-                {[
-                  { label: 'Facebook', href: 'https://facebook.com/', d: 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z' },
-                  { label: 'LinkedIn', href: 'https://linkedin.com/', d: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z' },
-                ].map(s => (
-                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" style={{
-                    width: 36, height: 36, borderRadius: 8,
-                    background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.14)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'rgba(255,255,255,0.65)', textDecoration: 'none',
-                    transition: 'background 0.2s, color 0.2s',
-                  }}
-                    onMouseEnter={e => {
-                      const el = e.currentTarget as HTMLAnchorElement
-                      el.style.background = 'rgba(255,255,255,0.2)'
-                      el.style.color = '#ffffff'
-                    }}
-                    onMouseLeave={e => {
-                      const el = e.currentTarget as HTMLAnchorElement
-                      el.style.background = 'rgba(255,255,255,0.1)'
-                      el.style.color = 'rgba(255,255,255,0.65)'
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d={s.d}/></svg>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 800, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
-                Quick Links
-              </h4>
-              {['Who We Are', 'What We Offer', 'Media & News', 'Our Branches', 'Careers'].map(label => (
-                <a key={label} href="#" style={{
-                  display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.55)',
-                  textDecoration: 'none', padding: '6px 0', transition: 'color 0.2s',
-                }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#ffffff' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.55)' }}
-                >
-                  {label}
-                </a>
-              ))}
-            </div>
-
-            {/* Regulators */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 800, color: '#ffffff', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
-                Regulated By
-              </h4>
-              {[
-                { href: 'https://www.bnr.rw/', lines: ['National Bank of Rwanda (BNR)', 'Licence No. BNR/D&LIC/000020'] },
-                { href: 'https://www.fic.gov.rw/', lines: ['Rwanda Financial Intelligence Unit', '(RFICA Member)'] },
-              ].map(({ href, lines }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'block', fontSize: 13.5, color: 'rgba(255,255,255,0.55)',
-                    lineHeight: 1.7, textDecoration: 'none', marginBottom: 16,
-                    transition: 'color 0.2s',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#ffffff' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.55)' }}
-                >
-                  {lines[0]}<br />{lines[1]}
-                </a>
-              ))}
-              <div style={{ marginTop: 16, display: 'inline-block', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, padding: '8px 14px' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Member</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)' }}>AccessGroup · SMART Campaign</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom bar */}
-          <div className="footer-bottom" style={{
-            paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)',
-            display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-          }}>
-            <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.35)' }}>
-              © {new Date().getFullYear()} AB Bank Rwanda Ltd. All rights reserved.
-            </p>
-            <div style={{ display: 'flex', gap: 20 }}>
-              {['Privacy Policy', 'Terms of Use', 'Cookie Policy', 'Cookie Settings'].map(t => (
-                <span key={t} style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', cursor: 'pointer', transition: 'color 0.2s' }}
-                  onClick={t === 'Cookie Settings' ? () => window.dispatchEvent(new Event(OPEN_EVENT)) : undefined}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)' }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </footer>
       {/* Floating accessibility FAB + panel */}
       <div className="a11y-fab" aria-hidden={false}>
         <button aria-label="Toggle accessibility menu" onClick={() => setA11yOpen(s => !s)} className="a11y-fab-button">

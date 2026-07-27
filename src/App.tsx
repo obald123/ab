@@ -1,33 +1,29 @@
-import Ticker from './components/Ticker'
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import Products from './components/Products'
-import LoanCalculator from './components/LoanCalculator'
-import Services from './components/Services'
-import Campaign from './components/Campaign'
-import About from './components/About'
-import News from './components/News'
-import SocialFeed from './components/SocialFeed'
-import Contact from './components/Contact'
-import Branches from './components/Branches'
-import CookieConsent from './components/CookieConsent'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import PageShell from './components/page/PageShell'
+import Home from './pages/Home'
+import Careers from './pages/Careers'
+import Tenders from './pages/Tenders'
+import Articles from './pages/Articles'
+import NewsPage from './pages/NewsPage'
+import Forms from './pages/Forms'
 
 export default function App() {
   return (
-    <div className="antialiased" style={{ background: '#ffffff' }}>
-      <Ticker />
-      <Navbar />
-      <Hero />
-      <Products />
-      <LoanCalculator />
-      <Services />
-      <Campaign />
-      <About />
-      <Branches />
-      <News />
-      <SocialFeed />
-      <Contact />
-      <CookieConsent />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<PageShell />}>
+          <Route index element={<Home />} />
+          <Route path="careers" element={<Careers />} />
+          <Route path="tenders" element={<Tenders />} />
+          <Route path="media/news" element={<NewsPage />} />
+          <Route path="media/articles" element={<Articles />} />
+          <Route path="forms" element={<Forms />} />
+          {/* Convenience aliases so shorter URLs still resolve */}
+          <Route path="news" element={<Navigate to="/media/news" replace />} />
+          <Route path="articles" element={<Navigate to="/media/articles" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue, animate, AnimatePresence, type MotionValue } from 'framer-motion'
-import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf, IconRoute } from './Icons'
+import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf, IconRoute, IconUsers, IconBriefcase, IconHandshake } from './Icons'
 
 /* ── data — sourced & paraphrased from abr.rw/who-we-are/ "Our History" ── */
 const timeline = [
@@ -862,9 +862,10 @@ export default function About() {
         <div style={{ margin: '0 auto', padding: '0 48px', position: 'relative' }}>
           <R>
             <div style={{ textAlign: 'center', marginBottom: 56 }}>
-              <span className="section-pill" style={{
+              <span className="section-pill section-pill--icon" style={{
                 background: 'rgba(186,230,253,0.12)', border: '1.5px solid rgba(186,230,253,0.25)', color: '#bae6fd',
               }}>
+                <IconBank size={14} strokeWidth={2} color="#bae6fd" />
                 Who We Are
               </span>
               <h2 style={{
@@ -1075,7 +1076,7 @@ export default function About() {
         }} />
         <div style={{ margin: '0 auto', padding: '0 48px' }}>
           <R style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span className="section-pill">Leadership</span>
+            <span className="section-pill section-pill--icon"><IconUsers size={14} strokeWidth={2} color="#0ea5e9" />Leadership</span>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0284c7', letterSpacing: '-0.025em' }}>
               Management Team
             </h2>
@@ -1095,7 +1096,7 @@ export default function About() {
         }} />
         <div style={{ margin: '0 auto', padding: '0 48px' }}>
           <R style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span className="section-pill">Board</span>
+            <span className="section-pill section-pill--icon"><IconBriefcase size={14} strokeWidth={2} color="#0ea5e9" />Board</span>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0284c7', letterSpacing: '-0.025em' }}>
               Board of Directors
             </h2>
@@ -1123,7 +1124,7 @@ export default function About() {
 
         <div style={{ margin: '0 auto', padding: '0 48px' }}>
           <R style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="section-pill">Ownership</span>
+            <span className="section-pill section-pill--icon"><IconHandshake size={14} strokeWidth={2} color="#0ea5e9" />Ownership</span>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0284c7', letterSpacing: '-0.025em' }}>
               Our Shareholders
             </h2>

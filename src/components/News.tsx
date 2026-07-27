@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { IconNews } from './Icons'
 
 const articles = [
   {
@@ -63,7 +64,7 @@ export default function News() {
         {/* Header */}
         <div data-reveal className="news-header" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 52 }}>
           <div>
-            <span className="section-pill">Media & News</span>
+            <span className="section-pill section-pill--icon"><IconNews size={14} strokeWidth={2} color="#0ea5e9" />Media & News</span>
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 700, fontSize: 'clamp(26px, 3.5vw, 44px)',

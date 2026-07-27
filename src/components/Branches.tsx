@@ -140,7 +140,7 @@ export default function Branches() {
           viewport={{ once: true, margin: '-100px' }}
           style={{ textAlign: 'center', marginBottom: 28 }}
         >
-          <span className="section-pill">Locations</span>
+          <span className="section-pill section-pill--icon"><IconMapPin size={14} strokeWidth={2} color="#0ea5e9" />Locations</span>
           <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', color: '#0284c7', letterSpacing: '-0.02em' }}>Our Branch Network</h2>
           <p style={{ color: '#647080', marginTop: 8, maxWidth: 560, marginInline: 'auto' }}>
             {branches.length} branches and credit outlets across Rwanda. Hover a marker to see the branch name, address and contact details.

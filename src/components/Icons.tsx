@@ -43,3 +43,13 @@ export const IconClock      = (p: IconProps) => <D {...p}><circle cx="12" cy="12
 /* Destination — two map pins joined by a dotted route. Used as the marker
    for the "Our Journey" section in place of the generic section-pill dot. */
 export const IconRoute      = (p: IconProps) => <D {...p}><path d="M17.5 12.5s3.5-3.9 3.5-6.5a3.5 3.5 0 1 0-7 0c0 2.6 3.5 6.5 3.5 6.5z"/><circle cx="17.5" cy="6" r="1.4"/><path d="M6.5 21.5s5.5-5.8 5.5-9a5.5 5.5 0 1 0-11 0c0 3.2 5.5 9 5.5 9z"/><circle cx="6.5" cy="12.5" r="2.2"/><path d="M10.2 19.6c3.4.5 6-.9 6.9-3.4" strokeDasharray="0.1 2.4"/></D>
+export const IconNews       = (p: IconProps) => <D {...p}><path d="M4 22h14a2 2 0 0 0 2-2V4a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v16a2 2 0 0 1-2-2v-8h2"/><path d="M8 7h8M8 11h8M8 15h5"/></D>
+export const IconGrid       = (p: IconProps) => <D {...p}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></D>
+export const IconFileText   = (p: IconProps) => <D {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8M8 17h8M8 9h2"/></D>
+export const IconBookOpen   = (p: IconProps) => <D {...p}><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/></D>
+export const IconDownload   = (p: IconProps) => <D {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></D>
+export const IconUpload     = (p: IconProps) => <D {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></D>
+export const IconSearch     = (p: IconProps) => <D {...p}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></D>
+export const IconGavel      = (p: IconProps) => <D {...p}><path d="m14 13-7.5 7.5a2.1 2.1 0 0 1-3-3L11 10"/><path d="m16 16 6-6M8 8l6-6M9 7l8 8M5 11l8 8"/></D>
+export const IconAlert      = (p: IconProps) => <D {...p}><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></D>
+export const IconArrowRight = (p: IconProps) => <D {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></D>
