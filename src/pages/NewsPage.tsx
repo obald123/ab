@@ -1,8 +1,11 @@
 import { useState } from 'react'
-import { IconNews, IconAlert, IconArrowRight } from '../components/Icons'
+import { IconNews, IconAlert, IconArrowRight, IconCalendar } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
-import { Card, Chip, Section, type Tone } from '../components/page/ui'
+import SmartImage from '../components/page/SmartImage'
+import { Chip, Section, type Tone } from '../components/page/ui'
 import { NOTICES, formatDate, type NoticeLevel } from '../data/site'
+
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
 
 /* Press releases mirror the seed data used by the home-page News section.
    Kept here so this page reads as the full archive rather than the
@@ -16,8 +19,7 @@ const PRESS = [
     title: 'NGOBOKA Life Insurance Now Available at All AB Rwanda Branches',
     excerpt:
       'In partnership with Sanlam Vie, AB Rwanda launches NGOBOKA — an accessible life insurance scheme offering individual coverage from RWF 400/month and family protection for spouse and up to four children from RWF 900/month.',
-    image: 'https://images.unsplash.com/photo-1678225894217-ec0de2dc0548?w=800&h=500&fit=crop&auto=format',
-    featured: true,
+    image: 'https://images.unsplash.com/photo-1678225894217-ec0de2dc0548?w=1200&h=700&fit=crop&auto=format',
   },
   {
     id: 'p2',
@@ -28,7 +30,6 @@ const PRESS = [
     excerpt:
       'Our digital payment platform E-kash — accessible via *540# — now covers all major mobile network operators and partner banks, bringing seamless mobile banking to every corner of Rwanda.',
     image: 'https://images.unsplash.com/photo-1708772565599-2c4e4b3ed9db?w=600&h=400&fit=crop&auto=format',
-    featured: false,
   },
   {
     id: 'p3',
@@ -39,7 +40,6 @@ const PRESS = [
     excerpt:
       'The new credit outlet extends the bank network deeper into the Eastern Province, serving agri-businesses and traders across the Ngoma catchment area.',
     image: 'https://images.unsplash.com/photo-1585540083814-ea6ee8af9e4f?w=600&h=400&fit=crop&auto=format',
-    featured: false,
   },
   {
     id: 'p4',
@@ -50,21 +50,48 @@ const PRESS = [
     excerpt:
       'The bank reports continued portfolio growth and improved asset quality for the financial year ended 31 December 2025. Full statements are available on the Forms & Downloads page.',
     image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=400&fit=crop&auto=format',
-    featured: false,
   },
 ]
 
-const LEVEL_TONE: Record<NoticeLevel, Tone> = {
-  Information: 'blue',
-  Important: 'amber',
-  Urgent: 'red',
+const LEVEL: Record<NoticeLevel, { tone: Tone; band: string; ink: string; wash: string }> = {
+  Information: { tone: 'blue', band: '#0ea5e9', ink: '#0284c7', wash: 'rgba(14,165,233,0.05)' },
+  Important: { tone: 'amber', band: '#d97706', ink: '#b45309', wash: 'rgba(217,119,6,0.05)' },
+  Urgent: { tone: 'red', band: '#dc2626', ink: '#b91c1c', wash: 'rgba(220,38,38,0.05)' },
+}
+
+/** Big day / month-year rail — the archive's spine. */
+function DateRail({ iso }: { iso: string }) {
+  const d = new Date(iso + 'T00:00:00')
+  return (
+    <div style={{ textAlign: 'center', flexShrink: 0, width: 66 }}>
+      <div style={{ fontFamily: 'var(--font-serif)', fontSize: 34, fontWeight: 700, color: '#0284c7', lineHeight: 1 }}>
+        {d.getDate()}
+      </div>
+      <div
+        style={{
+          fontFamily: MONO,
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          color: '#94a3b8',
+          marginTop: 5,
+        }}
+      >
+        {d.toLocaleDateString('en-GB', { month: 'short' })}
+        <br />
+        {d.getFullYear()}
+      </div>
+    </div>
+  )
 }
 
 type Tab = 'press' | 'notices'
 
 export default function NewsPage() {
   const [tab, setTab] = useState<Tab>('press')
-  const [featured, ...others] = PRESS
+  const [openNotice, setOpenNotice] = useState<string | null>(NOTICES[0]?.id ?? null)
+  const [lead, ...rest] = PRESS
 
   return (
     <main>
@@ -78,7 +105,7 @@ export default function NewsPage() {
       <Section>
         {/* Tabs — press releases and notices are both "media", but one is
             promotional and one is contractual, so they are kept apart. */}
-        <div role="tablist" aria-label="Media type" style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap' }}>
+        <div role="tablist" aria-label="Media type" style={{ display: 'flex', gap: 8, marginBottom: 34, flexWrap: 'wrap' }}>
           {(
             [
               ['press', 'Press releases', PRESS.length],
@@ -104,6 +131,7 @@ export default function NewsPage() {
                   fontSize: 13.5,
                   fontWeight: 800,
                   cursor: 'pointer',
+                  fontFamily: 'inherit',
                   transition: 'background 0.18s, color 0.18s',
                 }}
               >
@@ -126,100 +154,310 @@ export default function NewsPage() {
 
         {tab === 'press' ? (
           <>
-            <article style={{ marginBottom: 40 }}>
-              <Card interactive style={{ overflow: 'hidden', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)' }} >
-                <div style={{ position: 'relative', minHeight: 300 }}>
-                  <img
-                    src={featured.image}
-                    alt=""
-                    loading="lazy"
-                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-                <div style={{ padding: '34px 34px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-                    <Chip tone="blue">{featured.category}</Chip>
-                    <Chip tone="green">{featured.tag}</Chip>
+            {/* ── Lead story: copy sits on the image, newsroom style ── */}
+            <article className="news-lead" style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', marginBottom: 8 }}>
+              <div style={{ position: 'relative', minHeight: 440 }}>
+                <SmartImage src={lead.image} />
+                {/* Scrim: strong at the bottom so the headline always has a ground */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background:
+                      'linear-gradient(180deg, rgba(2,30,60,0.16) 0%, rgba(2,30,60,0.36) 42%, rgba(4,26,48,0.88) 100%)',
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'relative',
+                    minHeight: 440,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: '40px 44px 36px',
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+                    <span
+                      style={{
+                        background: '#0ea5e9',
+                        color: '#fff',
+                        borderRadius: 100,
+                        padding: '4px 13px',
+                        fontSize: 10.5,
+                        fontWeight: 900,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {lead.category}
+                    </span>
+                    <span
+                      style={{
+                        background: 'rgba(255,255,255,0.16)',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        color: '#fff',
+                        borderRadius: 100,
+                        padding: '4px 13px',
+                        fontSize: 10.5,
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        backdropFilter: 'blur(8px)',
+                      }}
+                    >
+                      {lead.tag}
+                    </span>
                   </div>
+
                   <h2
                     style={{
                       fontFamily: 'var(--font-serif)',
-                      fontSize: 'clamp(22px, 2.6vw, 30px)',
+                      fontSize: 'clamp(24px, 3.2vw, 42px)',
                       fontWeight: 700,
-                      color: '#0284c7',
-                      lineHeight: 1.22,
-                      margin: '0 0 12px',
+                      color: '#fff',
+                      lineHeight: 1.14,
+                      letterSpacing: '-0.025em',
+                      margin: '0 0 14px',
+                      maxWidth: 780,
+                      textShadow: '0 2px 20px rgba(2,20,40,0.4)',
                     }}
                   >
-                    {featured.title}
+                    {lead.title}
                   </h2>
-                  <p style={{ fontSize: 14.5, color: '#647080', lineHeight: 1.75, margin: '0 0 20px' }}>{featured.excerpt}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
-                    <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 700 }}>{formatDate(featured.date)}</span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 800, color: '#0ea5e9' }}>
-                      Read release
-                      <IconArrowRight size={14} strokeWidth={2.4} color="#0ea5e9" />
+                  <p
+                    style={{
+                      fontSize: 15,
+                      color: 'rgba(224,242,254,0.86)',
+                      lineHeight: 1.75,
+                      margin: '0 0 20px',
+                      maxWidth: 660,
+                    }}
+                  >
+                    {lead.excerpt}
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 7,
+                        fontFamily: MONO,
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        color: 'rgba(224,242,254,0.7)',
+                      }}
+                    >
+                      <IconCalendar size={13} strokeWidth={2} color="rgba(224,242,254,0.7)" />
+                      {formatDate(lead.date)}
+                    </span>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 7,
+                        fontSize: 13.5,
+                        fontWeight: 800,
+                        color: '#bae6fd',
+                      }}
+                    >
+                      Read the full release
+                      <IconArrowRight size={14} strokeWidth={2.4} color="#bae6fd" />
                     </span>
                   </div>
                 </div>
-              </Card>
+              </div>
             </article>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24 }}>
-              {others.map((n) => (
-                <Card key={n.id} interactive style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                  <img src={n.image} alt="" loading="lazy" style={{ width: '100%', height: 172, objectFit: 'cover', display: 'block' }} />
-                  <div style={{ padding: 22, display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-                      <Chip tone="blue">{n.category}</Chip>
-                      <Chip tone="grey">{n.tag}</Chip>
-                    </div>
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 700, color: '#0284c7', lineHeight: 1.3, margin: '0 0 10px' }}>
-                      {n.title}
-                    </h3>
-                    <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.7, margin: '0 0 18px', flex: 1 }}>{n.excerpt}</p>
-                    <span style={{ fontSize: 11.5, color: '#94a3b8', fontWeight: 700 }}>{formatDate(n.date)}</span>
-                  </div>
-                </Card>
+            {/* ── Archive index: date rail + thumbnail + copy, hairline rows ── */}
+            <div style={{ borderTop: '1px solid rgba(14,165,233,0.16)' }}>
+              {rest.map((n) => (
+                <PressRow key={n.id} item={n} />
               ))}
             </div>
           </>
         ) : (
-          <div style={{ display: 'grid', gap: 16 }}>
-            {NOTICES.map((notice) => (
-              <Card key={notice.id} style={{ padding: 24, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                <span
-                  aria-hidden="true"
+          /* ── Public notices: a formal register, not a feed ── */
+          <div style={{ display: 'grid', gap: 14 }}>
+            {NOTICES.map((notice) => {
+              const L = LEVEL[notice.level]
+              const open = openNotice === notice.id
+              return (
+                <article
+                  key={notice.id}
                   style={{
-                    flexShrink: 0,
-                    width: 42,
-                    height: 42,
-                    borderRadius: 12,
-                    display: 'grid',
-                    placeItems: 'center',
-                    background: notice.level === 'Urgent' ? 'rgba(220,38,38,0.1)' : 'rgba(14,165,233,0.1)',
+                    display: 'flex',
+                    background: open ? L.wash : '#ffffff',
+                    border: '1px solid rgba(14,165,233,0.14)',
+                    borderRadius: 14,
+                    overflow: 'hidden',
+                    transition: 'background 0.24s ease',
                   }}
                 >
-                  <IconAlert size={20} strokeWidth={2} color={notice.level === 'Urgent' ? '#b91c1c' : '#0284c7'} />
-                </span>
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
-                    <Chip tone={LEVEL_TONE[notice.level]}>{notice.level}</Chip>
-                    <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: '0.06em', color: '#94a3b8' }}>{notice.ref}</span>
+                  {/* Severity band */}
+                  <div aria-hidden="true" style={{ width: 6, flexShrink: 0, background: L.band }} />
+
+                  <div style={{ flex: 1, minWidth: 0, padding: '20px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
+                      <span
+                        style={{
+                          fontFamily: MONO,
+                          fontSize: 11.5,
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          color: L.ink,
+                          background: L.wash,
+                          border: `1px solid ${L.band}33`,
+                          borderRadius: 5,
+                          padding: '3px 9px',
+                        }}
+                      >
+                        {notice.ref}
+                      </span>
+                      <Chip tone={L.tone}>{notice.level}</Chip>
+                      {notice.level === 'Urgent' && (
+                        <span style={{ display: 'inline-flex' }}>
+                          <IconAlert size={16} strokeWidth={2.2} color={L.band} />
+                        </span>
+                      )}
+                      <span
+                        style={{
+                          marginLeft: 'auto',
+                          fontSize: 10.5,
+                          fontWeight: 800,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                          color: '#94a3b8',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Effective {formatDate(notice.effective)}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => setOpenNotice(open ? null : notice.id)}
+                      aria-expanded={open}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        textAlign: 'left',
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        fontSize: 17,
+                        fontWeight: 800,
+                        color: '#0f172a',
+                        lineHeight: 1.38,
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      {notice.title}
+                    </button>
+
+                    {open && (
+                      <p
+                        style={{
+                          fontSize: 13.5,
+                          color: '#647080',
+                          lineHeight: 1.8,
+                          margin: '12px 0 0',
+                          paddingLeft: 14,
+                          borderLeft: `2px solid ${L.band}44`,
+                          maxWidth: 780,
+                        }}
+                      >
+                        {notice.body}
+                      </p>
+                    )}
                   </div>
-                  <h3 style={{ fontSize: 16.5, fontWeight: 900, color: '#0f172a', margin: '0 0 8px', lineHeight: 1.35 }}>
-                    {notice.title}
-                  </h3>
-                  <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.75, margin: '0 0 12px' }}>{notice.body}</p>
-                  <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#0ea5e9' }}>
-                    Effective {formatDate(notice.effective)}
-                  </span>
-                </div>
-              </Card>
-            ))}
+                </article>
+              )
+            })}
           </div>
         )}
       </Section>
     </main>
+  )
+}
+
+function PressRow({ item }: { item: (typeof PRESS)[number] }) {
+  const [hover, setHover] = useState(false)
+  return (
+    <article
+      className="press-row"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 26,
+        padding: '26px 16px 26px 8px',
+        borderBottom: '1px solid rgba(14,165,233,0.16)',
+        background: hover ? 'rgba(14,165,233,0.035)' : 'transparent',
+        transition: 'background 0.2s ease',
+      }}
+    >
+      <DateRail iso={item.date} />
+
+      <div
+        style={{
+          position: 'relative',
+          width: 148,
+          height: 96,
+          flexShrink: 0,
+          borderRadius: 12,
+          overflow: 'hidden',
+        }}
+        className="press-thumb"
+      >
+        <SmartImage src={item.image} style={{ transform: hover ? 'scale(1.06)' : 'scale(1)', transition: 'transform 0.5s ease' }} />
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+          <Chip tone="blue">{item.category}</Chip>
+          <Chip tone="grey">{item.tag}</Chip>
+        </div>
+        <h3
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: 19,
+            fontWeight: 700,
+            color: hover ? '#0ea5e9' : '#0f172a',
+            lineHeight: 1.3,
+            margin: '0 0 7px',
+            letterSpacing: '-0.015em',
+            transition: 'color 0.2s ease',
+          }}
+        >
+          {item.title}
+        </h3>
+        <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.7, margin: 0, maxWidth: 720 }}>{item.excerpt}</p>
+      </div>
+
+      <span
+        aria-hidden="true"
+        className="press-chevron"
+        style={{
+          flexShrink: 0,
+          width: 38,
+          height: 38,
+          borderRadius: '50%',
+          display: 'grid',
+          placeItems: 'center',
+          border: `1.5px solid ${hover ? '#0ea5e9' : 'rgba(14,165,233,0.24)'}`,
+          background: hover ? '#0ea5e9' : 'transparent',
+          transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
+          transform: hover ? 'translateX(4px)' : 'none',
+        }}
+      >
+        <IconArrowRight size={15} strokeWidth={2.4} color={hover ? '#fff' : '#0ea5e9'} />
+      </span>
+    </article>
   )
 }

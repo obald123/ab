@@ -502,6 +502,23 @@ section[id] { scroll-margin-top: 100px; }
   border-radius: 6px;
 }
 
+/* Newsroom archive rows: drop the chevron, then the thumbnail, then the
+   date rail as space runs out — the headline is the last thing to give. */
+@media (max-width: 900px) {
+  .press-row .press-chevron { display: none !important; }
+  .press-row { gap: 18px !important; }
+  .news-lead > div { min-height: 380px !important; }
+  .news-lead > div > div:last-child { min-height: 380px !important; padding: 28px 24px 26px !important; }
+}
+@media (max-width: 680px) {
+  .press-row .press-thumb { display: none !important; }
+}
+@media (max-width: 460px) {
+  .press-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+  .press-row > div:first-child { width: auto !important; display: flex; align-items: baseline; gap: 8px; text-align: left !important; }
+  .press-row > div:first-child > div:last-child { display: inline !important; }
+}
+
 /* Careers cards: the countdown dial and the four-up spec strip both need
    to fold before the card starts squeezing the job title. */
 @media (max-width: 860px) {

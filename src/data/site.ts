@@ -529,3 +529,147 @@ export function daysUntil(iso: string) {
   today.setHours(0, 0, 0, 0)
   return Math.round((target - today.getTime()) / 86_400_000)
 }
+
+/* ── Employee awards ───────────────────────────────────────
+   Recognition programme content. Two cadences that are judged
+   differently and so are modelled differently:
+
+     Employee of the Month — one winner per month, peer + manager
+       nominated, cited for a specific act in that month.
+     Employee of the Year   — one winner per year, drawn from the
+       twelve monthly winners, cited for sustained impact and
+       backed by measurable results.
+   ─────────────────────────────────────────────────────────── */
+export type Award = {
+  id: string
+  period: string
+  periodShort: string
+  name: string
+  role: string
+  branch: string
+  department: string
+  photo: string
+  citation: string
+  quote: string
+  metrics: { value: string; label: string }[]
+}
+
+export const EMPLOYEE_OF_THE_YEAR: Award = {
+  id: 'eoy-2025',
+  period: '2025',
+  periodShort: 'FY2025',
+  name: 'Immaculée Mukamana',
+  role: 'Branch Manager',
+  branch: 'Musanze',
+  department: 'Business',
+  photo: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=900&fit=crop&auto=format',
+  citation:
+    'Immaculée took the Musanze branch from the smallest upcountry portfolio to the strongest in the network in a single financial year — without a single write-off. She rebuilt the branch appraisal routine around on-site visits, trained four new relationship officers herself, and personally reworked the repayment schedules of 60 agri-borrowers so instalments landed after harvest rather than before it.',
+  quote:
+    'You cannot assess a farmer from behind a desk in town. Go to the field, count what is actually growing, then decide. The numbers follow the respect.',
+  metrics: [
+    { value: '+38%', label: 'Portfolio growth' },
+    { value: '0.4%', label: 'Portfolio at risk' },
+    { value: '612', label: 'New borrowers' },
+    { value: '4', label: 'Officers mentored' },
+  ],
+}
+
+export const EMPLOYEE_OF_THE_MONTH: Award = {
+  id: 'eom-2026-07',
+  period: 'July 2026',
+  periodShort: 'Jul 2026',
+  name: 'Jean-Paul Habimana',
+  role: 'Digital Channels Engineer',
+  branch: 'Kigali (HQ)',
+  department: 'IT & Digital',
+  photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=900&fit=crop&auto=format',
+  citation:
+    'When the MTN settlement file format changed without notice on a Saturday night, Jean-Paul traced the failure, wrote the parser fix and had eKash reconciling again before the Sunday morning agent float run. Customers never saw an outage. He then wrote the runbook so the next person would not need to be him.',
+  quote:
+    'Nobody dials *540# thinking about integrations. They think about sending school fees. That is the job.',
+  metrics: [
+    { value: '3h 40m', label: 'Time to resolution' },
+    { value: '0', label: 'Customer-facing downtime' },
+    { value: '52k', label: 'Transactions protected' },
+  ],
+}
+
+export type PastAward = {
+  id: string
+  period: string
+  name: string
+  role: string
+  branch: string
+  reason: string
+}
+
+export const PAST_MONTHLY: PastAward[] = [
+  {
+    id: 'eom-2026-06',
+    period: 'June 2026',
+    name: 'Aline Uwimana',
+    role: 'Customer Service Officer',
+    branch: 'Nyabugogo',
+    reason: 'Handled 41 walk-ins during the tariff transition without a single escalation.',
+  },
+  {
+    id: 'eom-2026-05',
+    period: 'May 2026',
+    name: 'Eric Nsengiyumva',
+    role: 'Relationship Officer',
+    branch: 'Rwamagana',
+    reason: 'Recovered RWF 18M of arrears through renegotiation rather than enforcement.',
+  },
+  {
+    id: 'eom-2026-04',
+    period: 'April 2026',
+    name: 'Claudine Ingabire',
+    role: 'Teller',
+    branch: 'Huye',
+    reason: 'Spotted and stopped an attempted identity fraud at the counter.',
+  },
+  {
+    id: 'eom-2026-03',
+    period: 'March 2026',
+    name: 'Patrick Rwigema',
+    role: 'Credit Analyst',
+    branch: 'Kigali (HQ)',
+    reason: 'Cut average micro-loan appraisal turnaround from 4.2 days to 2.6.',
+  },
+  {
+    id: 'eom-2026-02',
+    period: 'February 2026',
+    name: 'Solange Mutesi',
+    role: 'Bancassurance Officer',
+    branch: 'Rubavu',
+    reason: 'Enrolled 220 families in NGOBOKA cover in a single month.',
+  },
+  {
+    id: 'eom-2026-01',
+    period: 'January 2026',
+    name: 'Fabrice Bizimana',
+    role: 'Agri Loan Officer',
+    branch: 'Nyagatare',
+    reason: 'Restructured 90 seasonal loans ahead of an unusually late rainy season.',
+  },
+]
+
+export const AWARD_CRITERIA = [
+  {
+    title: 'Customer outcome',
+    body: 'Did a real customer end up materially better off? Volume alone does not qualify anyone.',
+  },
+  {
+    title: 'SMART in practice',
+    body: 'Simple, Meaningful, Appropriate, Responsive, Transparent — demonstrated, not recited.',
+  },
+  {
+    title: 'Lifting the team',
+    body: 'Work that made colleagues better at their jobs counts as much as individual numbers.',
+  },
+  {
+    title: 'Integrity under pressure',
+    body: 'The decision that was harder but right, especially when nobody was watching.',
+  },
+]

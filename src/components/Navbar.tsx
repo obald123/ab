@@ -22,7 +22,13 @@ const NAV: NavItem[] = [
       { label: 'Forms & Downloads', to: '/forms', desc: 'Account forms, tariffs and statements' },
     ],
   },
-  { label: 'Careers', to: '/careers' },
+  {
+    label: 'Careers',
+    children: [
+      { label: 'Open Positions', to: '/careers', desc: 'Roles across the network' },
+      { label: 'Our People & Awards', to: '/awards', desc: 'Employee of the month & year' },
+    ],
+  },
   { label: 'Contact', hash: '#contact' },
 ]
 
