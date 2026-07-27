@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
-import { motion, useScroll, useTransform, useSpring, useMotionValue, animate, AnimatePresence, type MotionValue } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionTemplate, useReducedMotion, animate, AnimatePresence, type MotionValue } from 'framer-motion'
 import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf, IconRoute, IconUsers, IconBriefcase, IconHandshake } from './Icons'
 
 /* ── data — sourced & paraphrased from abr.rw/who-we-are/ "Our History" ── */
@@ -822,7 +822,326 @@ function ShareholderCard({ s, i }: { s: typeof shareholders[0]; i: number }) {
 }
 
 /* ── main component ── */
-export default function About() {
+/* ══════════════════════════════════════════════════════════════
+   VISION & MISSION
+
+   The formal statements are kept verbatim — they are the board-approved
+   wording. What is added underneath is the plain-language reading and
+   three concrete consequences, because a vision statement that nobody
+   can picture does not persuade anybody. "Leading provider of financial
+   services" means nothing until it means a trader in Nyabugogo can
+   borrow without owning land in Kigali.
+
+   The 3D is real rather than decorative: each card is a preserve-3d
+   surface and its contents sit at four different translateZ depths, so
+   tilting the card parallaxes the layers against each other instead of
+   sliding a flat picture around.
+   ══════════════════════════════════════════════════════════════ */
+type VMItem = {
+  index: string
+  glyph: string
+  label: string
+  statement: string
+  plain: string
+  meaningHeading: string
+  points: string[]
+  stat: string
+  statLabel: string
+}
+
+const VISION_MISSION: VMItem[] = [
+  {
+    index: '01',
+    glyph: '◈',
+    label: 'Vision',
+    statement:
+      'To be the leading provider of financial services to micro, small, and medium entrepreneurs and their families in Rwanda.',
+    plain:
+      '“Leading” is not about being the largest bank in Kigali. It is about being the one a first-time borrower can actually reach — and be taken seriously by.',
+    meaningHeading: 'What that looks like',
+    points: [
+      'A market trader in Nyabugogo can borrow without owning land in Kigali',
+      'A cooperative in Huye is judged on its books, not its postcode',
+      'A family stays covered when the harvest comes in late',
+    ],
+    stat: '200,000+',
+    statLabel: 'People served since 2014',
+  },
+  {
+    index: '02',
+    glyph: '◉',
+    label: 'Mission',
+    statement:
+      'Improve access to broad financial services for the majority of Rwandan businesses in a sustainable, efficient manner.',
+    plain:
+      '“Sustainable” means we intend to still be here in twenty years. “Efficient” means you should not lose a working day to open an account.',
+    meaningHeading: 'How we hold ourselves to it',
+    points: [
+      'Micro loans appraised and disbursed in under three days',
+      'Full banking on any handset, on any network, by dialling *540#',
+      'Branches and credit outlets in all five provinces — not only the capital',
+    ],
+    stat: '48 hrs',
+    statLabel: 'Average SME approval',
+  },
+]
+
+function VisionMissionCard({ item, index }: { item: VMItem; index: number }) {
+  const reduce = useReducedMotion()
+  const mx = useMotionValue(0.5)
+  const my = useMotionValue(0.5)
+  const sx = useSpring(mx, { stiffness: 130, damping: 18, mass: 0.3 })
+  const sy = useSpring(my, { stiffness: 130, damping: 18, mass: 0.3 })
+
+  const rotateY = useTransform(sx, [0, 1], [-7.5, 7.5])
+  const rotateX = useTransform(sy, [0, 1], [6, -6])
+  const glowX = useTransform(sx, [0, 1], ['0%', '100%'])
+  const glowY = useTransform(sy, [0, 1], ['0%', '100%'])
+  // Specular highlight that tracks the cursor across the glass.
+  const glow = useMotionTemplate`radial-gradient(460px circle at ${glowX} ${glowY}, rgba(186,230,253,0.17), transparent 62%)`
+
+  function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (reduce) return
+    const r = e.currentTarget.getBoundingClientRect()
+    mx.set((e.clientX - r.left) / r.width)
+    my.set((e.clientY - r.top) / r.height)
+  }
+  function onPointerLeave() {
+    mx.set(0.5)
+    my.set(0.5)
+  }
+
+  return (
+    <div style={{ perspective: 1500 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 54, rotateX: -14 }}
+        whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+        viewport={{ once: true, margin: '-70px' }}
+        transition={{ duration: 0.85, delay: index * 0.16, ease: [0.22, 1, 0.36, 1] }}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        <motion.div
+          onPointerMove={onPointerMove}
+          onPointerLeave={onPointerLeave}
+          className="about-vm-card"
+          style={{
+            rotateX: reduce ? 0 : rotateX,
+            rotateY: reduce ? 0 : rotateY,
+            transformStyle: 'preserve-3d',
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: 24,
+            padding: '38px 40px 34px',
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(186,230,253,0.18)',
+            backdropFilter: 'blur(18px)',
+            WebkitBackdropFilter: 'blur(18px)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 28px 60px rgba(0,10,30,0.26)',
+            height: '100%',
+          }}
+        >
+          {/* Cursor-tracked sheen */}
+          <motion.div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: glow, pointerEvents: 'none' }} />
+
+          {/* Oversized glyph, pushed behind the content plane */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              bottom: -40,
+              right: -18,
+              fontSize: 210,
+              lineHeight: 1,
+              color: '#bae6fd',
+              opacity: 0.055,
+              userSelect: 'none',
+              transform: 'translateZ(-30px)',
+              pointerEvents: 'none',
+            }}
+          >
+            {item.glyph}
+          </div>
+
+          {/* ── Layer 1 (deepest content): label row ── */}
+          <div
+            style={{
+              transform: 'translateZ(54px)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 22,
+              position: 'relative',
+            }}
+          >
+            <span
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: 17,
+                color: '#0c4a6e',
+                background: 'linear-gradient(140deg, #e0f2fe, #bae6fd)',
+                boxShadow: '0 8px 22px rgba(0,10,30,0.32)',
+                flexShrink: 0,
+              }}
+            >
+              {item.glyph}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.24em', color: '#bae6fd', textTransform: 'uppercase' }}>
+              {item.label}
+            </span>
+            <span
+              style={{
+                marginLeft: 'auto',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                fontSize: 12,
+                fontWeight: 700,
+                color: 'rgba(186,230,253,0.42)',
+                letterSpacing: '0.1em',
+              }}
+            >
+              {item.index}
+            </span>
+          </div>
+
+          {/* ── Layer 2: the formal statement, set large ── */}
+          <p
+            style={{
+              transform: 'translateZ(34px)',
+              position: 'relative',
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(19px, 1.9vw, 25px)',
+              fontWeight: 700,
+              lineHeight: 1.4,
+              letterSpacing: '-0.015em',
+              color: '#ffffff',
+              margin: '0 0 18px',
+            }}
+          >
+            {item.statement}
+          </p>
+
+          {/* ── Layer 3: the human reading ── */}
+          <p
+            style={{
+              transform: 'translateZ(22px)',
+              position: 'relative',
+              fontSize: 14.5,
+              lineHeight: 1.8,
+              color: 'rgba(224,242,254,0.72)',
+              margin: '0 0 26px',
+              paddingLeft: 16,
+              borderLeft: '2px solid rgba(186,230,253,0.32)',
+            }}
+          >
+            {item.plain}
+          </p>
+
+          {/* ── Layer 4: concrete consequences ── */}
+          <div style={{ transform: 'translateZ(16px)', position: 'relative' }}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 900,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'rgba(186,230,253,0.55)',
+                marginBottom: 14,
+              }}
+            >
+              {item.meaningHeading}
+            </div>
+            <ul style={{ listStyle: 'none', margin: '0 0 26px', padding: 0 }}>
+              {item.points.map((p, pi) => (
+                <motion.li
+                  key={p}
+                  initial={{ opacity: 0, x: -14 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.5, delay: 0.4 + index * 0.16 + pi * 0.12, ease: 'easeOut' }}
+                  style={{
+                    display: 'flex',
+                    gap: 12,
+                    alignItems: 'flex-start',
+                    marginBottom: 11,
+                    fontSize: 14,
+                    lineHeight: 1.65,
+                    color: 'rgba(255,255,255,0.82)',
+                  }}
+                >
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      flexShrink: 0,
+                      marginTop: 7,
+                      width: 7,
+                      height: 7,
+                      borderRadius: 2,
+                      transform: 'rotate(45deg)',
+                      background: '#bae6fd',
+                      boxShadow: '0 0 10px rgba(186,230,253,0.6)',
+                    }}
+                  />
+                  {p}
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+
+          {/* ── Layer 5 (nearest): the proof point ── */}
+          <div
+            style={{
+              transform: 'translateZ(46px)',
+              position: 'relative',
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 10,
+              background: 'rgba(186,230,253,0.1)',
+              border: '1px solid rgba(186,230,253,0.24)',
+              borderRadius: 12,
+              padding: '10px 16px',
+              boxShadow: '0 10px 26px rgba(0,10,30,0.24)',
+            }}
+          >
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 24, fontWeight: 700, color: '#ffffff', lineHeight: 1 }}>
+              {item.stat}
+            </span>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'rgba(186,230,253,0.72)',
+              }}
+            >
+              {item.statLabel}
+            </span>
+          </div>
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+
+function VisionMission() {
+  return (
+    <div
+      className="about-vm"
+      style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 40, alignItems: 'stretch' }}
+    >
+      {VISION_MISSION.map((item, i) => (
+        <VisionMissionCard key={item.label} item={item} index={i} />
+      ))}
+    </div>
+  )
+}
+
+/* `standalone` = rendered as the /who-we-are page rather than a home
+   section, so the first masthead must clear the fixed navbar. */
+export default function About({ standalone = false }: { standalone?: boolean }) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const heroRef = useRef<HTMLDivElement>(null)
 
@@ -840,9 +1159,9 @@ export default function About() {
         ref={heroRef} onMouseMove={onHeroMouse}
         style={{
           background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 40%, #0ea5e9 70%, #38bdf8 100%)',
-          padding: '88px 0 110px', position: 'relative', overflow: 'hidden',
-          clipPath: 'polygon(0 0, 100% 0, 100% 94%, 0 100%)',
+          padding: standalone ? '176px 0 120px' : '88px 0 110px', position: 'relative', overflow: 'hidden',
         }}
+        className="edge-curve-b"
       >
         <OrbCanvas />
 
@@ -879,53 +1198,7 @@ export default function About() {
             </div>
           </R>
 
-          {/* Vision/Mission 3D cards */}
-          <div className="about-vm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 36 }}>
-            {[
-              { label: 'VISION', icon: '◈', text: 'To be the leading provider of financial services to micro, small, and medium entrepreneurs and their families in Rwanda.' },
-              { label: 'MISSION', icon: '◉', text: 'Improve access to broad financial services for the majority of Rwandan businesses in a sustainable, efficient manner.' },
-            ].map((item, i) => {
-              const { ref, onMove, onLeave } = use3DTilt(6)
-              return (
-                <R key={item.label} delay={i * 120}>
-                  <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} style={{ transformStyle: 'preserve-3d', transition: 'transform 0.15s ease-out', borderRadius: 22 }}>
-                    <div className="about-vm-card" style={{
-                      background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(186,230,253,0.16)',
-                      borderRadius: 22, padding: '38px 40px', backdropFilter: 'blur(16px)',
-                      position: 'relative', overflow: 'hidden',
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 20px 48px rgba(0,0,0,0.15)',
-                    }}>
-                      <div style={{
-                        position: 'absolute', bottom: -14, right: -10,
-                        fontSize: 96, opacity: 0.04, userSelect: 'none', lineHeight: 1, color: '#bae6fd',
-                      }}>
-                        {item.icon}
-                      </div>
-                      <div style={{ transform: 'translateZ(20px)', position: 'relative' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-                          <div style={{
-                            width: 34, height: 34, borderRadius: 10,
-                            background: 'rgba(186,230,253,0.15)', border: '1px solid rgba(186,230,253,0.25)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 16, color: '#bae6fd',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                          }}>
-                            {item.icon}
-                          </div>
-                          <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.2em', color: '#bae6fd' }}>
-                            {item.label}
-                          </span>
-                        </div>
-                        <p style={{ fontSize: 16.5, lineHeight: 1.8, color: 'rgba(255,255,255,0.78)', margin: 0 }}>
-                          {item.text}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </R>
-              )
-            })}
-          </div>
+          <VisionMission />
 
           {/* Photo + copy */}
           <R delay={200}>
@@ -967,11 +1240,10 @@ export default function About() {
         }} />
 
         {/* Journey header — full bleed dark 3D panel */}
-        <div className="about-journey-header" style={{
+        <div className="about-journey-header edge-curve-b" style={{
           background: 'linear-gradient(160deg, #0c4a6e 0%, #0c4a6e 30%, #0284c7 60%, #0ea5e9 90%)',
           padding: '72px 28px 88px', position: 'relative', overflow: 'hidden',
           marginBottom: 72,
-          clipPath: 'polygon(0 0, 100% 0, 100% 88%, 0 100%)',
         }}>
           <OrbCanvas />
 

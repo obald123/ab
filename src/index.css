@@ -446,6 +446,23 @@ section[id] { scroll-margin-top: 100px; }
 .section-pill--icon::before { display: none; }
 .section-pill--icon svg { animation: blink 2.6s ease-in-out infinite; }
 
+/* ══════════════════════════════════════════════════════════════
+   SHARED EDGE CURVE
+   One ellipse geometry reused for the bottom edge of every masthead
+   and the top edge of the footer, so the page repeats a single
+   silhouette instead of three different diagonal slopes.
+   Curve depth is ~12% of the element's height and scales with it.
+   ══════════════════════════════════════════════════════════════ */
+.edge-curve-b { clip-path: ellipse(105% 100% at 50% 0%); }
+.edge-curve-t { clip-path: ellipse(105% 100% at 50% 100%); }
+
+/* Tall elements (a stacked mobile footer) would get an enormous arc from
+   a height-relative radius, so flatten the ellipse on narrow screens. */
+@media (max-width: 767px) {
+  .edge-curve-b { clip-path: ellipse(180% 100% at 50% 0%); }
+  .edge-curve-t { clip-path: ellipse(180% 100% at 50% 100%); }
+}
+
 /* ── Standalone pages (Careers / Tenders / Media / Forms) ── */
 .sr-only {
   position: absolute;
@@ -483,6 +500,13 @@ section[id] { scroll-margin-top: 100px; }
   outline: 2px solid #0ea5e9;
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* Careers cards: the countdown dial and the four-up spec strip both need
+   to fold before the card starts squeezing the job title. */
+@media (max-width: 860px) {
+  .job-dial { display: none !important; }
+  .job-spec > div { flex: 1 1 46% !important; border-left: none !important; padding: 6px 16px !important; }
 }
 
 @media (max-width: 900px) {
@@ -1079,7 +1103,10 @@ body.a11y-large-text { font-size: 1.12rem; }
 }
 @media (max-width: 480px) {
   .about-vm-card { padding: 28px 24px !important; }
-  .about-vm-card p { font-size: 15px !important; }
+  /* The statement is set large on desktop; step it down before it starts
+     eating the whole card on a phone. */
+  .about-vm-card > p:first-of-type { font-size: 18px !important; }
+  .about-vm-card li { font-size: 13.5px !important; }
   .about-photo-copy-content { padding: 28px 24px !important; }
 }
 

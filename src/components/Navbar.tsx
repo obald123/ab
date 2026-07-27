@@ -10,7 +10,7 @@ type NavItem =
   | { label: string; children: { label: string; to: string; desc: string }[] }
 
 const NAV: NavItem[] = [
-  { label: 'Who We Are', hash: '#about' },
+  { label: 'Who We Are', to: '/who-we-are' },
   { label: 'Products', hash: '#products' },
   { label: 'Branches', hash: '#branches' },
   {

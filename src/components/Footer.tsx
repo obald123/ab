@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { OPEN_EVENT } from './CookieConsent'
+import logo from '../imports/logo1-transparent.png'
 
 /* The site's single footer.
 
@@ -13,7 +14,7 @@ import { OPEN_EVENT } from './CookieConsent'
 type QuickLink = { label: string; to?: string; hash?: string }
 
 const QUICK_LINKS: QuickLink[] = [
-  { label: 'Who We Are', hash: '/#about' },
+  { label: 'Who We Are', to: '/who-we-are' },
   { label: 'What We Offer', hash: '/#products' },
   { label: 'News & Notices', to: '/media/news' },
   { label: 'Articles & Insights', to: '/media/articles' },
@@ -59,7 +60,7 @@ function dim(e: React.MouseEvent<HTMLElement>) {
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#0284c7', padding: '48px 48px 28px' }}>
+    <footer className="edge-curve-t" style={{ background: '#0284c7', padding: '104px 48px 28px' }}>
       <div style={{ margin: '0 auto' }}>
         <div
           className="footer-grid"
@@ -67,6 +68,31 @@ export default function Footer() {
         >
           {/* Brand */}
           <div>
+            {/* The logo keeps its real colours here — same globe, same navy
+                wordmark as the navbar. Those colours have no contrast against
+                the #0284c7 footer on their own, so the mark sits on a white
+                plate instead of being reversed to flat white, which was
+                flattening the globe into a silhouette. */}
+            <Link
+              to="/"
+              aria-label="AB Bank Rwanda — home"
+              style={{
+                display: 'inline-block',
+                marginBottom: 22,
+                background: '#ffffff',
+                borderRadius: 12,
+                padding: '12px 20px',
+                boxShadow: '0 6px 18px rgba(2,30,60,0.16)',
+              }}
+            >
+              <img
+                src={logo}
+                alt="AB Bank Rwanda"
+                width={1352}
+                height={402}
+                style={{ height: 44, width: 'auto', display: 'block' }}
+              />
+            </Link>
             <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320, marginTop: 0 }}>
               The Bank Which Cares For You. Providing accessible, responsible financial services to micro, small and
               medium entrepreneurs across Rwanda since 2014.

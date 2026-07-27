@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { IconFileText, IconDownload, IconMapPin } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
-import { Card, Chip, EmptyState, FilterBar, Section } from '../components/page/ui'
+import { EmptyState, FilterBar, Section } from '../components/page/ui'
 import { FORMS, FORM_CATEGORIES, formatDate, type FormDoc } from '../data/site'
 
 const CATEGORIES = ['All', ...FORM_CATEGORIES] as const
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
 
 const TYPE_COLOR: Record<FormDoc['fileType'], string> = {
   PDF: '#b91c1c',
@@ -12,74 +13,145 @@ const TYPE_COLOR: Record<FormDoc['fileType'], string> = {
   XLSX: '#15803d',
 }
 
-function FormRow({ doc }: { doc: FormDoc }) {
+/* A downloads page should look like a document shelf, not a feed. Each item
+   is drawn as a sheet of paper with a folded corner and its file type
+   printed on it — the thing you are about to receive is the thing you see. */
+function FormTile({ doc }: { doc: FormDoc }) {
+  const [hover, setHover] = useState(false)
+  const color = TYPE_COLOR[doc.fileType]
+
   return (
-    <Card interactive style={{ padding: 20, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+    <a
+      href="#forms"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      aria-label={`Download ${doc.title}, ${doc.fileType}, ${doc.size}`}
+      style={{
+        display: 'flex',
+        gap: 18,
+        alignItems: 'flex-start',
+        padding: '20px 22px',
+        background: '#ffffff',
+        border: `1px solid ${hover ? 'rgba(14,165,233,0.34)' : 'rgba(14,165,233,0.13)'}`,
+        borderRadius: 14,
+        textDecoration: 'none',
+        boxShadow: hover ? '0 16px 34px rgba(2,30,60,0.11)' : '0 2px 12px rgba(2,30,60,0.04)',
+        transform: hover ? 'translateY(-3px)' : 'none',
+        transition: 'transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease',
+      }}
+    >
+      {/* Paper sheet with a folded corner */}
       <span
         aria-hidden="true"
         style={{
+          position: 'relative',
+          width: 52,
+          height: 64,
           flexShrink: 0,
-          width: 46,
-          height: 46,
-          borderRadius: 12,
+          background: '#fff',
+          border: `1.5px solid ${color}44`,
+          borderRadius: '4px 14px 4px 4px',
+          boxShadow: hover ? `0 8px 18px ${color}26` : `0 3px 8px ${color}1a`,
+          transition: 'box-shadow 0.22s ease',
           display: 'grid',
           placeItems: 'center',
-          background: 'rgba(14,165,233,0.08)',
-          border: '1px solid rgba(14,165,233,0.16)',
         }}
       >
-        <IconFileText size={21} strokeWidth={2} color="#0284c7" />
+        {/* The fold */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: 15,
+            height: 15,
+            background: `linear-gradient(225deg, ${color}33 50%, transparent 50%)`,
+            borderTopRightRadius: 13,
+          }}
+        />
+        {/* Ruled lines */}
+        <span
+          style={{
+            position: 'absolute',
+            left: 8,
+            right: 8,
+            top: 22,
+            height: 14,
+            backgroundImage: `linear-gradient(${color}26 1.5px, transparent 1.5px)`,
+            backgroundSize: '100% 6px',
+          }}
+        />
+        <span
+          style={{
+            position: 'absolute',
+            bottom: 6,
+            left: 0,
+            right: 0,
+            textAlign: 'center',
+            fontFamily: MONO,
+            fontSize: 8.5,
+            fontWeight: 900,
+            letterSpacing: '0.08em',
+            color,
+          }}
+        >
+          {doc.fileType}
+        </span>
       </span>
 
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ display: 'flex', gap: 9, alignItems: 'center', marginBottom: 7, flexWrap: 'wrap' }}>
-          <Chip tone="blue">{doc.category}</Chip>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span
+          style={{
+            display: 'block',
+            fontSize: 15.5,
+            fontWeight: 800,
+            color: '#0f172a',
+            lineHeight: 1.35,
+            marginBottom: 6,
+          }}
+        >
+          {doc.title}
+        </span>
+        <span style={{ display: 'block', fontSize: 13, color: '#647080', lineHeight: 1.68, marginBottom: 12 }}>
+          {doc.description}
+        </span>
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            fontFamily: MONO,
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: '#94a3b8',
+            letterSpacing: '0.04em',
+            flexWrap: 'wrap',
+          }}
+        >
+          <span>{doc.size}</span>
+          <span aria-hidden="true">·</span>
+          <span>Updated {formatDate(doc.updated)}</span>
           <span
             style={{
-              fontSize: 10,
-              fontWeight: 900,
-              letterSpacing: '0.07em',
-              color: TYPE_COLOR[doc.fileType],
-              border: `1px solid ${TYPE_COLOR[doc.fileType]}33`,
-              borderRadius: 5,
-              padding: '2px 6px',
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontFamily: 'inherit',
+              fontSize: 12.5,
+              fontWeight: 800,
+              color: '#0ea5e9',
+              letterSpacing: 0,
+              transform: hover ? 'translateX(3px)' : 'none',
+              transition: 'transform 0.22s ease',
             }}
           >
-            {doc.fileType}
+            <IconDownload size={14} strokeWidth={2.2} color="#0ea5e9" />
+            Download
           </span>
-          <span style={{ fontSize: 11.5, color: '#94a3b8', fontWeight: 700 }}>{doc.size}</span>
-        </div>
-
-        <h3 style={{ fontSize: 15.5, fontWeight: 800, color: '#0f172a', margin: '0 0 6px', lineHeight: 1.35 }}>
-          {doc.title}
-        </h3>
-        <p style={{ fontSize: 13, color: '#647080', lineHeight: 1.7, margin: '0 0 12px' }}>{doc.description}</p>
-        <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>Updated {formatDate(doc.updated)}</span>
-      </div>
-
-      <button
-        type="button"
-        aria-label={`Download ${doc.title}`}
-        style={{
-          flexShrink: 0,
-          alignSelf: 'center',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 7,
-          background: 'rgba(14,165,233,0.08)',
-          border: '1px solid rgba(14,165,233,0.2)',
-          color: '#0284c7',
-          borderRadius: 9,
-          padding: '9px 15px',
-          fontWeight: 800,
-          fontSize: 13,
-          cursor: 'pointer',
-        }}
-      >
-        <IconDownload size={15} strokeWidth={2} color="#0284c7" />
-        Download
-      </button>
-    </Card>
+        </span>
+      </span>
+    </a>
   )
 }
 
@@ -96,6 +168,14 @@ export default function Forms() {
     )
   }, [query, category])
 
+  /* Grouped by category so the page reads as a shelf with labelled sections
+     rather than one long undifferentiated list. */
+  const groups = useMemo(() => {
+    return FORM_CATEGORIES.map((c) => ({ category: c, docs: filtered.filter((f) => f.category === c) })).filter(
+      (g) => g.docs.length > 0,
+    )
+  }, [filtered])
+
   return (
     <main>
       <PageHero
@@ -103,33 +183,91 @@ export default function Forms() {
         eyebrow="Forms & Downloads"
         title="Bank forms, tariffs & statements"
         lead="Every form you need to open an account, apply for a loan, enrol in insurance or update your records — plus our published tariff guide, terms and audited financial statements."
+        meta={
+          <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
+            {[
+              [`${FORMS.length}`, 'Documents'],
+              [`${FORM_CATEGORIES.length}`, 'Categories'],
+            ].map(([v, l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
+                  {v}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(186,230,253,0.72)',
+                    marginTop: 5,
+                  }}
+                >
+                  {l}
+                </div>
+              </div>
+            ))}
+          </div>
+        }
       />
 
       <Section>
-        <FilterBar
-          query={query}
-          onQuery={setQuery}
-          placeholder="Search forms and documents"
-          options={CATEGORIES}
-          active={category}
-          onSelect={setCategory}
-        />
+        <div id="forms">
+          <FilterBar
+            query={query}
+            onQuery={setQuery}
+            placeholder="Search forms and documents"
+            options={CATEGORIES}
+            active={category}
+            onSelect={setCategory}
+          />
+        </div>
 
-        <p style={{ fontSize: 13, color: '#647080', marginBottom: 20 }}>
-          Showing <strong>{filtered.length}</strong> of {FORMS.length} documents
-        </p>
-
-        {filtered.length === 0 ? (
+        {groups.length === 0 ? (
           <EmptyState message="No documents match that search. Try another category or clear the filters." />
         ) : (
-          <div style={{ display: 'grid', gap: 14 }}>
-            {filtered.map((f) => (
-              <FormRow key={f.id} doc={f} />
-            ))}
-          </div>
+          groups.map((g) => (
+            <section key={g.category} style={{ marginBottom: 44 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: '#0284c7',
+                    margin: 0,
+                    whiteSpace: 'nowrap',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {g.category}
+                </h2>
+                <span aria-hidden="true" style={{ flex: 1, height: 1, background: 'rgba(14,165,233,0.18)' }} />
+                <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: '#94a3b8' }}>
+                  {String(g.docs.length).padStart(2, '0')}
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 16 }}>
+                {g.docs.map((f) => (
+                  <FormTile key={f.id} doc={f} />
+                ))}
+              </div>
+            </section>
+          ))
         )}
 
-        <Card style={{ marginTop: 40, padding: 28, background: '#f8fbfe', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+        <div
+          style={{
+            marginTop: 12,
+            padding: 28,
+            background: '#f8fbfe',
+            border: '1px solid rgba(14,165,233,0.13)',
+            borderRadius: 16,
+            display: 'flex',
+            gap: 16,
+            alignItems: 'flex-start',
+          }}
+        >
           <span style={{ flexShrink: 0, marginTop: 2 }}>
             <IconMapPin size={20} strokeWidth={2} color="#0ea5e9" />
           </span>
@@ -143,7 +281,7 @@ export default function Forms() {
               applies to you.
             </p>
           </div>
-        </Card>
+        </div>
       </Section>
     </main>
   )

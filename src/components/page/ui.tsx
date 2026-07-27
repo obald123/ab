@@ -167,6 +167,94 @@ export function FilterBar({
   )
 }
 
+/* Countdown dial. Used wherever a deadline is the single most important
+   fact on a card — job closing dates and tender submission deadlines. The
+   ring drains as the window closes and shifts amber, then grey. */
+export function DeadlineRing({
+  daysLeft,
+  windowDays = 30,
+  size = 74,
+}: {
+  daysLeft: number
+  windowDays?: number
+  size?: number
+}) {
+  const expired = daysLeft < 0
+  const pct = expired ? 0 : Math.min(Math.max(daysLeft / windowDays, 0), 1)
+  const stroke = 5
+  const r = (size - stroke) / 2
+  const c = 2 * Math.PI * r
+  const color = expired ? '#94a3b8' : daysLeft <= 7 ? '#d97706' : '#0ea5e9'
+
+  return (
+    <div
+      style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}
+      role="img"
+      aria-label={expired ? 'Closed' : `${daysLeft} days remaining`}
+    >
+      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }} aria-hidden="true">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(14,165,233,0.14)" strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - pct)}
+          style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+        />
+      </svg>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'grid',
+          placeItems: 'center',
+          textAlign: 'center',
+          lineHeight: 1,
+        }}
+      >
+        <div>
+          <div style={{ fontSize: expired ? 12 : 20, fontWeight: 900, color, fontFamily: 'var(--font-serif)' }}>
+            {expired ? '—' : daysLeft}
+          </div>
+          <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', color: '#94a3b8', marginTop: 2 }}>
+            {expired ? 'CLOSED' : daysLeft === 1 ? 'DAY' : 'DAYS'}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Rubber-stamp status marker for the procurement register. */
+export function Stamp({ label, tone }: { label: string; tone: Tone }) {
+  const t = TONES[tone]
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        transform: 'rotate(-7deg)',
+        border: `2.5px solid ${t.fg}`,
+        color: t.fg,
+        borderRadius: 6,
+        padding: '4px 12px',
+        fontSize: 12,
+        fontWeight: 900,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        opacity: 0.82,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {label}
+    </span>
+  )
+}
+
 export function EmptyState({ message }: { message: string }) {
   return (
     <div

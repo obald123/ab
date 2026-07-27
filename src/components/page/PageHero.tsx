@@ -25,9 +25,8 @@ export default function PageHero({
         background: 'linear-gradient(160deg, #0c4a6e 0%, #0c4a6e 28%, #0284c7 62%, #0ea5e9 95%)',
         padding: '152px 48px 72px',
         overflow: 'hidden',
-        clipPath: 'polygon(0 0, 100% 0, 100% 92%, 0 100%)',
       }}
-      className="page-hero"
+      className="page-hero edge-curve-b"
     >
       <div
         aria-hidden="true"
