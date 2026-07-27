@@ -463,6 +463,30 @@ section[id] { scroll-margin-top: 100px; }
   .edge-curve-t { clip-path: ellipse(180% 100% at 50% 100%); }
 }
 
+/* ── Cookie consent dialog ──
+   Height lives here rather than inline so the dvh upgrade can override it.
+   On mobile, 100vh ignores the browser chrome and the action row ends up
+   under the URL bar; 100dvh tracks the actual visible viewport. */
+.cookie-dialog {
+  max-height: calc(100vh - 32px);
+}
+@supports (height: 100dvh) {
+  .cookie-dialog {
+    max-height: calc(100dvh - 32px);
+  }
+}
+/* Slim scrollbar so the panel doesn't grow a chunky native one mid-dialog. */
+.cookie-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.cookie-scroll::-webkit-scrollbar-thumb {
+  background: rgba(14, 165, 233, 0.35);
+  border-radius: 3px;
+}
+.cookie-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 /* ── Standalone pages (Careers / Tenders / Media / Forms) ── */
 .sr-only {
   position: absolute;

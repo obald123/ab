@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IconShield, IconZap, IconChart, IconCheck } from './Icons'
 
@@ -194,22 +195,31 @@ export default function CookieConsent() {
             }}
           />
 
+          {/* Centring is done by this flex wrapper, not by a transform on the
+              dialog: framer-motion writes its own `transform` from y/scale and
+              was overwriting `translate(-50%, -50%)`, which left the panel
+              hanging off the centre point instead of centred on it. */}
+          <div
+            style={{
+              position: 'fixed', inset: 0, zIndex: 10051,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 16, pointerEvents: 'none',
+            }}
+          >
           <motion.div
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="cookie-consent-title"
             aria-describedby="cookie-consent-body"
+            className="cookie-dialog"
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              position: 'fixed', zIndex: 10051,
-              left: '50%', top: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 'min(560px, calc(100vw - 32px))',
-              maxHeight: 'calc(100vh - 48px)',
+              pointerEvents: 'auto',
+              width: 'min(560px, 100%)',
               display: 'flex', flexDirection: 'column',
               background: '#ffffff',
               borderRadius: 20,
@@ -221,7 +231,15 @@ export default function CookieConsent() {
             {/* Brand accent bar */}
             <div style={{ height: 4, background: `linear-gradient(90deg, ${BLUE} 0%, #38bdf8 50%, ${BLUE_DARK} 100%)`, flexShrink: 0 }} />
 
-            <div style={{ padding: '24px 26px 0', flexShrink: 0 }}>
+            {/* Everything between the accent bar and the action row scrolls.
+                `flex: 1 1 auto` + `minHeight: 0` is what actually bounds it —
+                without minHeight a flex child refuses to shrink below its
+                content and the action row gets pushed out of the dialog. */}
+            <div
+              className="cookie-scroll"
+              style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain' }}
+            >
+            <div style={{ padding: '24px 26px 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -242,12 +260,13 @@ export default function CookieConsent() {
               <p id="cookie-consent-body" style={{ fontSize: 14, color: MUTED, lineHeight: 1.68, margin: 0 }}>
                 We use cookies to enhance your browsing experience, and analyze our traffic.
                 By clicking <strong style={{ color: INK, fontWeight: 700 }}>"Accept All"</strong>, you consent to our use of cookies.{' '}
-                <a
-                  href="#"
+                <Link
+                  to="/forms"
+                  onClick={() => setOpen(false)}
                   style={{ color: BLUE_DARK, fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 3 }}
                 >
                   Cookie Policy
-                </a>
+                </Link>
               </p>
             </div>
 
@@ -260,7 +279,7 @@ export default function CookieConsent() {
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ overflowY: 'auto', minHeight: 0 }}
+                  style={{ overflow: 'hidden' }}
                 >
                   <div style={{ padding: '20px 26px 4px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {CATEGORIES.map(({ key, Icon, title, locked, desc }) => {
@@ -309,10 +328,14 @@ export default function CookieConsent() {
               )}
             </AnimatePresence>
 
-            {/* Actions */}
+            </div>
+
+            {/* Actions — always visible, never scrolled away */}
             <div style={{
               display: 'flex', flexWrap: 'wrap', gap: 10,
-              padding: '20px 26px 24px', flexShrink: 0,
+              padding: '18px 26px 22px', flexShrink: 0,
+              borderTop: '1px solid rgba(14,165,233,0.14)',
+              background: '#ffffff',
             }}>
               {customizing ? (
                 <button
@@ -356,6 +379,7 @@ export default function CookieConsent() {
               </button>
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>
