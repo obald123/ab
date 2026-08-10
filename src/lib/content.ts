@@ -109,6 +109,14 @@ export function useSingleton<T>(type: SingletonType, fallback: T): ContentState<
   return state
 }
 
+/* The extension is the only signal available for an arbitrary URL, and it is
+   deterministic for anything the media API produced — keys always end in the
+   real, sniffed type. */
+export function isVideoSource(value: string | undefined | null): boolean {
+  if (!value) return false
+  return /\.(mp4|webm)(\?|#|$)/i.test(value)
+}
+
 /* Media keys from the CMS are relative; anything already absolute (a legacy
    URL still in the payload) is passed through untouched. */
 export function mediaUrl(value: string | undefined | null): string {

@@ -310,113 +310,158 @@ section[id] { scroll-margin-top: 100px; }
   will-change: transform;
 }
 
-/* ── Hero 3D card stack ── */
-.hero-stack {
-  perspective: 1200px;
-  perspective-origin: 50% 45%;
-}
-.hero-stack__layer {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  transform-style: preserve-3d;
-  pointer-events: none;
-}
-.hero-stack__card {
-  position: relative;
-  width: 78%;
-  max-width: 430px;
-  border-radius: 28px;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  will-change: transform, filter;
-}
-.hero-stack__card img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 28px;
-}
-/* ── CMS story panel ──
-   When the hero document carries a story, each card in the stack becomes one
-   beat: the editor's picture, a scrim, and the words over it. The card keeps
-   a fixed 16:10 face so a stack of mixed-aspect uploads still fans out evenly
-   — without it, one tall photograph would shear the whole choreography. */
-.hero-story {
+/* ── Story reel ──
+   One beat at a time in a single frame. Replaces the earlier 3D card stack:
+   it takes however many beats the CMS supplies rather than being built around
+   a fixed number, and it plays on load instead of waiting for a scroll. */
+.hero-reel {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  border-radius: 28px;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 0;
 }
-.hero-story__img {
+.hero-reel__frame {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  aspect-ratio: 4 / 5;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 34px 90px rgba(2, 14, 28, 0.42);
+  will-change: transform;
+}
+.hero-reel__slide {
   position: absolute;
   inset: 0;
+}
+.hero-reel__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 28px;
+  display: block;
 }
-/* Placeholder while a panel has words but no picture yet. */
-.hero-story__img--empty {
-  background: linear-gradient(140deg, #075985, #0284c7 60%, #0ea5e9);
+/* Slow drift across the dwell, so a still photograph still has life in it.
+   Runs on the compositor; it never triggers layout. */
+.hero-reel__img--drift {
+  animation: heroKenBurns 9s ease-out forwards;
+  transform-origin: center 60%;
 }
-/* Bottom-weighted so the copy has something to sit on regardless of what the
-   photograph happens to be doing behind it. */
-.hero-story__scrim {
+.hero-reel__img--empty {
+  background: linear-gradient(150deg, #075985 0%, #0284c7 55%, #0ea5e9 100%);
+}
+.hero-reel__scrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(3, 32, 56, 0.92) 0%,
-    rgba(3, 32, 56, 0.62) 38%,
-    rgba(3, 32, 56, 0.08) 72%,
+    rgba(3, 26, 46, 0.94) 0%,
+    rgba(3, 26, 46, 0.66) 34%,
+    rgba(3, 26, 46, 0.12) 68%,
     transparent 100%
   );
   pointer-events: none;
 }
-.hero-story__copy {
+.hero-reel__copy {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 46px;
+  padding: 0 28px;
+}
+.hero-reel__copy > div {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 20px 22px 22px;
-  text-align: left;
+  gap: 7px;
 }
-.hero-story__kicker {
-  font-size: 10.5px;
+.hero-reel__kicker {
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #bae6fd;
 }
-.hero-story__title {
-  font-size: clamp(16px, 1.5vw, 21px);
+.hero-reel__title {
+  font-size: clamp(20px, 2.2vw, 27px);
   font-weight: 900;
-  letter-spacing: -0.01em;
-  line-height: 1.15;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
   color: #ffffff;
 }
-.hero-story__caption {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.78);
+.hero-reel__caption {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* Specular highlight — its X position is driven by the card's own
-   rotateY, so light appears to catch the surface as the card turns. */
-.hero-stack__sheen {
+/* The progress track is also the control: it says how many beats there are,
+   which is showing, and how long it has left. */
+.hero-reel__track {
   position: absolute;
-  top: -30%;
-  left: -20%;
-  width: 40%;
-  height: 160%;
-  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.24) 50%, transparent 100%);
+  left: 28px;
+  right: 28px;
+  bottom: 22px;
+  display: flex;
+  gap: 6px;
+}
+.hero-reel__seg {
+  flex: 1;
+  height: 3px;
+  padding: 0;
+  border: none;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.26);
+  overflow: hidden;
+  cursor: pointer;
+  /* The bar is thin, so the hit target is grown upward instead of thickening
+     the line. */
+  position: relative;
+}
+.hero-reel__seg::before {
+  content: '';
+  position: absolute;
+  inset: -11px 0;
+}
+.hero-reel__seg:focus-visible {
+  outline: 2px solid #bae6fd;
+  outline-offset: 4px;
+}
+.hero-reel__segfill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 100px;
+  background: #ffffff;
+}
+
+.hero-reel__star {
+  position: absolute;
+  width: 78px;
+  opacity: 0.8;
   pointer-events: none;
+  z-index: 3;
+}
+.hero-reel__star--tr {
+  top: 2%;
+  right: 2%;
+  animation: floatY 6s ease-in-out infinite;
+}
+.hero-reel__star--bl {
+  bottom: 4%;
+  left: 2%;
+  width: 70px;
+  opacity: 0.85;
+  animation: floatY2 7s ease-in-out 0.5s infinite;
+}
+
+@keyframes heroKenBurns {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to   { transform: scale(1.12) translate3d(0, -1.5%, 0); }
+}
+@keyframes heroSegFill {
+  from { width: 0%; }
+  to   { width: 100%; }
 }
 
 /* ── Motion preferences ──

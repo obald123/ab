@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { mediaUrl, useSingleton } from '../lib/content'
+import { isVideoSource, mediaUrl, useSingleton } from '../lib/content'
+import starOutline from '../imports/landing/Star 17.png'
+import starFilled from '../imports/landing/Star 17 (1).png'
 import {
+  AnimatePresence,
   motion,
-  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -10,11 +12,6 @@ import {
   useTransform,
   type MotionValue,
 } from 'framer-motion'
-import cardTop from '../imports/landing/card.png'
-import cardMiddle from '../imports/landing/card (1).png'
-import cardBottom from '../imports/landing/card (2).png'
-import starOutline from '../imports/landing/Star 17.png'
-import starFilled from '../imports/landing/Star 17 (1).png'
 
 /* ══════════════════════════════════════════════
    BRAND TOKENS  (from logo exactly)
@@ -23,22 +20,6 @@ import starFilled from '../imports/landing/Star 17 (1).png'
 ══════════════════════════════════════════════ */
 const BD = '#0284c7'
 const GL = '#9fa8b8'
-
-/* ══════════════════════════════════════════════
-   SCROLL CHOREOGRAPHY
-   One normalised progress value (0 → 1 across the
-   hero) drives everything. These are its phase
-   boundaries:
-
-     0.00 → 0.30   ASSEMBLE  cards converge into a stack
-     0.30 → 0.45   LOCKED    one solid object
-     0.45 → 0.85   REVEAL    fans open into three views
-
-   Every animated property is keyed to these same four
-   stops so the whole scene moves as one system.
-══════════════════════════════════════════════ */
-const STOPS = [0, 0.3, 0.45, 0.85] as const
-type Quad = [number, number, number, number]
 
 /* ── The living sky ──
    Four stacked layers, all animated by CSS keyframes in index.css.
@@ -70,29 +51,7 @@ function SkyBg() {
   )
 }
 
-/* ── One card of the 3D stack ──
-   Receives the shared progress value and maps it onto its own
-   depth, offset and rotation. Every property below is either a
-   transform or a filter, so no frame ever triggers layout. */
-type CardConfig = {
-  src: string
-  alt: string
-  width: number
-  height: number
-  widthPct: string
-  zIndex: number
-  x: Quad
-  y: Quad
-  z: Quad
-  rotateY: Quad
-  rotateZ: Quad
-  brightness: Quad
-  shadowY: Quad
-  shadowBlur: Quad
-  shadowAlpha: Quad
-}
-
-/** One beat of the CMS-authored story, painted onto a card in the stack. */
+/** One beat of the CMS-authored story. */
 export interface StoryPanel {
   id: string
   image: string
@@ -102,348 +61,257 @@ export interface StoryPanel {
   caption: string
 }
 
-function StackCard({
-  p,
-  config,
-  panel,
-  index,
-}: {
-  p: MotionValue<number>
-  config: CardConfig
-  /** When present the card carries a story beat instead of the stock artwork. */
-  panel?: StoryPanel
-  index: number
-}) {
-  const stops = STOPS as unknown as number[]
-  const x = useTransform(p, stops, config.x)
-  const y = useTransform(p, stops, config.y)
-  const z = useTransform(p, stops, config.z)
-  const rotateY = useTransform(p, stops, config.rotateY)
-  const rotateZ = useTransform(p, stops, config.rotateZ)
+/** How long each beat holds before the reel advances. */
+const DWELL_MS = 5200
 
-  /* Depth-linked brightness. Cheap fake ambient occlusion — it does more for
-     perceived depth than the transforms themselves. The stock artwork is
-     desaturated to sit behind the copy, but an editor's photograph keeps its
-     colour: greyscaling someone's chosen image would be the wrong call. */
-  const brightness = useTransform(p, stops, config.brightness)
-  const litFilter = useMotionTemplate`brightness(${brightness}) contrast(1.04)`
-  const stockFilter = useMotionTemplate`grayscale(1) brightness(${brightness}) contrast(1.08)`
-  const filter = panel ? litFilter : stockFilter
+/* ── The story reel ──
+   One beat at a time in a single frame: the picture drifts slowly behind the
+   words while a segmented bar shows how many beats there are and how long the
+   current one has left.
 
-  // Shadow tightens as the stack closes and softens as it opens.
-  const shadowY = useTransform(p, stops, config.shadowY)
-  const shadowBlur = useTransform(p, stops, config.shadowBlur)
-  const shadowAlpha = useTransform(p, stops, config.shadowAlpha)
-  const boxShadow = useMotionTemplate`0 ${shadowY}px ${shadowBlur}px rgba(2, 14, 28, ${shadowAlpha})`
-
-  // Specular sweep driven by the card's own rotation, so light reads
-  // as catching a real surface as it turns rather than as a decal.
-  const sheenX = useTransform(rotateY, [-40, 0, 40], ['10%', '120%', '250%'])
-  const sheenOpacity = useTransform(rotateY, [-40, -10, 0, 10, 40], [0.95, 0.3, 0.16, 0.3, 0.95])
-
-  /* The words are held back until the stack has finished opening — while the
-     cards are still converging they overlap, and copy laid over copy is
-     unreadable. They fade in over the tail of the REVEAL phase. */
-  const copyOpacity = useTransform(p, [0.5, 0.72], [0, 1])
-  const copyY = useTransform(p, [0.5, 0.72], [14, 0])
-
-  return (
-    <div className="hero-stack__layer" style={{ zIndex: config.zIndex }}>
-      <motion.div
-        className="hero-stack__card"
-        style={{ x, y, z, rotateY, rotateZ, filter, boxShadow, width: config.widthPct }}
-      >
-        {panel ? (
-          <div className="hero-story">
-            {panel.image ? (
-              <img
-                className="hero-story__img"
-                src={mediaUrl(panel.image)}
-                alt={panel.alt}
-                width={config.width}
-                height={config.height}
-                loading={index === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-              />
-            ) : (
-              /* A panel with words but no picture yet still has to hold its
-                 shape, or the stack collapses while an editor is mid-edit. */
-              <div className="hero-story__img hero-story__img--empty" aria-hidden="true" />
-            )}
-            <div className="hero-story__scrim" aria-hidden="true" />
-            <motion.div className="hero-story__copy" style={{ opacity: copyOpacity, y: copyY }}>
-              {panel.kicker && <span className="hero-story__kicker">{panel.kicker}</span>}
-              {panel.title && <span className="hero-story__title">{panel.title}</span>}
-              {panel.caption && <span className="hero-story__caption">{panel.caption}</span>}
-            </motion.div>
-          </div>
-        ) : (
-          <img
-            src={config.src}
-            alt={config.alt}
-            width={config.width}
-            height={config.height}
-            decoding="async"
-          />
-        )}
-        <motion.div className="hero-stack__sheen" style={{ x: sheenX, opacity: sheenOpacity }} />
-      </motion.div>
-    </div>
-  )
-}
-
-const CARDS: CardConfig[] = [
-  {
-    // Back card — rests high-right, swings out to the right on the reveal.
-    src: cardBottom,
-    alt: '',
-    width: 552,
-    height: 302,
-    widthPct: '74%',
-    zIndex: 1,
-    x: [34, 12, 12, 238],
-    y: [-124, -28, -28, -44],
-    z: [-230, -55, -55, -95],
-    rotateY: [3, 1.5, 1.5, -38],
-    rotateZ: [-7, -3.5, -3.5, 3],
-    brightness: [0.6, 0.7, 0.7, 0.88],
-    shadowY: [40, 20, 20, 34],
-    shadowBlur: [92, 44, 44, 80],
-    shadowAlpha: [0.34, 0.5, 0.5, 0.3],
-  },
-  {
-    // Middle card — stays centred and comes forward on the reveal.
-    src: cardMiddle,
-    alt: '',
-    width: 530,
-    height: 261,
-    widthPct: '76%',
-    zIndex: 2,
-    x: [0, 0, 0, 0],
-    y: [-14, -2, -2, 8],
-    z: [-110, -26, -26, 34],
-    rotateY: [0, 0, 0, 0],
-    rotateZ: [-4.5, -2, -2, 0],
-    brightness: [0.8, 0.86, 0.86, 1.02],
-    shadowY: [38, 20, 20, 40],
-    shadowBlur: [88, 46, 46, 86],
-    shadowAlpha: [0.34, 0.46, 0.46, 0.32],
-  },
-  {
-    // Front card — rests low-left, swings out to the left, mirroring the back.
-    src: cardTop,
-    alt: '',
-    width: 530,
-    height: 261,
-    widthPct: '78%',
-    zIndex: 3,
-    x: [-30, -10, -10, -238],
-    y: [112, 26, 26, -36],
-    z: [0, 0, 0, -95],
-    rotateY: [-3, -1.5, -1.5, 38],
-    rotateZ: [-2, -1, -1, -3],
-    brightness: [1.02, 1.04, 1.04, 0.9],
-    shadowY: [42, 22, 22, 34],
-    shadowBlur: [96, 48, 48, 80],
-    shadowAlpha: [0.38, 0.52, 0.52, 0.3],
-  },
-]
-
-/* ── 3D right-hand scene ── */
-function LandingCards({
-  p,
-  rotateX,
-  rotateY,
+   Chosen over a fixed card arrangement because it takes however many beats the
+   CMS supplies — one or nine — instead of being built around a set number, and
+   because it plays on its own rather than waiting for the visitor to scroll. */
+function StoryReel({
   story,
+  driftX,
+  driftY,
 }: {
-  p: MotionValue<number>
-  rotateX: MotionValue<number>
-  rotateY: MotionValue<number>
-  /** CMS story beats. Empty falls back to the stock card artwork. */
   story: StoryPanel[]
+  driftX: MotionValue<number>
+  driftY: MotionValue<number>
 }) {
-  // The small guide line draws itself just after the cards settle, so
-  // the line and the stack read as one connected system.
-  const innerDraw = useTransform(p, [0.08, 0.6], [0, 1])
+  const reduce = useReducedMotion()
+  const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+
+  const count = story.length
+  // Modulo rather than a stored clamp, so the reel survives the CMS returning
+  // fewer beats than it did a moment ago.
+  const active = count > 0 ? index % count : 0
+  const beat = story[active]
+
+  useEffect(() => {
+    // A single beat is not a slideshow, and reduced motion means no autoplay.
+    if (reduce || paused || count < 2) return
+    const timer = setTimeout(() => {
+      setIndex((i) => i + 1)
+    }, DWELL_MS)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [index, paused, reduce, count])
+
+  if (!beat) return null
+
+  const hold = () => {
+    setPaused(true)
+  }
+  const release = () => {
+    setPaused(false)
+  }
 
   return (
     <div
-      className="hero-stack"
-      style={{
-        position: 'relative',
-        width: '100%',
-        minHeight: 620,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        // Sits low in the column on purpose: the fan-out happens late in the
-        // scroll, and starting lower keeps it inside the viewport long enough
-        // to actually read.
-        marginTop: 76,
-      }}
+      className="hero-reel"
+      role="group"
+      aria-roledescription="carousel"
+      aria-label="Our story"
+      onMouseEnter={hold}
+      onMouseLeave={release}
+      onFocusCapture={hold}
+      onBlurCapture={release}
     >
-      <motion.div
-        style={{
-          position: 'relative',
-          width: '100%',
-          minHeight: 520,
-          transformStyle: 'preserve-3d',
-          rotateX,
-          rotateY,
-        }}
-      >
-        <svg
-          viewBox="0 0 80 520"
-          width={8}
-          height="100%"
-          style={{
-            position: 'absolute',
-            top: '10%',
-            left: '18%',
-            bottom: '10%',
-            pointerEvents: 'none',
-            overflow: 'visible',
-            zIndex: 6,
-            filter: 'drop-shadow(0 0 18px rgba(255,255,255,0.14))',
-          }}
-          aria-hidden="true"
-        >
-          <motion.path
-            d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
-            fill="none"
-            stroke="rgba(255,255,255,0.96)"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ pathLength: innerDraw }}
-          />
-          <motion.path
-            d="M8 10 C 14 120, 12 240, 18 360 C 26 428, 10 480, 8 510"
-            fill="none"
-            stroke="rgba(255,255,255,0.28)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray="8 16"
-            style={{ pathLength: innerDraw }}
-          />
-        </svg>
-
-        {[
-          { src: starOutline, top: '14%', size: 30, opacity: 0.95 },
-          { src: starFilled, top: '44%', size: 26, opacity: 0.9 },
-          { src: starOutline, top: '72%', size: 22, opacity: 0.9 },
-        ].map((s, i) => (
-          <img
-            key={i}
-            src={s.src}
-            alt=""
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              top: s.top,
-              left: '19.4%',
-              width: s.size,
-              filter: 'brightness(0) invert(1)',
-              opacity: s.opacity,
-              zIndex: 4,
-            }}
-          />
-        ))}
-
-        {/* The stack is three cards deep, so it renders the first three beats.
-            They are assigned back-to-front so the first beat sits on top. */}
-        {CARDS.map((config, i) => {
-          const panel = story[CARDS.length - 1 - i]
-          return (
-            <StackCard
-              key={panel?.id ?? config.src}
-              p={p}
-              config={config}
-              index={i}
-              {...(panel ? { panel } : {})}
-            />
-          )
-        })}
-      </motion.div>
-
+      {/* Brand marks that framed the previous scene and still frame this one.
+          Pure CSS keyframes, so they drift whether or not React re-renders. */}
       <img
         src={starOutline}
         alt=""
         aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: '12%',
-          right: '-6%',
-          width: 88,
-          opacity: 0.75,
-          animation: 'floatY 6s ease-in-out infinite',
-          zIndex: 4,
-        }}
+        className="hero-reel__star hero-reel__star--tr"
       />
       <img
         src={starFilled}
         alt=""
         aria-hidden="true"
-        style={{
-          position: 'absolute',
-          bottom: '8%',
-          left: '-8%',
-          width: 80,
-          opacity: 0.85,
-          animation: 'floatY2 7s ease-in-out 0.5s infinite',
-          zIndex: 4,
-        }}
+        className="hero-reel__star hero-reel__star--bl"
       />
+      <motion.div className="hero-reel__frame" style={{ x: driftX, y: driftY }}>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={beat.id}
+            className="hero-reel__slide"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.85, ease: 'easeOut' }}
+          >
+            {beat.image && isVideoSource(beat.image) ? (
+              /* Muted and inline so it is allowed to autoplay at all, and
+                 `poster`-less on purpose: the frame is already dark, so a
+                 flash of empty background is less jarring than a still that
+                 does not match the first frame. Reduced motion gets controls
+                 and no autoplay instead. */
+              <video
+                key={beat.id}
+                className="hero-reel__img"
+                src={mediaUrl(beat.image)}
+                aria-label={beat.alt}
+                autoPlay={!reduce}
+                muted
+                loop
+                playsInline
+                controls={reduce === true}
+                preload={active === 0 ? 'auto' : 'metadata'}
+              />
+            ) : beat.image ? (
+              <img
+                className={`hero-reel__img${reduce ? '' : ' hero-reel__img--drift'}`}
+                src={mediaUrl(beat.image)}
+                alt={beat.alt}
+                loading={active === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            ) : (
+              /* A beat with words but no picture still has to fill the frame,
+                 or the reel collapses while an editor is mid-edit. */
+              <div className="hero-reel__img hero-reel__img--empty" aria-hidden="true" />
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="hero-reel__scrim" aria-hidden="true" />
+
+        <div className="hero-reel__copy">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={beat.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+            >
+              {beat.kicker && <span className="hero-reel__kicker">{beat.kicker}</span>}
+              {beat.title && <span className="hero-reel__title">{beat.title}</span>}
+              {beat.caption && <span className="hero-reel__caption">{beat.caption}</span>}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Doubles as the control: each segment says how many beats there are,
+            which one is showing, and how long it has left. */}
+        {count > 1 && (
+          <div className="hero-reel__track">
+            {story.map((panel, i) => (
+              <button
+                key={panel.id}
+                type="button"
+                className="hero-reel__seg"
+                aria-label={`Show ${panel.title || `beat ${String(i + 1)}`}`}
+                aria-current={i === active}
+                onClick={() => {
+                  setIndex(i)
+                }}
+              >
+                <span
+                  className="hero-reel__segfill"
+                  style={{
+                    /* Past beats read as complete, the current one fills over
+                       its dwell, and the rest stay empty. */
+                    width: i < active ? '100%' : i === active ? undefined : '0%',
+                    animation:
+                      i === active && !reduce
+                        ? `heroSegFill ${String(DWELL_MS)}ms linear forwards`
+                        : undefined,
+                    animationPlayState: paused ? 'paused' : 'running',
+                  }}
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </motion.div>
     </div>
   )
 }
 
-/* ── Count-up ── */
+/* Placeholder story, shown until an editor publishes real panels in
+   Admin → Hero → Animated Story. It carries no pictures on purpose: each card
+   falls back to the brand gradient, so the hero reads as intentional rather
+   than as three broken image frames. The copy describes what the bank
+   actually offers, so it is presentable in the meantime. */
+const FALLBACK_STORY: StoryPanel[] = [
+  {
+    id: 'placeholder-1',
+    image: '',
+    alt: '',
+    kicker: '01',
+    title: 'Apply in minutes',
+    caption: 'At any of our branches and outlets across all five provinces.',
+  },
+  {
+    id: 'placeholder-2',
+    image: '',
+    alt: '',
+    kicker: '02',
+    title: 'Approved in 48 hours',
+    caption: "Collateral-light lending built for Rwanda's entrepreneurs.",
+  },
+  {
+    id: 'placeholder-3',
+    image: '',
+    alt: '',
+    kicker: '03',
+    title: 'Your business grows',
+    caption: 'Repay on terms that match how your business actually earns.',
+  },
+]
+
+/* ── Count-up figure ──
+   Animates from zero to `to` the first time it scrolls into view, once. The
+   easing is cubic-out over 1.1s, which lands the number rather than letting it
+   creep. Reduced motion skips straight to the value. */
 function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const [val, setVal] = useState(0)
+  const [value, setValue] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
   const reduce = useReducedMotion()
 
   useEffect(() => {
-    // Reduced motion renders the final value directly — no counting, and
-    // no setState from an effect just to skip the animation.
     if (reduce) return
-    const node = ref.current
-    if (!node) return
+    const el = ref.current
+    if (!el) return
 
-    let raf = 0
+    let frame = 0
     const obs = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return
+        if (!entry?.isIntersecting) return
         obs.disconnect()
-        const start = performance.now()
-        const duration = 1100
-        const tick = (now: number) => {
-          const t = Math.min((now - start) / duration, 1)
-          // easeOutCubic — lands softly instead of stopping dead
-          setVal(Math.round(to * (1 - Math.pow(1 - t, 3))))
-          if (t < 1) raf = requestAnimationFrame(tick)
+        const started = performance.now()
+        const step = (now: number) => {
+          const t = Math.min((now - started) / 1100, 1)
+          setValue(Math.round(to * (1 - (1 - t) ** 3)))
+          if (t < 1) frame = requestAnimationFrame(step)
         }
-        raf = requestAnimationFrame(tick)
+        frame = requestAnimationFrame(step)
       },
       { threshold: 0.5 },
     )
-    obs.observe(node)
+    obs.observe(el)
     return () => {
       obs.disconnect()
-      cancelAnimationFrame(raf)
+      cancelAnimationFrame(frame)
     }
   }, [to, reduce])
 
   return (
     <span ref={ref}>
-      {reduce ? to : val}
+      {reduce ? to : value}
       {suffix}
     </span>
   )
 }
 
+/** A rotating headline. `sub` is a node so a line can carry emphasis. */
 interface HeroSlide {
   line1: string
   line2: string
@@ -451,7 +319,7 @@ interface HeroSlide {
   sub: React.ReactNode
 }
 
-/** Shown only until the CMS responds, and if it never does. */
+/** Shown until the CMS hero document supplies slides. */
 const FALLBACK_SLIDES: HeroSlide[] = [
   {
     line1: 'Banking Built',
@@ -459,8 +327,9 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     line3: '& Beyond',
     sub: (
       <>
-        Responsible, inclusive financial services for entrepreneurs, families, and businesses — accessible from any
-        branch or by dialling <strong style={{ color: '#ffffff' }}>*540#</strong>.
+        Responsible, inclusive financial services for entrepreneurs, families, and businesses —
+        accessible from any branch or by dialling{' '}
+        <strong style={{ color: '#ffffff' }}>*540#</strong>.
       </>
     ),
   },
@@ -512,7 +381,11 @@ export default function Hero() {
 
   /* A beat with neither picture nor headline would animate an empty card, so
      only panels with something to show reach the stack. */
-  const story: StoryPanel[] = (hero?.story ?? []).filter((b) => b.image || b.title)
+  /* A beat with neither picture nor headline would animate an empty card, so
+     only panels with something to show reach the stack. With none published,
+     the placeholder stands in. */
+  const published = (hero?.story ?? []).filter((b) => b.image || b.title)
+  const story: StoryPanel[] = published.length > 0 ? published : FALLBACK_STORY
 
   /* Clamped during render rather than corrected in an effect: if the CMS
      returns fewer slides than the index currently held, reading past the end
@@ -542,8 +415,10 @@ export default function Hero() {
   const pointerY = useMotionValue(0.5)
   const px = useSpring(pointerX, { stiffness: 90, damping: 20, mass: 0.3 })
   const py = useSpring(pointerY, { stiffness: 90, damping: 20, mass: 0.3 })
-  const sceneRotateX = useTransform(py, [0, 1], [5, -5])
-  const sceneRotateY = useTransform(px, [0, 1], [-8, 8])
+  /* Pointer parallax, now a drift rather than a tilt — the reel is a frame
+     you look through, so nudging it reads better than rotating it. */
+  const sceneDriftX = useTransform(px, [0, 1], [-14, 14])
+  const sceneDriftY = useTransform(py, [0, 1], [-10, 10])
 
   // Content easing out as the hero leaves. The scene holds its
   // opacity far longer than the copy so the card reveal — which
@@ -698,8 +573,11 @@ export default function Hero() {
           // under the navbar at the old 48px.
           padding: '140px 48px 80px',
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 40,
+          /* The reel carries the pictures, so it takes the larger share. The
+             copy column stays wide enough for the headline to break where it
+             is meant to rather than becoming a narrow ribbon. */
+          gridTemplateColumns: 'minmax(0, 0.85fr) minmax(0, 1.15fr)',
+          gap: 44,
           alignItems: 'center',
         }}
       >
@@ -951,7 +829,7 @@ export default function Hero() {
           style={{ position: 'relative', zIndex: 2 }}
         >
           <motion.div style={{ opacity: sceneOpacity }}>
-            <LandingCards p={p} rotateX={sceneRotateX} rotateY={sceneRotateY} story={story} />
+            <StoryReel story={story} driftX={sceneDriftX} driftY={sceneDriftY} />
           </motion.div>
         </motion.div>
       </div>

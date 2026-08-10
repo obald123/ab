@@ -54,6 +54,14 @@ const rwf = (n: number) =>
 const pct1 = (n: number) =>
   n.toLocaleString('en-RW', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
+/** Short form for the range hint. Zero stays "0" rather than becoming "0K". */
+const compactRwf = (n: number): string => {
+  if (n === 0) return '0'
+  if (n >= 1_000_000) return `${String(n / 1_000_000)}M`
+  if (n >= 1000) return `${String(n / 1000)}K`
+  return String(n)
+}
+
 /** Standard amortising payment. Falls back to straight division at 0%. */
 function monthlyPayment(amount: number, annualRate: number, months: number): number {
   if (amount <= 0 || months <= 0) return 0
@@ -406,11 +414,14 @@ export default function LoanCalculator() {
               label="Loan amount"
               suffix="RWF"
               value={draft.amount}
-              min={100_000}
+              /* Floored at 0, not at a product minimum: a field that silently
+                 refuses to go below a threshold reads as broken while you are
+                 clearing it to type a new figure. */
+              min={0}
               max={100_000_000}
               step={100_000}
               onChange={(next) => setDraft((d) => ({ ...d, amount: next }))}
-              format={(n) => (n >= 1_000_000 ? `${String(n / 1_000_000)}M` : `${String(n / 1000)}K`)}
+              format={compactRwf}
               onSubmit={calculate}
             />
 
