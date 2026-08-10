@@ -1,29 +1,36 @@
-/* ── Rates Running Banner ── */
+import { useCollection } from '../lib/content'
 
-const rates = [
-  { label: 'Savings Account',      value: '6.5%',    unit: 'p.a.',  tag: 'Interest Rate' },
-  { label: 'Umugore Savings',      value: '9.5%',    unit: 'p.a.',  tag: 'Women\'s Account' },
-  { label: 'Fixed Deposit 6M',     value: '10.25%',  unit: 'p.a.',  tag: 'Term Deposit' },
-  { label: 'Fixed Deposit 12M',    value: '11.0%',   unit: 'p.a.',  tag: 'Term Deposit' },
-  { label: 'SME Business Loan',    value: '17.5%',   unit: 'p.a.',  tag: 'Lending Rate' },
-  { label: 'Personal Loan',        value: '19.0%',   unit: 'p.a.',  tag: 'Lending Rate' },
-  { label: 'Mortgage Loan',        value: '15.5%',   unit: 'p.a.',  tag: 'Home Loan' },
-  { label: 'USD / RWF',            value: '1,347.50', unit: 'RWF',  tag: 'Exchange Rate' },
-  { label: 'EUR / RWF',            value: '1,468.20', unit: 'RWF',  tag: 'Exchange Rate' },
-  { label: 'GBP / RWF',            value: '1,712.80', unit: 'RWF',  tag: 'Exchange Rate' },
-  { label: 'KES / RWF',            value: '10.42',   unit: 'RWF',   tag: 'Exchange Rate' },
-  { label: 'UGX / RWF',            value: '0.37',    unit: 'RWF',   tag: 'Exchange Rate' },
-  { label: 'eKash Transfer Fee',   value: 'FREE',    unit: '3 months', tag: 'Campaign Offer' },
-  { label: 'USSD Banking',         value: '*540#',   unit: 'all networks', tag: 'Mobile Money' },
-]
+/* ── Rates Running Banner ── */
 
 type Direction = 'up' | 'down' | 'neutral'
 
-const indicators: Direction[] = [
-  'up', 'up', 'up', 'up',
-  'neutral', 'neutral', 'down',
-  'up', 'up', 'down', 'up', 'down',
-  'neutral', 'neutral',
+interface Rate {
+  label: string
+  value: string
+  unit: string
+  tag: string
+  /* Editors set the arrow with the rate itself. It used to live in a separate
+     array indexed by position, which silently mismatched whenever the list
+     changed length. */
+  direction: Direction
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK: Rate[] = [
+  { label: 'Savings Account', value: '6.5%', unit: 'p.a.', tag: 'Interest Rate', direction: 'up' },
+  { label: 'Umugore Savings', value: '9.5%', unit: 'p.a.', tag: "Women's Account", direction: 'up' },
+  { label: 'Fixed Deposit 6M', value: '10.25%', unit: 'p.a.', tag: 'Term Deposit', direction: 'up' },
+  { label: 'Fixed Deposit 12M', value: '11.0%', unit: 'p.a.', tag: 'Term Deposit', direction: 'up' },
+  { label: 'SME Business Loan', value: '17.5%', unit: 'p.a.', tag: 'Lending Rate', direction: 'neutral' },
+  { label: 'Personal Loan', value: '19.0%', unit: 'p.a.', tag: 'Lending Rate', direction: 'neutral' },
+  { label: 'Mortgage Loan', value: '15.5%', unit: 'p.a.', tag: 'Home Loan', direction: 'down' },
+  { label: 'USD / RWF', value: '1,347.50', unit: 'RWF', tag: 'Exchange Rate', direction: 'up' },
+  { label: 'EUR / RWF', value: '1,468.20', unit: 'RWF', tag: 'Exchange Rate', direction: 'up' },
+  { label: 'GBP / RWF', value: '1,712.80', unit: 'RWF', tag: 'Exchange Rate', direction: 'down' },
+  { label: 'KES / RWF', value: '10.42', unit: 'RWF', tag: 'Exchange Rate', direction: 'up' },
+  { label: 'UGX / RWF', value: '0.37', unit: 'RWF', tag: 'Exchange Rate', direction: 'down' },
+  { label: 'eKash Transfer Fee', value: 'FREE', unit: '3 months', tag: 'Campaign Offer', direction: 'neutral' },
+  { label: 'USSD Banking', value: '*540#', unit: 'all networks', tag: 'Mobile Money', direction: 'neutral' },
 ]
 
 function Arrow({ dir }: { dir: Direction }) {
@@ -44,7 +51,7 @@ function Arrow({ dir }: { dir: Direction }) {
   )
 }
 
-function RateItem({ rate, dir }: { rate: typeof rates[0], dir: Direction }) {
+function RateItem({ rate, dir }: { rate: Rate; dir: Direction }) {
   const isCampaign = rate.tag === 'Campaign Offer'
   const isFree = rate.value === 'FREE'
   return (
@@ -90,6 +97,7 @@ function RateItem({ rate, dir }: { rate: typeof rates[0], dir: Direction }) {
 }
 
 export default function RatesBanner() {
+  const { data: rates } = useCollection<Rate>('rate', FALLBACK)
   const doubled = [...rates, ...rates]
 
   return (
@@ -156,7 +164,7 @@ export default function RatesBanner() {
           padding: '0 28px',
         }}>
           {doubled.map((r, i) => (
-            <RateItem key={i} rate={r} dir={indicators[i % indicators.length]} />
+            <RateItem key={i} rate={r} dir={r.direction} />
           ))}
         </div>
       </div>

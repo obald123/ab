@@ -1,16 +1,26 @@
-import { IconGift, IconMobile, IconTrendUp, IconHeart, IconGlobe, IconStar } from './Icons'
+import { useCollection } from '../lib/content'
+import { iconFor } from '../lib/icon-map'
 
 /* ── Top announcement bar — sits above the navbar ── */
-const items = [
-  { Icon: IconGift,     text: 'GRAND CAMPAIGN: Open an account before August 15 — get 3 months zero fees + free debit card' },
-  { Icon: IconMobile,   text: 'NEW: eKash Plus — instant transfers, savings pockets & cross-border remittance via *540#' },
-  { Icon: IconTrendUp,  text: 'SME Boost Loan: up to RWF 50M approved in 48 hours — apply now at any branch' },
-  { Icon: IconHeart,    text: "Umugore Savings: 9.5% p.a. interest rate — celebrating Rwanda's women entrepreneurs" },
-  { Icon: IconGlobe,    text: 'Send money to 12 African countries instantly via eKash — competitive FX rates daily' },
-  { Icon: IconStar,     text: 'AB Rwanda rated #1 for customer satisfaction — 94% of customers would recommend us' },
+
+interface TickerItem {
+  icon: string
+  text: string
+}
+
+/* Shown only until the CMS responds, and if it never does. A bank's homepage
+   with an empty announcement bar looks broken; stale copy does not. */
+const FALLBACK: TickerItem[] = [
+  { icon: 'gift', text: 'GRAND CAMPAIGN: Open an account before August 15 — get 3 months zero fees + free debit card' },
+  { icon: 'mobile', text: 'NEW: eKash Plus — instant transfers, savings pockets & cross-border remittance via *540#' },
+  { icon: 'trend-up', text: 'SME Boost Loan: up to RWF 50M approved in 48 hours — apply now at any branch' },
+  { icon: 'heart', text: "Umugore Savings: 9.5% p.a. interest rate — celebrating Rwanda's women entrepreneurs" },
+  { icon: 'globe', text: 'Send money to 12 African countries instantly via eKash — competitive FX rates daily' },
+  { icon: 'star', text: 'AB Rwanda rated #1 for customer satisfaction — 94% of customers would recommend us' },
 ]
 
 export default function Ticker() {
+  const { data: items } = useCollection<TickerItem>('ticker', FALLBACK)
   const doubled = [...items, ...items]
 
   return (
@@ -57,11 +67,13 @@ export default function Ticker() {
           width: 'max-content', willChange: 'transform',
           paddingLeft: 32,
         }}>
-          {doubled.map((item, i) => (
+          {doubled.map((item, i) => {
+            const Icon = iconFor(item.icon)
+            return (
             <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 20, flexShrink: 0 }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
                 <span style={{ display: 'flex', alignItems: 'center' }}>
-                  <item.Icon size={13} color="rgba(168,216,240,0.7)" strokeWidth={2} />
+                  <Icon size={13} color="rgba(168,216,240,0.7)" strokeWidth={2} />
                 </span>
                 <span style={{ fontSize: 11.5, color: 'rgba(168,216,240,0.85)', fontWeight: 600, letterSpacing: '0.01em' }}>
                   {item.text}
@@ -69,7 +81,8 @@ export default function Ticker() {
               </span>
               <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(168,216,240,0.25)', flexShrink: 0 }} />
             </span>
-          ))}
+            )
+          })}
         </div>
       </div>
 

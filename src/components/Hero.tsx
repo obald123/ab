@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { mediaUrl, useSingleton } from '../lib/content'
 import {
   motion,
   useMotionTemplate,
@@ -91,7 +92,28 @@ type CardConfig = {
   shadowAlpha: Quad
 }
 
-function StackCard({ p, config }: { p: MotionValue<number>; config: CardConfig }) {
+/** One beat of the CMS-authored story, painted onto a card in the stack. */
+export interface StoryPanel {
+  id: string
+  image: string
+  alt: string
+  kicker: string
+  title: string
+  caption: string
+}
+
+function StackCard({
+  p,
+  config,
+  panel,
+  index,
+}: {
+  p: MotionValue<number>
+  config: CardConfig
+  /** When present the card carries a story beat instead of the stock artwork. */
+  panel?: StoryPanel
+  index: number
+}) {
   const stops = STOPS as unknown as number[]
   const x = useTransform(p, stops, config.x)
   const y = useTransform(p, stops, config.y)
@@ -99,10 +121,14 @@ function StackCard({ p, config }: { p: MotionValue<number>; config: CardConfig }
   const rotateY = useTransform(p, stops, config.rotateY)
   const rotateZ = useTransform(p, stops, config.rotateZ)
 
-  // Depth-linked brightness. Cheap fake ambient occlusion — it does
-  // more for perceived depth than the transforms themselves.
+  /* Depth-linked brightness. Cheap fake ambient occlusion — it does more for
+     perceived depth than the transforms themselves. The stock artwork is
+     desaturated to sit behind the copy, but an editor's photograph keeps its
+     colour: greyscaling someone's chosen image would be the wrong call. */
   const brightness = useTransform(p, stops, config.brightness)
-  const filter = useMotionTemplate`grayscale(1) brightness(${brightness}) contrast(1.08)`
+  const litFilter = useMotionTemplate`brightness(${brightness}) contrast(1.04)`
+  const stockFilter = useMotionTemplate`grayscale(1) brightness(${brightness}) contrast(1.08)`
+  const filter = panel ? litFilter : stockFilter
 
   // Shadow tightens as the stack closes and softens as it opens.
   const shadowY = useTransform(p, stops, config.shadowY)
@@ -115,19 +141,51 @@ function StackCard({ p, config }: { p: MotionValue<number>; config: CardConfig }
   const sheenX = useTransform(rotateY, [-40, 0, 40], ['10%', '120%', '250%'])
   const sheenOpacity = useTransform(rotateY, [-40, -10, 0, 10, 40], [0.95, 0.3, 0.16, 0.3, 0.95])
 
+  /* The words are held back until the stack has finished opening — while the
+     cards are still converging they overlap, and copy laid over copy is
+     unreadable. They fade in over the tail of the REVEAL phase. */
+  const copyOpacity = useTransform(p, [0.5, 0.72], [0, 1])
+  const copyY = useTransform(p, [0.5, 0.72], [14, 0])
+
   return (
     <div className="hero-stack__layer" style={{ zIndex: config.zIndex }}>
       <motion.div
         className="hero-stack__card"
         style={{ x, y, z, rotateY, rotateZ, filter, boxShadow, width: config.widthPct }}
       >
-        <img
-          src={config.src}
-          alt={config.alt}
-          width={config.width}
-          height={config.height}
-          decoding="async"
-        />
+        {panel ? (
+          <div className="hero-story">
+            {panel.image ? (
+              <img
+                className="hero-story__img"
+                src={mediaUrl(panel.image)}
+                alt={panel.alt}
+                width={config.width}
+                height={config.height}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            ) : (
+              /* A panel with words but no picture yet still has to hold its
+                 shape, or the stack collapses while an editor is mid-edit. */
+              <div className="hero-story__img hero-story__img--empty" aria-hidden="true" />
+            )}
+            <div className="hero-story__scrim" aria-hidden="true" />
+            <motion.div className="hero-story__copy" style={{ opacity: copyOpacity, y: copyY }}>
+              {panel.kicker && <span className="hero-story__kicker">{panel.kicker}</span>}
+              {panel.title && <span className="hero-story__title">{panel.title}</span>}
+              {panel.caption && <span className="hero-story__caption">{panel.caption}</span>}
+            </motion.div>
+          </div>
+        ) : (
+          <img
+            src={config.src}
+            alt={config.alt}
+            width={config.width}
+            height={config.height}
+            decoding="async"
+          />
+        )}
         <motion.div className="hero-stack__sheen" style={{ x: sheenX, opacity: sheenOpacity }} />
       </motion.div>
     </div>
@@ -196,10 +254,13 @@ function LandingCards({
   p,
   rotateX,
   rotateY,
+  story,
 }: {
   p: MotionValue<number>
   rotateX: MotionValue<number>
   rotateY: MotionValue<number>
+  /** CMS story beats. Empty falls back to the stock card artwork. */
+  story: StoryPanel[]
 }) {
   // The small guide line draws itself just after the cards settle, so
   // the line and the stack read as one connected system.
@@ -290,9 +351,20 @@ function LandingCards({
           />
         ))}
 
-        {CARDS.map((config) => (
-          <StackCard key={config.src} p={p} config={config} />
-        ))}
+        {/* The stack is three cards deep, so it renders the first three beats.
+            They are assigned back-to-front so the first beat sits on top. */}
+        {CARDS.map((config, i) => {
+          const panel = story[CARDS.length - 1 - i]
+          return (
+            <StackCard
+              key={panel?.id ?? config.src}
+              p={p}
+              config={config}
+              index={i}
+              {...(panel ? { panel } : {})}
+            />
+          )
+        })}
       </motion.div>
 
       <img
@@ -372,7 +444,15 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
   )
 }
 
-const HERO_SLIDES = [
+interface HeroSlide {
+  line1: string
+  line2: string
+  line3: string
+  sub: React.ReactNode
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_SLIDES: HeroSlide[] = [
   {
     line1: 'Banking Built',
     line2: 'for Rwanda',
@@ -413,8 +493,31 @@ const HEADLINE_STYLE: React.CSSProperties = {
   letterSpacing: '-0.025em',
 }
 
+interface HeroDocument {
+  slides: { id: string; line1: string; line2: string; line3: string; sub: string }[]
+  quickLinks: { id: string; label: string; icon: string }[]
+  /** Optional: hero documents saved before the story existed omit it. */
+  story?: StoryPanel[]
+}
+
 export default function Hero() {
   const [heroSlide, setHeroSlide] = useState(0)
+
+  /* A `null` fallback distinguishes the two cases precisely: no document yet
+     means show the built-in slides, while a document that exists is used
+     exactly — including an empty slide list, which is an editorial choice
+     rather than a failure. */
+  const { data: hero } = useSingleton<HeroDocument | null>('hero', null)
+  const HERO_SLIDES: HeroSlide[] = hero ? hero.slides : FALLBACK_SLIDES
+
+  /* A beat with neither picture nor headline would animate an empty card, so
+     only panels with something to show reach the stack. */
+  const story: StoryPanel[] = (hero?.story ?? []).filter((b) => b.image || b.title)
+
+  /* Clamped during render rather than corrected in an effect: if the CMS
+     returns fewer slides than the index currently held, reading past the end
+     must not survive even one frame. */
+  const activeSlide = HERO_SLIDES.length > 0 ? heroSlide % HERO_SLIDES.length : 0
   const sectionRef = useRef<HTMLElement>(null)
   const rectRef = useRef<DOMRect | null>(null)
   const reduce = useReducedMotion()
@@ -458,12 +561,16 @@ export default function Hero() {
   const lineY = useTransform<number, number>([p, py], ([pv, pyv]) => pv * 110 + (pyv - 0.5) * 54)
   const lineOpacity = useTransform(p, [0, 0.9], [0.8, 0.55])
 
+  /* Restarted when the slide count changes: the CMS may return a different
+     number of slides than the fallback, and a stale modulus would either skip
+     slides or index past the end. */
   useEffect(() => {
+    if (HERO_SLIDES.length === 0) return
     const timer = setInterval(() => {
       setHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)
     }, 4000)
     return () => clearInterval(timer)
-  }, [])
+  }, [HERO_SLIDES.length])
 
   // Cache the section rect so pointer moves never force a layout read.
   useEffect(() => {
@@ -618,14 +725,14 @@ export default function Hero() {
             {HERO_SLIDES.map((slide, i) => (
               <div
                 key={i}
-                aria-hidden={heroSlide !== i}
+                aria-hidden={activeSlide !== i}
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  opacity: heroSlide === i ? 1 : 0,
-                  transform: heroSlide === i ? 'translateY(0)' : 'translateY(12px)',
+                  opacity: activeSlide === i ? 1 : 0,
+                  transform: activeSlide === i ? 'translateY(0)' : 'translateY(12px)',
                   transition: 'opacity 0.5s ease, transform 0.5s ease',
-                  pointerEvents: heroSlide === i ? 'auto' : 'none',
+                  pointerEvents: activeSlide === i ? 'auto' : 'none',
                 }}
               >
                 <h1 style={{ ...HEADLINE_STYLE, color: '#ffffff' }}>{slide.line1}</h1>
@@ -655,16 +762,16 @@ export default function Hero() {
               <button
                 key={i}
                 aria-label={`Show slide ${i + 1}`}
-                aria-current={heroSlide === i}
+                aria-current={activeSlide === i}
                 onClick={() => setHeroSlide(i)}
                 style={{
-                  width: heroSlide === i ? 24 : 8,
+                  width: activeSlide === i ? 24 : 8,
                   height: 8,
                   borderRadius: 4,
                   border: 'none',
                   cursor: 'pointer',
                   padding: 0,
-                  background: heroSlide === i ? '#ffffff' : 'rgba(255,255,255,0.3)',
+                  background: activeSlide === i ? '#ffffff' : 'rgba(255,255,255,0.3)',
                   transition: 'width 0.3s, background 0.3s',
                 }}
               />
@@ -678,7 +785,7 @@ export default function Hero() {
             {HERO_SLIDES.map((slide, i) => (
               <p
                 key={i}
-                aria-hidden={heroSlide !== i}
+                aria-hidden={activeSlide !== i}
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -687,10 +794,10 @@ export default function Hero() {
                   lineHeight: 1.78,
                   maxWidth: 470,
                   margin: 0,
-                  opacity: heroSlide === i ? 1 : 0,
-                  transform: heroSlide === i ? 'translateY(0)' : 'translateY(10px)',
+                  opacity: activeSlide === i ? 1 : 0,
+                  transform: activeSlide === i ? 'translateY(0)' : 'translateY(10px)',
                   transition: 'opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s',
-                  pointerEvents: heroSlide === i ? 'auto' : 'none',
+                  pointerEvents: activeSlide === i ? 'auto' : 'none',
                 }}
               >
                 {slide.sub}
@@ -844,7 +951,7 @@ export default function Hero() {
           style={{ position: 'relative', zIndex: 2 }}
         >
           <motion.div style={{ opacity: sceneOpacity }}>
-            <LandingCards p={p} rotateX={sceneRotateX} rotateY={sceneRotateY} />
+            <LandingCards p={p} rotateX={sceneRotateX} rotateY={sceneRotateY} story={story} />
           </motion.div>
         </motion.div>
       </div>

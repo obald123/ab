@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionTemplate, useReducedMotion, animate, AnimatePresence, type MotionValue } from 'framer-motion'
+import { useSingleton } from '../lib/content'
 import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf, IconRoute, IconUsers, IconBriefcase, IconHandshake } from './Icons'
 
 /* ── data — sourced & paraphrased from abr.rw/who-we-are/ "Our History" ── */
@@ -54,7 +55,8 @@ const timeline = [
   },
 ]
 
-const management = [
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_MANAGEMENT = [
   {
     name: 'Zachary Raymond', role: 'Chief Executive Officer',
     image: 'https://abr.rw/wp-content/uploads/2023/02/CEO_Zach.jpg',
@@ -85,7 +87,8 @@ const management = [
   },
 ]
 
-const board = [
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_BOARD = [
   {
     name: 'Dianne Dusaidi', role: 'Chairperson',
     image: 'https://abr.rw/wp-content/uploads/2021/05/Dianne_Dusaidi.jpg',
@@ -123,7 +126,8 @@ const board = [
   },
 ]
 
-const shareholders = [
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_SHAREHOLDERS = [
   {
     name: 'AccessHolding', abbr: 'AH', color: '#0284c7',
     logo: 'https://abr.rw/wp-content/uploads/2021/04/AH-Logo-rgb-e1618829595587-1024x189.png',
@@ -659,8 +663,29 @@ function JourneyPath() {
   )
 }
 
+interface AboutPeople {
+  management: { id: string; name: string; role: string; image: string; detail: string; bio: string; color: string }[]
+  board: AboutPeople['management']
+  shareholders: { id: string; name: string; abbr: string; color: string; logo: string; desc: string }[]
+}
+
+/* The CMS models the people grids but not the scroll-animated timeline, whose
+   marker positions are computed at module load from a fixed length. Wiring the
+   timeline would mean rebuilding that animation, so it stays in code for now. */
+function useAboutPeople() {
+  const { data } = useSingleton<Partial<AboutPeople>>('about', {})
+  return {
+    /* `??`, not a length check: an absent key means the About document has
+       never been saved, so the built-in copy stands in. A key that is present
+       but empty means an editor emptied it, and that must show as empty. */
+    management: data.management ?? FALLBACK_MANAGEMENT,
+    board: data.board ?? FALLBACK_BOARD,
+    shareholders: data.shareholders ?? FALLBACK_SHAREHOLDERS,
+  }
+}
+
 /* ── 3D management card ── */
-function ManagementCard({ m, i }: { m: typeof management[0]; i: number }) {
+function ManagementCard({ m, i }: { m: (typeof FALLBACK_MANAGEMENT)[0]; i: number }) {
   const { ref, onMove, onLeave } = use3DTilt(14)
   return (
     <R delay={i * 90}>
@@ -716,7 +741,7 @@ function ManagementCard({ m, i }: { m: typeof management[0]; i: number }) {
   )
 }
 
-function BoardCard({ b, i }: { b: typeof board[0]; i: number }) {
+function BoardCard({ b, i }: { b: (typeof FALLBACK_BOARD)[0]; i: number }) {
   const { ref, onMove, onLeave } = use3DTilt(10)
   return (
     <R delay={i * 90}>
@@ -752,7 +777,18 @@ function BoardCard({ b, i }: { b: typeof board[0]; i: number }) {
 }
 
 /* ── 3D shareholder card ── */
-function ShareholderCard({ s, i }: { s: typeof shareholders[0]; i: number }) {
+/* `shareIcon` is decorative and not modelled in the CMS, so it is optional:
+   shareholders added through the CMS simply render without it. */
+interface ShareholderView {
+  name: string
+  abbr: string
+  color: string
+  logo: string
+  desc: string
+  shareIcon?: string
+}
+
+function ShareholderCard({ s, i }: { s: ShareholderView; i: number }) {
   const { ref, onMove, onLeave } = use3DTilt(10)
   return (
     <R delay={i * 100}>
@@ -1152,6 +1188,7 @@ function VisionMission() {
 /* `standalone` = rendered as the /who-we-are page rather than a home
    section, so the first masthead must clear the fixed navbar. */
 export default function About({ standalone = false }: { standalone?: boolean }) {
+  const { management, board, shareholders } = useAboutPeople()
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const heroRef = useRef<HTMLDivElement>(null)
 

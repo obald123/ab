@@ -1,7 +1,19 @@
 import { useEffect, useRef } from 'react'
 import { IconNews } from './Icons'
+import { mediaUrl, useCollection } from '../lib/content'
 
-const articles = [
+interface Article {
+  category: string
+  tag: string
+  date: string
+  title: string
+  excerpt: string
+  image: string
+  featured: boolean
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK: Article[] = [
   {
     category: 'Bancassurance',
     tag: 'New Product',
@@ -32,6 +44,7 @@ const articles = [
 ]
 
 export default function News() {
+  const { data: articles } = useCollection<Article>('news', FALLBACK)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -119,7 +132,7 @@ export default function News() {
           >
             <div className="news-featured-image" style={{ position: 'relative', minHeight: 300, background: '#e6f2fa', overflow: 'hidden' }}>
               <img
-                src={articles[0].image}
+                src={mediaUrl(articles[0].image)}
                 alt={articles[0].title}
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
                 onMouseEnter={e => { (e.target as HTMLImageElement).style.transform = 'scale(1.05)' }}
@@ -212,7 +225,7 @@ export default function News() {
 
               <div style={{ height: 190, position: 'relative', background: '#e6f2fa', overflow: 'hidden' }}>
                 <img
-                  src={article.image}
+                  src={mediaUrl(article.image)}
                   alt={article.title}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
                 />

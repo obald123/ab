@@ -239,59 +239,6 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right CTAs */}
-          <div className="nav-desktop-cta" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 7,
-                padding: '7px 14px',
-                borderRadius: 100,
-                border: '1.5px solid rgba(14,165,233,0.2)',
-                background: 'rgba(14,165,233,0.04)',
-              }}
-            >
-              <span
-                style={{
-                  display: 'block',
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background: '#0ea5e9',
-                  animation: 'blink 2s ease-in-out infinite',
-                }}
-              />
-              <span style={{ fontSize: 12, fontWeight: 800, color: '#0ea5e9', letterSpacing: '0.05em' }}>*540#</span>
-            </div>
-            <button
-              onClick={() => goToSection('#products')}
-              style={{
-                fontSize: 13.5,
-                fontWeight: 700,
-                background: '#0ea5e9',
-                color: '#ffffff',
-                padding: '10px 22px',
-                borderRadius: 8,
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'background 0.2s, transform 0.2s',
-                letterSpacing: '0.01em',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#0284c7'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#0ea5e9'
-                e.currentTarget.style.transform = 'none'
-              }}
-            >
-              Open Account
-            </button>
-          </div>
-
           {/* Mobile hamburger */}
           <button
             onClick={() => setOpen(!open)}
@@ -389,26 +336,6 @@ export default function Navbar() {
                 </button>
               )
             })}
-            <button
-              onClick={() => goToSection('#products')}
-              style={{
-                display: 'block',
-                width: '100%',
-                marginTop: 16,
-                padding: '15px 0',
-                textAlign: 'center',
-                background: '#0ea5e9',
-                color: '#fff',
-                borderRadius: 8,
-                border: 'none',
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
-            >
-              Open Account
-            </button>
           </div>
         </div>
       )}

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { motion } from 'framer-motion'
 import { IconMapPin } from './Icons'
 import pinBlueUrl from '../imports/icons/pin-blue.svg'
 import pinGreyUrl from '../imports/icons/pin-grey.svg'
+import { useCollection } from '../lib/content'
 
 /* ══════════════════════════════════════════════
    Branch data — sourced from abr.rw/our-branches/
@@ -21,42 +22,53 @@ const BANK_CONTACT = {
   email: 'info@abr.rw',
 }
 
-type Branch = {
+/** What the CMS stores for a branch. */
+interface CmsBranch {
   name: string
   addr: string
   lat: number
   lng: number
-  isHQ?: boolean
+  isHQ: boolean
+}
+
+/* `kind` and `hours` are display-only and not modelled in the CMS, so they are
+   derived rather than authored: HQ and named branches keep branch hours,
+   credit outlets close on Saturdays. */
+type Branch = CmsBranch & {
   kind: 'Branch' | 'Credit Outlet'
   hours: string
 }
 
-const branches: Branch[] = [
-  { name: 'Nyarugenge (HQ)', addr: 'BCK Building, KN 78 St, Kigali Town', lat: -1.9441, lng: 30.0619, isHQ: true, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
-  { name: 'Gisozi', addr: 'APARWA Building, KG 33 Ave, Gakinjiro', lat: -1.929, lng: 30.064, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
-  { name: 'Musanze', addr: 'Nova Market Complex, NM 11 St, Musanze Town', lat: -1.504, lng: 29.632, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
-  { name: 'Kimironko', addr: 'House No 93, KG 11 Ave, near Kimironko & Kibagabaga junction', lat: -1.943, lng: 30.083, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
-  { name: 'Nyabugogo', addr: 'Inkundamahoro Building, KN 20 Ave', lat: -1.979, lng: 30.085, kind: 'Branch', hours: 'Mon–Fri 9am–5pm · Sat 9am–1pm' },
-  { name: 'Gicumbi', addr: 'GANA House, Gicumbi Town, near 7th Day Adventist Church, opposite ENGEN Station', lat: -1.583, lng: 30.051, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Karongi', addr: 'Building opposite Hotel Kivu Plazza (Floor 2), Karongi Town', lat: -2.070, lng: 29.046, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Huye', addr: 'INTASHYA House, opposite Rubis Station', lat: -2.607, lng: 29.739, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Kabarondo', addr: 'Opposite Kabarondo Market', lat: -2.063, lng: 30.345, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Rwamagana', addr: 'Building opposite MEREZ Station (Floor 1), Rwamagana Town', lat: -1.945, lng: 30.434, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Gatsibo', addr: 'Cactus Hotel Building (Ground Floor), Kabarore Sector', lat: -1.619, lng: 30.567, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Muhanga', addr: 'Commercial Complex House, near ADEPER Gahogo', lat: -2.102, lng: 29.756, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Nyagatare', addr: 'Opposite Rapha Clinic, EN 14 Ave, Nyagatare Town', lat: -1.291, lng: 30.329, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Nyamagabe', addr: 'Kanimba Building (Floor 1), Nyamagabe Town', lat: -2.488, lng: 29.397, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Nyamata', addr: 'Ndahiro Building (Floor 2), opposite the market, Nyamata Town', lat: -2.005, lng: 30.238, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Nyanza', addr: 'Rubangura House (Floor 1), opposite Nyanza Market', lat: -2.351, lng: 29.745, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Rubavu', addr: 'Ubuntu House, main avenue, Rubavu Town', lat: -1.710, lng: 29.276, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Rusizi', addr: 'Former COGEBANQUE Building (Ground floor), Kamembe Town', lat: -2.478, lng: 28.860, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Rulindo', addr: 'Near Base Market, opposite BPR', lat: -1.678, lng: 29.764, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Nyabihu', addr: 'Kora Sector, next to BK/Kora Branch', lat: -1.567, lng: 29.546, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Kirehe', addr: 'Opposite BARAKA Medical Clinic', lat: -2.024, lng: 30.666, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Nyamasheke', addr: 'Tyazo Sector, opposite the taxi park', lat: -2.463, lng: 29.121, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Rutsiro', addr: 'Congo Nil Cell, Gihango Sector, near the district building', lat: -1.806, lng: 29.343, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Burera', addr: 'Rusumo Sector, opposite BK Burera Branch', lat: -1.482, lng: 29.776, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
-  { name: 'Ngoma', addr: 'Ngoma District, opposite the market', lat: -2.103, lng: 30.183, kind: 'Credit Outlet', hours: 'Mon–Fri 9am–5pm' },
+const BRANCH_HOURS = 'Mon–Fri 9am–5pm · Sat 9am–1pm'
+const OUTLET_HOURS = 'Mon–Fri 9am–5pm'
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK: Branch[] = [
+  { name: 'Nyarugenge (HQ)', addr: 'BCK Building, KN 78 St, Kigali Town', lat: -1.9441, lng: 30.0619, isHQ: true, kind: 'Branch', hours: BRANCH_HOURS },
+  { name: 'Gisozi', addr: 'APARWA Building, KG 33 Ave, Gakinjiro', lat: -1.929, lng: 30.064, isHQ: false, kind: 'Branch', hours: BRANCH_HOURS },
+  { name: 'Musanze', addr: 'Nova Market Complex, NM 11 St, Musanze Town', lat: -1.504, lng: 29.632, isHQ: false, kind: 'Branch', hours: BRANCH_HOURS },
+  { name: 'Kimironko', addr: 'House No 93, KG 11 Ave, near Kimironko & Kibagabaga junction', lat: -1.943, lng: 30.083, isHQ: false, kind: 'Branch', hours: BRANCH_HOURS },
+  { name: 'Nyabugogo', addr: 'Inkundamahoro Building, KN 20 Ave', lat: -1.979, lng: 30.085, isHQ: false, kind: 'Branch', hours: BRANCH_HOURS },
+  { name: 'Gicumbi', addr: 'GANA House, Gicumbi Town, near 7th Day Adventist Church, opposite ENGEN Station', lat: -1.583, lng: 30.051, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Karongi', addr: 'Building opposite Hotel Kivu Plazza (Floor 2), Karongi Town', lat: -2.070, lng: 29.046, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Huye', addr: 'INTASHYA House, opposite Rubis Station', lat: -2.607, lng: 29.739, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Kabarondo', addr: 'Opposite Kabarondo Market', lat: -2.063, lng: 30.345, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Rwamagana', addr: 'Building opposite MEREZ Station (Floor 1), Rwamagana Town', lat: -1.945, lng: 30.434, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Gatsibo', addr: 'Cactus Hotel Building (Ground Floor), Kabarore Sector', lat: -1.619, lng: 30.567, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Muhanga', addr: 'Commercial Complex House, near ADEPER Gahogo', lat: -2.102, lng: 29.756, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Nyagatare', addr: 'Opposite Rapha Clinic, EN 14 Ave, Nyagatare Town', lat: -1.291, lng: 30.329, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Nyamagabe', addr: 'Kanimba Building (Floor 1), Nyamagabe Town', lat: -2.488, lng: 29.397, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Nyamata', addr: 'Ndahiro Building (Floor 2), opposite the market, Nyamata Town', lat: -2.005, lng: 30.238, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Nyanza', addr: 'Rubangura House (Floor 1), opposite Nyanza Market', lat: -2.351, lng: 29.745, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Rubavu', addr: 'Ubuntu House, main avenue, Rubavu Town', lat: -1.710, lng: 29.276, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Rusizi', addr: 'Former COGEBANQUE Building (Ground floor), Kamembe Town', lat: -2.478, lng: 28.860, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Rulindo', addr: 'Near Base Market, opposite BPR', lat: -1.678, lng: 29.764, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Nyabihu', addr: 'Kora Sector, next to BK/Kora Branch', lat: -1.567, lng: 29.546, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Kirehe', addr: 'Opposite BARAKA Medical Clinic', lat: -2.024, lng: 30.666, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Nyamasheke', addr: 'Tyazo Sector, opposite the taxi park', lat: -2.463, lng: 29.121, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Rutsiro', addr: 'Congo Nil Cell, Gihango Sector, near the district building', lat: -1.806, lng: 29.343, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Burera', addr: 'Rusumo Sector, opposite BK Burera Branch', lat: -1.482, lng: 29.776, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
+  { name: 'Ngoma', addr: 'Ngoma District, opposite the market', lat: -2.103, lng: 30.183, isHQ: false, kind: 'Credit Outlet', hours: OUTLET_HOURS },
 ]
 
 /* Inline SVG icons for the Leaflet popup — Leaflet takes an HTML string, so
@@ -103,6 +115,24 @@ export default function Branches() {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [hovered, setHovered] = useState<Branch | null>(null)
 
+  const { data: cmsBranches } = useCollection<CmsBranch>('branch', FALLBACK)
+
+  /* The CMS does not model opening hours or the branch/outlet distinction, so
+     those are filled in here. A branch named "(HQ)" or flagged isHQ keeps full
+     branch hours; everything else is treated as a credit outlet. */
+  const branches: Branch[] = useMemo(
+    () =>
+      cmsBranches.map((b) => {
+        const isBranch = b.isHQ || /\(HQ\)|Branch$/i.test(b.name)
+        return {
+          ...b,
+          kind: isBranch ? 'Branch' : 'Credit Outlet',
+          hours: isBranch ? BRANCH_HOURS : OUTLET_HOURS,
+        }
+      }),
+    [cmsBranches],
+  )
+
   useEffect(() => {
     if (!mapRef.current) return
     const map = L.map(mapRef.current, { center, zoom: 8, scrollWheelZoom: false })
@@ -128,7 +158,9 @@ export default function Branches() {
     return () => {
       map.remove()
     }
-  }, [])
+    // Rebuilt when CMS branches arrive so the markers match the list below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [branches])
 
   return (
     <section id="branches" style={{ padding: '64px 0', background: '#f6fbff' }}>

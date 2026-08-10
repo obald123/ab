@@ -1,22 +1,52 @@
 import { useEffect, useRef, useState } from 'react'
 import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus } from 'lucide-react'
 import { IconSend } from './Icons'
+import { useSingleton } from '../lib/content'
 
-const smartValues = [
-  { letter: 'S', word: 'Simple', desc: 'Easy to understand products and processes' },
-  { letter: 'M', word: 'Meaningful', desc: 'Solutions with real impact on clients\' lives' },
-  { letter: 'A', word: 'Appropriate', desc: 'Tailored to client needs, not one-size-fits-all' },
-  { letter: 'R', word: 'Responsive', desc: 'Respectful, timely and relevant service' },
-  { letter: 'T', word: 'Transparent', desc: 'Clear pricing and honest communication' },
-]
+interface ContactDocument {
+  info: {
+    address: string
+    phone1: string
+    phone2: string
+    email: string
+    hours: string
+    ekashCode: string
+    momoCode: string
+    whatsapp: string
+  }
+  branches: { id: string; name: string; address: string; city: string }[]
+  smartValues: { id: string; letter: string; word: string; desc: string }[]
+}
 
-const branches = [
-  { name: 'Head Office – Kigali', address: 'Nyarugenge Avenue, KN 78 St', city: 'Kigali, Rwanda' },
-  { name: 'Remera Branch', address: 'Gasabo District, Remera', city: 'Kigali, Rwanda' },
-  { name: 'Nyamirambo Branch', address: 'Nyamirambo, KN 43 St', city: 'Kigali, Rwanda' },
-]
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK: ContactDocument = {
+  info: {
+    address: 'Nyarugenge Avenue, KN 78 St, Kigali, Rwanda',
+    phone1: '5500',
+    phone2: '+(250) 78 819 83 00',
+    email: 'info@abr.rw',
+    hours: 'Mon – Fri: 8:00 – 17:00 · Sat: 9:00 – 13:00',
+    ekashCode: '*540#',
+    momoCode: '*182*4#',
+    whatsapp: '78 819 83 00',
+  },
+  branches: [
+    { id: 'cb1', name: 'Head Office – Kigali', address: 'Nyarugenge Avenue, KN 78 St', city: 'Kigali, Rwanda' },
+    { id: 'cb2', name: 'Remera Branch', address: 'Gasabo District, Remera', city: 'Kigali, Rwanda' },
+    { id: 'cb3', name: 'Nyamirambo Branch', address: 'Nyamirambo, KN 43 St', city: 'Kigali, Rwanda' },
+  ],
+  smartValues: [
+    { id: 'sv1', letter: 'S', word: 'Simple', desc: 'Easy to understand products and processes' },
+    { id: 'sv2', letter: 'M', word: 'Meaningful', desc: "Solutions with real impact on clients' lives" },
+    { id: 'sv3', letter: 'A', word: 'Appropriate', desc: 'Tailored to client needs, not one-size-fits-all' },
+    { id: 'sv4', letter: 'R', word: 'Responsive', desc: 'Respectful, timely and relevant service' },
+    { id: 'sv5', letter: 'T', word: 'Transparent', desc: 'Clear pricing and honest communication' },
+  ],
+}
 
 export default function Contact() {
+  const { data: contact } = useSingleton<ContactDocument>('contact', FALLBACK)
+  const { smartValues, branches } = contact
   const containerRef = useRef<HTMLDivElement>(null)
   const [formState, setFormState] = useState({ name: '', email: '', message: '' })
   const [submitted, setSubmitted] = useState(false)

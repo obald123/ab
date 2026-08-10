@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { useSingleton } from '../lib/content'
 import { IconMobile, IconTrendUp, IconHeart } from './Icons'
 
 const B = '#0ea5e9'
@@ -53,7 +54,39 @@ function StatBlock({ value, suffix, label, trigger, delay }: { value: number, su
 
 const LAUNCH = new Date('2026-08-15T09:00:00')
 
-const products = [
+type IconComp = React.FC<{ size?: number; color?: string; strokeWidth?: number }>
+
+interface CampaignProduct {
+  id: string
+  badge: string
+  badgeColor: string
+  badgeText: string
+  name: string
+  tagline: string
+  description: string
+  features: string[]
+  accent: string
+  accentLight: string
+  stat: string
+  statLabel: string
+  Icon?: IconComp
+}
+
+interface CampaignDocument {
+  banner: {
+    label: string
+    headline: string
+    subtext: string
+    ctaText: string
+    ctaLink: string
+    launchDate: string
+  }
+  products: CampaignProduct[]
+  stats: { id: string; value: number; suffix: string; label: string }[]
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_PRODUCTS: CampaignProduct[] = [
   {
     id: 'ekash-plus', badge: 'NEW LAUNCH', badgeColor: '#bae6fd', badgeText: '#0284c7',
     name: 'eKash Plus', tagline: 'Super-charged mobile money',
@@ -77,9 +110,44 @@ const products = [
   },
 ]
 
+/* Icons are presentation and are not modelled in the CMS, so CMS products
+   reuse the fallback icons in order. */
+function useCampaign(): CampaignDocument {
+  const { data } = useSingleton<CampaignDocument>('campaign', {
+    banner: {
+      label: 'GRAND CAMPAIGN · LAUNCH 15 AUGUST 2026',
+      headline: '',
+      subtext: '',
+      ctaText: '',
+      ctaLink: '',
+      launchDate: '2026-08-15T09:00:00',
+    },
+    products: FALLBACK_PRODUCTS,
+    stats: [],
+  })
+
+  return useMemo(() => {
+    /* No emptiness check: when the campaign document does not exist yet
+       useSingleton already returned the fallback below, and once it does exist
+       an empty product list is a deliberate editorial choice. */
+    return {
+      ...data,
+      products: data.products.map((p, i) => ({
+        ...p,
+        Icon: p.Icon ?? FALLBACK_PRODUCTS[i % FALLBACK_PRODUCTS.length]?.Icon,
+      })),
+    }
+  }, [data])
+}
+
 /* ── Campaign countdown banner ── */
 function CampaignBanner() {
-  const cd = useCountdown(LAUNCH)
+  const { banner } = useCampaign()
+  const launch = useMemo(() => {
+    const parsed = new Date(banner.launchDate)
+    return Number.isNaN(parsed.getTime()) ? LAUNCH : parsed
+  }, [banner.launchDate])
+  const cd = useCountdown(launch)
   const pad = (n: number) => String(n).padStart(2, '0')
   return (
     <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg,#0c4a6e 0%,#0ea5e9 55%,#38bdf8 100%)', borderRadius: 28, padding: '52px', boxShadow: '0 32px 80px rgba(14,165,233,0.30)' }}>
@@ -130,7 +198,8 @@ function CampaignBanner() {
 }
 
 /* ── Product card ── */
-function ProductCard({ p, index }: { p: typeof products[0], index: number }) {
+function ProductCard({ p, index }: { p: CampaignProduct; index: number }) {
+  const Icon = p.Icon ?? IconMobile
   const tilt = use3DTilt(8)
   const [visible, setVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -149,7 +218,7 @@ function ProductCard({ p, index }: { p: typeof products[0], index: number }) {
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${p.accent},${p.accent}88)` }} />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div style={{ width: 52, height: 52, borderRadius: 14, background: p.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p.Icon size={26} color="#ffffff" />
+              <Icon size={26} color="#ffffff" />
             </div>
             <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.12em', background: p.badgeColor, color: p.badgeText, padding: '4px 12px', borderRadius: 100 }}>{p.badge}</span>
           </div>
@@ -206,6 +275,8 @@ function StatsStrip() {
 }
 
 export default function Campaign() {
+  const { products } = useCampaign()
+
   return (
     <section id="campaign" style={{ background: '#f4f8fc', padding: '96px 0' }}>
       <div style={{ margin: '0 auto', padding: '0 48px' }}>

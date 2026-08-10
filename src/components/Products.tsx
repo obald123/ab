@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { useCollection } from '../lib/content'
 import { motion } from 'framer-motion'
 import { IconCoin, IconTrendUp, IconLeaf, IconBank, IconCreditCard, IconExchange, IconGlobe, IconShield, IconMobile, IconZap, IconPercent, IconUsers, IconMapPin, IconCalculator, IconPen } from './Icons'
 
@@ -25,7 +26,16 @@ const catIcons: Record<Cat, IconComp> = {
   'Digital Solutions': IconMobile,
 }
 
-const data: Record<Cat, { Icon: IconComp; title: string; tag: string; bullets: string[]; highlight?: boolean }[]> = {
+interface ProductCard {
+  Icon: IconComp
+  title: string
+  tag: string
+  bullets: string[]
+  highlight?: boolean
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK: Record<Cat, ProductCard[]> = {
   Loans: [
     {
       Icon: IconCoin, title: 'Micro Loan', tag: 'RWF 200K – 5M',
@@ -86,7 +96,7 @@ const data: Record<Cat, { Icon: IconComp; title: string; tag: string; bullets: s
   ],
 }
 
-function Card({ item }: { item: typeof data.Loans[0] }) {
+function Card({ item }: { item: ProductCard }) {
   const ref = useRef<HTMLDivElement>(null)
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -263,9 +273,49 @@ function Card({ item }: { item: typeof data.Loans[0] }) {
   )
 }
 
+/** What the CMS stores for one product. */
+interface CmsProduct {
+  category: Cat
+  title: string
+  tag: string
+  highlight: boolean
+  bullets: string[]
+}
+
 export default function Products() {
   const [active, setActive] = useState<Cat>('Loans')
   const sectionRef = useRef<HTMLElement>(null)
+
+  const { data: cmsProducts, degraded } = useCollection<CmsProduct>('product', [])
+
+  /* The CMS stores a flat list; the tabs need it grouped. Each product's icon
+     comes from its category, which is the only icon signal the CMS carries. */
+  const data: Record<Cat, ProductCard[]> = useMemo(() => {
+    // Only an unreachable API falls back. Once the CMS answers it is
+    // authoritative — backfilling empty categories here used to show mock
+    // products alongside real ones, which made the CMS look broken.
+    if (degraded) return FALLBACK
+
+    const grouped: Record<Cat, ProductCard[]> = {
+      Loans: [],
+      Accounts: [],
+      'Banking Services': [],
+      Bancassurance: [],
+      'Digital Solutions': [],
+    }
+    for (const product of cmsProducts) {
+      const bucket = grouped[product.category]
+      if (!bucket) continue
+      bucket.push({
+        Icon: catIcons[product.category],
+        title: product.title,
+        tag: product.tag,
+        bullets: product.bullets,
+        highlight: product.highlight,
+      })
+    }
+    return grouped
+  }, [cmsProducts, degraded])
 
   useEffect(() => {
     const el = sectionRef.current; if (!el) return

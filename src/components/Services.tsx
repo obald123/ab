@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
@@ -22,6 +22,7 @@ import {
   IconBulb,
   IconGrid,
 } from './Icons'
+import { useCollection } from '../lib/content'
 
 type IconComp = React.FC<{ size?: number; color?: string; strokeWidth?: number }>
 type Service = { title: string; description: string; Icon: IconComp; highlight?: string }
@@ -50,6 +51,8 @@ type Chapter = {
   services: Service[]
 }
 
+/* Presentation — gradients, colours and icons — stays in code; only the
+   service list inside each chapter is editorial and comes from the CMS. */
 const CHAPTERS: Chapter[] = [
   {
     tab: 'Personal',
@@ -288,10 +291,50 @@ function ServiceCard({ service, chapter, index }: { service: Service; chapter: C
   )
 }
 
+/** What the CMS stores for one service. */
+interface CmsService {
+  tab: string
+  title: string
+  description: string
+  highlight: string
+}
+
+/* Merges CMS services into the hardcoded chapters. Icons are not modelled in
+   the CMS, so each chapter reuses its own icons in order and repeats the last
+   one if editors add more services than there are icons. */
+function useChapters(): Chapter[] {
+  const { data: services, degraded } = useCollection<CmsService>('service', [])
+
+  return useMemo(() => {
+    // Only an unreachable API falls back; a chapter the editors have left
+    // empty renders empty rather than showing built-in services beside real
+    // ones, which would be indistinguishable to a reader.
+    if (degraded) return CHAPTERS
+
+    return CHAPTERS.map((chapter) => {
+      const forTab = services.filter((s) => s.tab === chapter.tab)
+
+      return {
+        ...chapter,
+        services: forTab.map((s, i) => ({
+          title: s.title,
+          description: s.description,
+          Icon:
+            chapter.services[i]?.Icon ??
+            chapter.services[chapter.services.length - 1]?.Icon ??
+            IconBank,
+          ...(s.highlight ? { highlight: s.highlight } : {}),
+        })),
+      }
+    })
+  }, [services, degraded])
+}
+
 /* ── The pinned chapter panel ── */
 function PinnedServices() {
   const sectionRef = useRef<HTMLElement>(null)
   const [index, setIndex] = useState(0)
+  const chapters = useChapters()
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -302,15 +345,15 @@ function PinnedServices() {
      this only ever calls setState on an actual chapter change — three
      renders across the whole scroll, not one per frame. */
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    const next = Math.min(Math.floor(v * CHAPTERS.length), CHAPTERS.length - 1)
+    const next = Math.min(Math.floor(v * chapters.length), chapters.length - 1)
     setIndex((prev) => (prev === next ? prev : next))
   })
 
   /* Position inside the current chapter, 0 → 1. Drives the continuous
      motion that keeps the panel alive while it is pinned. */
   const localP = useTransform(scrollYProgress, (v) => {
-    const scaled = v * CHAPTERS.length
-    return scaled - Math.min(Math.floor(scaled), CHAPTERS.length - 1)
+    const scaled = v * chapters.length
+    return scaled - Math.min(Math.floor(scaled), chapters.length - 1)
   })
 
   const railFill = useTransform(scrollYProgress, [0, 1], [0, 1])
@@ -319,24 +362,29 @@ function PinnedServices() {
   const teaserOpacity = useTransform(localP, [0.5, 0.92], [0, 1])
   const teaserFill = useTransform(localP, [0.5, 1], [0, 1])
 
-  const chapter = CHAPTERS[index]
-  const next = CHAPTERS[index + 1]
+  const chapter = chapters[index]
+  const next = chapters[index + 1]
 
   /* Clicking a tab or a rail dot scrolls to the middle of that chapter,
      so the section is navigable without hunting with the wheel. */
-  const goTo = useCallback((i: number) => {
-    const el = sectionRef.current
-    if (!el) return
-    const top = el.offsetTop
-    const range = el.offsetHeight - window.innerHeight
-    window.scrollTo({ top: top + ((i + 0.5) / CHAPTERS.length) * range, behavior: 'smooth' })
-  }, [])
+  const goTo = useCallback(
+    (i: number) => {
+      const el = sectionRef.current
+      if (!el) return
+      const top = el.offsetTop
+      const range = el.offsetHeight - window.innerHeight
+      window.scrollTo({ top: top + ((i + 0.5) / chapters.length) * range, behavior: 'smooth' })
+    },
+    // The chapter count drives the scroll maths, so a stale value would
+    // scroll to the wrong offset once CMS services load.
+    [chapters.length],
+  )
 
   return (
     <section
       id="services"
       ref={sectionRef}
-      style={{ position: 'relative', height: `${CHAPTERS.length * 100}vh` }}
+      style={{ position: 'relative', height: `${chapters.length * 100}vh` }}
       aria-label="Our services"
     >
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
@@ -432,7 +480,7 @@ function PinnedServices() {
             </span>
 
             <div role="tablist" aria-label="Service categories" style={{ display: 'flex', gap: 6 }}>
-              {CHAPTERS.map((c, i) => {
+              {chapters.map((c, i) => {
                 const on = i === index
                 return (
                   <button
@@ -570,7 +618,7 @@ function PinnedServices() {
                 />
               </div>
               <span style={{ fontSize: 12, fontWeight: 800, color: chapter.sub, letterSpacing: '0.06em' }}>
-                {String(index + 1).padStart(2, '0')} / {String(CHAPTERS.length).padStart(2, '0')}
+                {String(index + 1).padStart(2, '0')} / {String(chapters.length).padStart(2, '0')}
               </span>
             </div>
 
@@ -691,9 +739,11 @@ function PinnedServices() {
    under prefers-reduced-motion, the chapters render as plain stacked
    blocks with the same content and no scroll hijacking. */
 function StackedServices() {
+  const chapters = useChapters()
+
   return (
     <section id="services" style={{ background: '#ffffff' }} aria-label="Our services">
-      {CHAPTERS.map((chapter, i) => (
+      {chapters.map((chapter, i) => (
         <div key={chapter.tab} style={{ background: chapter.bg, padding: '64px 24px' }}>
           <div style={{ maxWidth: 1180, margin: '0 auto' }}>
             <span
@@ -728,7 +778,7 @@ function StackedServices() {
                 <ServiceCard key={s.title} service={s} chapter={chapter} index={si} />
               ))}
             </div>
-            {i === CHAPTERS.length - 1 && (
+            {i === chapters.length - 1 && (
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 28 }}>
                 <a
                   href="#contact"
