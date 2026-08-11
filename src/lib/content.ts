@@ -42,23 +42,43 @@ const PREVIEW_STORAGE_KEY = 'abr.preview.token'
 /** 32 random bytes, base64url — the shape the API issues. */
 const PREVIEW_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
 
+/* Storage access throws rather than returning null when the browser has
+   blocked it — private modes, embedded webviews, "block third-party cookies".
+   This runs at module scope, so an uncaught throw here would take down the
+   whole bundle and render a blank page. Preview is a reviewer convenience;
+   it must never be able to break the public site. */
+function safeSessionStorage(): Storage | null {
+  try {
+    return window.sessionStorage
+  } catch {
+    return null
+  }
+}
+
 function readPreviewToken(): string | null {
   if (typeof window === 'undefined') return null
 
-  const fromUrl = new URLSearchParams(window.location.search).get('preview')
-  if (fromUrl && PREVIEW_TOKEN_PATTERN.test(fromUrl)) {
-    window.sessionStorage.setItem(PREVIEW_STORAGE_KEY, fromUrl)
+  try {
+    const store = safeSessionStorage()
 
-    // Strip it from the address bar so the credential is not shared by a
-    // copied link, a bookmark, or an outbound Referer.
-    const cleaned = new URL(window.location.href)
-    cleaned.searchParams.delete('preview')
-    window.history.replaceState(null, '', cleaned.toString())
-    return fromUrl
+    const fromUrl = new URLSearchParams(window.location.search).get('preview')
+    if (fromUrl && PREVIEW_TOKEN_PATTERN.test(fromUrl)) {
+      store?.setItem(PREVIEW_STORAGE_KEY, fromUrl)
+
+      // Strip it from the address bar so the credential is not shared by a
+      // copied link, a bookmark, or an outbound Referer.
+      const cleaned = new URL(window.location.href)
+      cleaned.searchParams.delete('preview')
+      window.history.replaceState(null, '', cleaned.toString())
+      return fromUrl
+    }
+
+    const stored = store?.getItem(PREVIEW_STORAGE_KEY)
+    return stored && PREVIEW_TOKEN_PATTERN.test(stored) ? stored : null
+  } catch {
+    // Not previewing is always a safe answer: the site shows live content.
+    return null
   }
-
-  const stored = window.sessionStorage.getItem(PREVIEW_STORAGE_KEY)
-  return stored && PREVIEW_TOKEN_PATTERN.test(stored) ? stored : null
 }
 
 /** Non-null only while this tab is previewing an unpublished change. */
@@ -71,7 +91,11 @@ export function isPreviewing(): boolean {
 /** Leaves preview mode for this tab and reloads onto live content. */
 export function exitPreview(): void {
   if (typeof window === 'undefined') return
-  window.sessionStorage.removeItem(PREVIEW_STORAGE_KEY)
+  try {
+    safeSessionStorage()?.removeItem(PREVIEW_STORAGE_KEY)
+  } catch {
+    // Reloading still drops out of preview for this navigation.
+  }
   window.location.reload()
 }
 
