@@ -25,7 +25,9 @@ export default function Ticker() {
 
   return (
     <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 300,
+      // Offset is 0 normally; the staging-preview banner sets it so the fixed
+      // chrome sits below the banner instead of under it.
+      position: 'fixed', top: 'var(--abr-preview-offset, 0px)', left: 0, right: 0, zIndex: 300,
       background: '#0284c7',
       borderBottom: '1px solid rgba(14,165,233,0.3)',
       height: 36,

@@ -20,6 +20,61 @@ import { useEffect, useState } from 'react'
 const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:4000'
 const API = `${BASE_URL}/api/v1`
 
+/** The API root, for the few callers that build a URL the hooks do not cover. */
+export const API_ROOT = API
+
+/* ═══════════════════════════════════════════════════════════════
+   STAGING PREVIEW
+
+   A reviewer opens this site with `?preview=<token>` from the CMS.
+   In that mode every read goes to the token-scoped preview endpoint
+   instead of the live one, so the page renders the *pending* change
+   in its real surroundings — same components, same styles, same
+   everything — without any of it being published.
+
+   The token is a bearer credential, so it is taken out of the
+   address bar immediately and held in sessionStorage: it then dies
+   with the tab, does not survive a copied URL, and is not handed to
+   any third party in a Referer header.
+   ═══════════════════════════════════════════════════════════════ */
+
+const PREVIEW_STORAGE_KEY = 'abr.preview.token'
+/** 32 random bytes, base64url — the shape the API issues. */
+const PREVIEW_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
+
+function readPreviewToken(): string | null {
+  if (typeof window === 'undefined') return null
+
+  const fromUrl = new URLSearchParams(window.location.search).get('preview')
+  if (fromUrl && PREVIEW_TOKEN_PATTERN.test(fromUrl)) {
+    window.sessionStorage.setItem(PREVIEW_STORAGE_KEY, fromUrl)
+
+    // Strip it from the address bar so the credential is not shared by a
+    // copied link, a bookmark, or an outbound Referer.
+    const cleaned = new URL(window.location.href)
+    cleaned.searchParams.delete('preview')
+    window.history.replaceState(null, '', cleaned.toString())
+    return fromUrl
+  }
+
+  const stored = window.sessionStorage.getItem(PREVIEW_STORAGE_KEY)
+  return stored && PREVIEW_TOKEN_PATTERN.test(stored) ? stored : null
+}
+
+/** Non-null only while this tab is previewing an unpublished change. */
+export const previewToken: string | null = readPreviewToken()
+
+export function isPreviewing(): boolean {
+  return previewToken !== null
+}
+
+/** Leaves preview mode for this tab and reloads onto live content. */
+export function exitPreview(): void {
+  if (typeof window === 'undefined') return
+  window.sessionStorage.removeItem(PREVIEW_STORAGE_KEY)
+  window.location.reload()
+}
+
 export type CollectionType = 'ticker' | 'news' | 'rate' | 'product' | 'service' | 'branch'
 export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | 'contact'
 
@@ -34,7 +89,11 @@ interface SingletonResponse<T> {
 }
 
 async function fetchContent<R>(type: string, signal: AbortSignal): Promise<R> {
-  const response = await fetch(`${API}/content/${type}`, { signal })
+  const url = previewToken
+    ? `${API}/preview/${previewToken}/content/${type}`
+    : `${API}/content/${type}`
+
+  const response = await fetch(url, { signal })
   if (!response.ok) throw new Error(`Content request failed: ${String(response.status)}`)
   return (await response.json()) as R
 }
@@ -122,6 +181,12 @@ export function isVideoSource(value: string | undefined | null): boolean {
 export function mediaUrl(value: string | undefined | null): string {
   if (!value) return ''
   if (/^(https?:)?\/\//i.test(value) || value.startsWith('data:')) return value
+  // Media the API serves lives on the API host, which may differ from this one.
   if (value.startsWith('/api/')) return `${BASE_URL}${value}`
+  /* Any other absolute path is served by this site — a bundled asset, or a
+     site-relative path an editor typed. Treating those as media keys would
+     produce `/api/v1/media//assets/…` and 404. */
+  if (value.startsWith('/')) return value
+  // Anything left is a bare storage key.
   return `${API}/media/${value}`
 }

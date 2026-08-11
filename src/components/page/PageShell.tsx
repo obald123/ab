@@ -4,6 +4,8 @@ import Ticker from '../Ticker'
 import Navbar from '../Navbar'
 import Footer from '../Footer'
 import CookieConsent from '../CookieConsent'
+import PreviewBanner from '../PreviewBanner'
+import { isPreviewing } from '../../lib/content'
 
 /** Routed pages don't keep the previous page's scroll position. */
 function ScrollToTop() {
@@ -18,9 +20,33 @@ function ScrollToTop() {
 /* Shared chrome for every route. The home one-pager and the standalone
    pages both render inside this, so the ticker, navbar and footer are
    defined once instead of per page. */
+/** Height of the staging-preview banner, in px. */
+const PREVIEW_BANNER_HEIGHT = 36
+
 export default function PageShell() {
+  const previewing = isPreviewing()
+
+  /* The banner is fixed to the viewport, and so are the ticker and navbar.
+     Publishing its height as a custom property is what lets those two shift
+     down by it without either of them knowing preview mode exists. */
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--abr-preview-offset',
+      previewing ? `${String(PREVIEW_BANNER_HEIGHT)}px` : '0px',
+    )
+  }, [previewing])
+
   return (
-    <div className="antialiased" style={{ background: '#ffffff', minHeight: '100vh' }}>
+    <div
+      className="antialiased"
+      style={{
+        background: '#ffffff',
+        minHeight: '100vh',
+        // Pushes the flow content down by the same amount as the fixed chrome.
+        paddingTop: previewing ? PREVIEW_BANNER_HEIGHT : 0,
+      }}
+    >
+      <PreviewBanner />
       <ScrollToTop />
       <Ticker />
       <Navbar />

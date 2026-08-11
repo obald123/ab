@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { isVideoSource, mediaUrl, useSingleton } from '../lib/content'
+import storyPhoto from '../imports/story/story-photo.webp'
+import storyClip from '../imports/story/story-clip.mp4'
 import starOutline from '../imports/landing/Star 17.png'
 import starFilled from '../imports/landing/Star 17 (1).png'
 import {
@@ -243,21 +245,24 @@ function StoryReel({
 const FALLBACK_STORY: StoryPanel[] = [
   {
     id: 'placeholder-1',
-    image: '',
-    alt: '',
+    image: storyPhoto,
+    alt: 'Sample artwork: the AB Rwanda globe over a blue horizon.',
     kicker: '01',
     title: 'Apply in minutes',
     caption: 'At any of our branches and outlets across all five provinces.',
   },
   {
+    // Exercises the video path, so the reel is not only ever proven with stills.
     id: 'placeholder-2',
-    image: '',
-    alt: '',
+    image: storyClip,
+    alt: 'Sample clip: the AB Rwanda globe turning.',
     kicker: '02',
     title: 'Approved in 48 hours',
     caption: "Collateral-light lending built for Rwanda's entrepreneurs.",
   },
   {
+    // Left bare on purpose: keeps the no-picture path visible, which is what an
+    // editor sees between adding a beat and uploading its media.
     id: 'placeholder-3',
     image: '',
     alt: '',

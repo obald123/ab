@@ -119,7 +119,8 @@ export default function Navbar() {
     <header
       style={{
         position: 'fixed',
-        top: 36,
+        // 36px clears the ticker; the offset is non-zero only in staging preview.
+        top: 'calc(var(--abr-preview-offset, 0px) + 36px)',
         left: 0,
         right: 0,
         zIndex: 200,
