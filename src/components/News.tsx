@@ -70,6 +70,13 @@ export default function News() {
     return () => obs.disconnect()
   }, [])
 
+  /* The CMS is authoritative, including when it returns nothing — so an editor
+     unpublishing every article is a real, reachable state, not an impossible
+     one. Reading articles[0] unguarded crashed the whole page here. With no
+     news to show, the section removes itself rather than heading an empty grid. */
+  const [featured, ...rest] = articles
+  if (!featured) return null
+
   return (
     <section id="news" style={{ background: '#f8fbfe', padding: '100px 0' }}>
       <div style={{ margin: '0 auto', padding: '0 48px' }} ref={containerRef}>
@@ -132,8 +139,8 @@ export default function News() {
           >
             <div className="news-featured-image" style={{ position: 'relative', minHeight: 300, background: '#e6f2fa', overflow: 'hidden' }}>
               <img
-                src={mediaUrl(articles[0].image)}
-                alt={articles[0].title}
+                src={mediaUrl(featured.image)}
+                alt={featured.title}
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
                 onMouseEnter={e => { (e.target as HTMLImageElement).style.transform = 'scale(1.05)' }}
                 onMouseLeave={e => { (e.target as HTMLImageElement).style.transform = 'scale(1)' }}
@@ -149,13 +156,13 @@ export default function News() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em' }}>
-                  {articles[0].category.toUpperCase()}
+                  {featured.category.toUpperCase()}
                 </span>
                 <span style={{
                   background: '#ffffff', color: '#0ea5e9',
                   fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 4, letterSpacing: '0.06em',
                 }}>
-                  {articles[0].tag.toUpperCase()}
+                  {featured.tag.toUpperCase()}
                 </span>
               </div>
             </div>
@@ -163,16 +170,16 @@ export default function News() {
             <div className="news-featured-content" style={{ padding: '44px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
                 <div style={{ width: 40, height: 3, background: '#0ea5e9', borderRadius: 2 }} />
-                <span style={{ fontSize: 12, color: '#8fa0aa', fontWeight: 600 }}>{articles[0].date}</span>
+                <span style={{ fontSize: 12, color: '#8fa0aa', fontWeight: 600 }}>{featured.date}</span>
               </div>
               <h3 style={{
                 fontWeight: 800, fontSize: 22, color: '#0284c7',
                 lineHeight: 1.35, marginBottom: 16, letterSpacing: '-0.01em',
               }}>
-                {articles[0].title}
+                {featured.title}
               </h3>
               <p style={{ fontSize: 14.5, color: '#647080', lineHeight: 1.7, marginBottom: 28 }}>
-                {articles[0].excerpt}
+                {featured.excerpt}
               </p>
               <a href="#news" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -193,7 +200,7 @@ export default function News() {
 
         {/* Sub articles */}
         <div className="news-sub-articles" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-          {articles.slice(1).map(article => (
+          {rest.map(article => (
             <div key={article.title} data-reveal style={{
               background: '#ffffff', border: '1px solid rgba(14,165,233,0.1)',
               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
