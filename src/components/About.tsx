@@ -251,8 +251,45 @@ function OrbCanvas() {
   return <canvas ref={ref} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
 }
 
-/* ── SVG curved journey path ── */
-const JOURNEY_PATH = 'M60,280 C180,100 320,460 480,280 C640,100 780,460 940,280 C1100,100 1240,460 1400,280 C1560,100 1700,460 1860,280'
+/* ── SVG curved journey path ──────────────────────────────────────────────
+   Generated from the number of milestones rather than hard-coded, so the wave
+   always has exactly one crest per milestone. The previous fixed path had five
+   fixed curves: with any count other than the one it was drawn for, markers
+   drifted off the crests while their labels kept alternating on `index % 2`,
+   so text landed on top of the line. Now each milestone sits at an extreme by
+   construction and its label stack always points away from the curve — adding
+   history stays correct without redrawing anything.
+
+   Because every segment is a congruent S, arc length per segment is equal, so
+   a milestone's position along the path is simply i / (count - 1).            */
+
+const VB_WIDTH = 1920
+/** Centreline the wave oscillates about. */
+const MID_Y = 280
+/** Centreline → crest. The full crest-to-trough span is twice this. */
+const WAVE_AMPLITUDE = 105
+const PAD_X = 90
+
+function buildJourneyPath(count: number): string {
+  // One milestone has no wave to draw; give the marker a straight line to sit on.
+  if (count < 2) return `M${PAD_X},${MID_Y} L${VB_WIDTH - PAD_X},${MID_Y}`
+
+  const step = (VB_WIDTH - PAD_X * 2) / (count - 1)
+  const yAt = (i: number) => (i % 2 === 0 ? MID_Y - WAVE_AMPLITUDE : MID_Y + WAVE_AMPLITUDE)
+
+  let d = `M${PAD_X},${yAt(0)}`
+  for (let i = 1; i < count; i++) {
+    const x0 = PAD_X + step * (i - 1)
+    const x1 = PAD_X + step * i
+    // Control points on the vertical midline of the segment give a smooth,
+    // symmetric S with horizontal tangents at each milestone.
+    const cx = (x0 + x1) / 2
+    d += ` C${cx},${yAt(i - 1)} ${cx},${yAt(i)} ${x1},${yAt(i)}`
+  }
+  return d
+}
+
+const JOURNEY_PATH = buildJourneyPath(timeline.length)
 
 /* ── single milestone marker — scroll-linked reveal + hover for full detail ── */
 function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave }: {
@@ -428,9 +465,11 @@ function JourneyDetailCard({ item, pt, boundsRef }: {
   )
 }
 
-/* fraction along the path each milestone sits at */
+/* Fraction along the path each milestone sits at. The generated path puts a
+   milestone at every crest and trough, and its segments are congruent, so
+   these are exact — no inset fudge needed to keep markers off the line. */
 const MARKER_FRACS = timeline.length > 1
-  ? timeline.map((_, i) => (i / (timeline.length - 1)) * 0.92 + 0.04)
+  ? timeline.map((_, i) => i / (timeline.length - 1))
   : [0.5]
 
 function JourneyPath() {
@@ -545,7 +584,42 @@ function JourneyPath() {
 
   return (
     <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden' }}>
-      <div ref={innerRef} style={{ position: 'relative', minHeight: '100vh', overflow: 'visible' }}>
+      {/* In normal flow, above the canvas — not absolutely positioned over it.
+          As an overlay this sat on top of the curve and the first milestone's
+          labels, and no choice of coordinates fixes that for every screen width
+          and milestone count. Stacked, it cannot collide by construction. */}
+      <div style={{ padding: '0 48px', marginBottom: 8, maxWidth: 1400 }}>
+        <span className="section-pill section-pill--icon" style={{
+          background: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(14,165,233,0.15)', color: '#0284c7',
+          boxShadow: '0 2px 12px rgba(14,165,233,0.08)',
+        }}>
+          <IconRoute size={15} strokeWidth={2} color="#0ea5e9" />
+          Our Journey
+        </span>
+        <h2 style={{
+          fontWeight: 900, fontSize: 'clamp(24px, 3.5vw, 42px)', color: '#0284c7',
+          lineHeight: 1.1, letterSpacing: '-0.02em', marginTop: 10,
+        }}>
+          Tracing Our <span style={{ color: '#0ea5e9' }}>Growth &amp; Impact</span>
+        </h2>
+        <p style={{ fontSize: 13, color: '#647080', marginTop: 8 }}>
+          Hover or tap a milestone to read the full story.
+        </p>
+      </div>
+
+      {/* Height tracks the artwork rather than the viewport. The SVG is fitted
+          with `meet`, so on a wide screen its width binds and it needs only
+          ~22% of that width in height — a 100vh box left roughly 300px of dead
+          space above and below the curve. Scaling with vw keeps the curve and
+          its labels at a constant relative size, and the clamp stops it
+          collapsing on phones or ballooning on ultrawide displays. */}
+      <div
+        ref={innerRef}
+        /* The viewBox is 1920×465, so the artwork needs 24.2% of the width in
+           height. Anything less and `meet` fits to height instead, shrinking
+           the curve away from the container edges — keep this above 25vw. */
+        style={{ position: 'relative', height: 'clamp(380px, 26vw, 560px)', overflow: 'visible' }}
+      >
         {/* Subtle grid background */}
         <div style={{
           position: 'absolute', inset: 0,
@@ -555,7 +629,11 @@ function JourneyPath() {
 
         <svg
           ref={svgRef}
-          viewBox="0 0 1920 560"
+          /* Sized to what is actually drawn: crest at y=175 and trough at
+             y=385, with label stacks reaching ~106 above a marker and ~114
+             below. So content spans roughly y=69 to y=499, and this box adds a
+             small margin either side. Recompute it if WAVE_AMPLITUDE changes. */
+          viewBox="0 55 1920 465"
           preserveAspectRatio="xMidYMid meet"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}
         >
@@ -626,26 +704,16 @@ function JourneyPath() {
           )}
         </AnimatePresence>
 
-        {/* Title overlay */}
-        <div style={{ position: 'absolute', top: 28, left: 32, zIndex: 10, pointerEvents: 'none' }}>
-          <span className="section-pill section-pill--icon" style={{
-            background: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(14,165,233,0.15)', color: '#0284c7',
-            boxShadow: '0 2px 12px rgba(14,165,233,0.08)',
-          }}>
-            <IconRoute size={15} strokeWidth={2} color="#0ea5e9" />
-            Our Journey
-          </span>
-          <h2 style={{ fontWeight: 900, fontSize: 'clamp(24px, 3.5vw, 42px)', color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.02em', marginTop: 10 }}>
-            Tracing Our<br /><span style={{ color: '#0ea5e9' }}>Growth & Impact</span>
-          </h2>
-          <p style={{ fontSize: 12.5, color: '#647080', marginTop: 8, maxWidth: 220 }}>
-            Hover or tap a milestone to read the full story.
-          </p>
-        </div>
+        {/* End cap pill — fades in as the path finishes drawing.
 
-        {/* End cap pill — fades in as the path finishes drawing */}
+            Pinned to the corner opposite the final milestone. The wave
+            alternates crest/trough per milestone, so the last one is at the
+            bottom for an even count and the top for an odd one; anchoring the
+            pill to a fixed corner would put it under that milestone's label
+            stack half the time. */}
         <motion.div style={{
-          position: 'absolute', bottom: 32, right: 32, zIndex: 10,
+          position: 'absolute', right: 32, zIndex: 10,
+          ...(timeline.length % 2 === 0 ? { top: 18 } : { bottom: 32 }),
           opacity: endOpacity,
         }}>
           <div style={{
