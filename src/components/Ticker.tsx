@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useCollection } from '../lib/content'
 import { iconFor } from '../lib/icon-map'
 
@@ -88,21 +89,23 @@ export default function Ticker() {
         </div>
       </div>
 
-      {/* Right CTA */}
-      <a href="#campaign" className="ticker-cta" style={{
+      {/* Right CTA — a standing, always-visible way in to /report, not just
+          the footer link. Anyone scanning past the ticker sees it on every
+          page, which matters most for the misconduct/whistleblowing track. */}
+      <Link to="/report" className="ticker-cta" style={{
         flexShrink: 0, padding: '0 16px', height: '100%',
         display: 'flex', alignItems: 'center', gap: 6,
         borderLeft: '1px solid rgba(168,216,240,0.15)',
-        fontSize: 10.5, fontWeight: 800, color: '#e8f400',
+        fontSize: 10.5, fontWeight: 800, color: '#fca5a5',
         textDecoration: 'none', letterSpacing: '0.06em', whiteSpace: 'nowrap',
         transition: 'background 0.2s',
       }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(232,244,0,0.08)' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.12)' }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
       >
-        View Offers
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="#e8f400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-      </a>
+        Whistleblowing
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="#fca5a5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </Link>
     </div>
   )
 }

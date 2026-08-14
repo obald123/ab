@@ -8,6 +8,8 @@ import Tenders from './pages/Tenders'
 import Articles from './pages/Articles'
 import NewsPage from './pages/NewsPage'
 import Forms from './pages/Forms'
+import ReportIncident from './pages/ReportIncident'
+import ReportStatus from './pages/ReportStatus'
 
 export default function App() {
   return (
@@ -22,6 +24,8 @@ export default function App() {
           <Route path="media/news" element={<NewsPage />} />
           <Route path="media/articles" element={<Articles />} />
           <Route path="forms" element={<Forms />} />
+          <Route path="report" element={<ReportIncident />} />
+          <Route path="report/status" element={<ReportStatus />} />
           {/* Convenience aliases so shorter URLs still resolve */}
           <Route path="news" element={<Navigate to="/media/news" replace />} />
           <Route path="articles" element={<Navigate to="/media/articles" replace />} />

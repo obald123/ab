@@ -23,6 +23,7 @@ const QUICK_LINKS: QuickLink[] = [
   { label: 'Forms & Downloads', to: '/forms' },
   { label: 'Careers', to: '/careers' },
   { label: 'Our People & Awards', to: '/awards' },
+  { label: 'Report an Incident', to: '/report' },
 ]
 
 const SOCIALS = [
