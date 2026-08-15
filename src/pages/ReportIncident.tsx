@@ -62,7 +62,7 @@ const SEVERITIES: { value: Severity; label: string; hint: string }[] = [
 ]
 
 const MIN_DESCRIPTION = 30
-const MIN_PASSPHRASE = 12
+const MIN_PASSPHRASE = 4
 
 type Step = 'track' | 'details' | 'identity' | 'review'
 
