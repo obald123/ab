@@ -98,10 +98,20 @@ export default function Ticker() {
         borderLeft: '1px solid rgba(168,216,240,0.15)',
         fontSize: 10.5, fontWeight: 800, color: '#fca5a5',
         textDecoration: 'none', letterSpacing: '0.06em', whiteSpace: 'nowrap',
-        transition: 'background 0.2s',
+        transition: 'background 0.2s, color 0.2s',
       }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.12)' }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+        onMouseEnter={e => {
+          const el = e.currentTarget as HTMLElement
+          el.style.background = '#dc2626'
+          el.style.color = '#ffffff'
+          el.querySelector('svg path')?.setAttribute('stroke', '#ffffff')
+        }}
+        onMouseLeave={e => {
+          const el = e.currentTarget as HTMLElement
+          el.style.background = 'transparent'
+          el.style.color = '#fca5a5'
+          el.querySelector('svg path')?.setAttribute('stroke', '#fca5a5')
+        }}
       >
         Whistleblowing
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="#fca5a5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
