@@ -2,10 +2,13 @@ import { useMemo, useState } from 'react'
 import { IconFileText, IconDownload, IconMapPin } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { EmptyState, FilterBar, Section } from '../components/page/ui'
-import { FORMS, FORM_CATEGORIES, formatDate, type FormDoc } from '../data/site'
+import { useCollection } from '../lib/content'
+import { FORMS, formatDate, type FormDoc } from '../data/site'
 
-const CATEGORIES = ['All', ...FORM_CATEGORIES] as const
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_FORMS: FormDoc[] = FORMS
 
 const TYPE_COLOR: Record<FormDoc['fileType'], string> = {
   PDF: '#b91c1c',
@@ -158,23 +161,33 @@ function FormTile({ doc }: { doc: FormDoc }) {
 export default function Forms() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<string>('All')
+  const { data: docs } = useCollection<FormDoc>('form', FALLBACK_FORMS)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return FORMS.filter(
+    return docs.filter(
       (f) =>
         (category === 'All' || f.category === category) &&
         (!q || `${f.title} ${f.description} ${f.category}`.toLowerCase().includes(q)),
     )
-  }, [query, category])
+  }, [query, category, docs])
+
+  /* Categories come from whatever is published rather than a fixed list, so an
+     editor adding a new one gets both a filter chip and a section heading for
+     it without a deploy. */
+  const categories = useMemo(
+    () => ['All', ...new Set(docs.map((f) => f.category).filter(Boolean))],
+    [docs],
+  )
 
   /* Grouped by category so the page reads as a shelf with labelled sections
      rather than one long undifferentiated list. */
   const groups = useMemo(() => {
-    return FORM_CATEGORIES.map((c) => ({ category: c, docs: filtered.filter((f) => f.category === c) })).filter(
-      (g) => g.docs.length > 0,
-    )
-  }, [filtered])
+    return categories
+      .filter((c) => c !== 'All')
+      .map((c) => ({ category: c, docs: filtered.filter((f) => f.category === c) }))
+      .filter((g) => g.docs.length > 0)
+  }, [filtered, categories])
 
   return (
     <main>
@@ -186,8 +199,8 @@ export default function Forms() {
         meta={
           <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
             {[
-              [`${FORMS.length}`, 'Documents'],
-              [`${FORM_CATEGORIES.length}`, 'Categories'],
+              [`${docs.length}`, 'Documents'],
+              [`${categories.length - 1}`, 'Categories'],
             ].map(([v, l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
@@ -217,7 +230,7 @@ export default function Forms() {
             query={query}
             onQuery={setQuery}
             placeholder="Search forms and documents"
-            options={CATEGORIES}
+            options={categories}
             active={category}
             onSelect={setCategory}
           />

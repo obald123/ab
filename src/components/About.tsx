@@ -1,54 +1,84 @@
-import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
+import { createElement, useEffect, useMemo, useRef, useState, useCallback, useLayoutEffect } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionTemplate, useReducedMotion, animate, AnimatePresence, type MotionValue } from 'framer-motion'
-import { useSingleton } from '../lib/content'
-import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconMapPin, IconMobile, IconCpu, IconZap, IconLeaf, IconRoute, IconUsers, IconBriefcase, IconHandshake } from './Icons'
+import { mediaUrl, useSingleton } from '../lib/content'
+import { iconFor } from '../lib/icon-map'
+/* Timeline milestone icons now come from the CMS by name, resolved through
+   iconFor — only icons used directly in fixed page furniture are imported. */
+import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconRoute, IconUsers, IconBriefcase, IconHandshake } from './Icons'
 
-/* ── data — sourced & paraphrased from abr.rw/who-we-are/ "Our History" ── */
-const timeline = [
+/* ── data ──
+   The timeline, vision/mission and company narrative all come from the CMS
+   `about` document now. These constants remain as the offline fallback the
+   whole site uses: shown until the API responds, and if it never does.
+   Sourced & paraphrased from abr.rw/who-we-are/ "Our History". */
+
+/** One milestone, as stored. `icon` is a name resolved through the icon map. */
+export interface TimelineEvent {
+  id: string
+  year: string
+  quarter: string
+  category: string
+  headline: string
+  text: string
+  stat: string
+  statLabel: string
+  highlight: boolean
+  icon: string
+}
+
+const FALLBACK_TIMELINE: TimelineEvent[] = [
   {
-    year: '2014', quarter: 'Q1', category: 'Founded', CategoryIcon: IconBank,
+    id: 'm1',
+    year: '2014', quarter: 'Q1', category: 'Founded', icon: 'bank',
     headline: 'Born in Nyamirambo',
     text: 'AB Rwanda opens its very first branch in Nyamirambo. Before the year is out, two more branches follow in Nyarugenge and Gisozi — bringing accessible credit to micro-entrepreneurs from day one.',
     stat: '3', statLabel: 'Branches', highlight: true,
   },
   {
-    year: '2015', quarter: 'Q2', category: 'Expansion', CategoryIcon: IconMapPin,
+    id: 'm2',
+    year: '2015', quarter: 'Q2', category: 'Expansion', icon: 'map-pin',
     headline: 'Kimironko Opens',
     text: 'The fourth branch launches in Kimironko, making AB Rwanda the fastest-growing microfinance bank in its segment.',
     stat: '4', statLabel: 'Branches', highlight: false,
   },
   {
-    year: '2016', quarter: 'Q3', category: 'Growth', CategoryIcon: IconMap,
+    id: 'm3',
+    year: '2016', quarter: 'Q3', category: 'Growth', icon: 'map',
     headline: 'First Upcountry Branch',
     text: "Musanze branch opens as the bank's fifth and first branch outside Kigali — extending responsible financial services to the Northern Province.",
     stat: '5', statLabel: 'Branches', highlight: false,
   },
   {
-    year: '2018', quarter: 'Q2', category: 'Network', CategoryIcon: IconBuilding,
+    id: 'm4',
+    year: '2018', quarter: 'Q2', category: 'Network', icon: 'building',
     headline: 'Nyabugogo & First Outlets',
     text: 'Nyabugogo branch opens in Kigali while the original Nyamirambo branch merges into Nyarugenge. The same year, AB Rwanda opens its first three credit outlets — Muhanga, Rwamagana and Kabarondo — beginning its rural push.',
     stat: '3', statLabel: 'New Outlets', highlight: true,
   },
   {
-    year: '2019', quarter: 'Q1', category: 'Rural', CategoryIcon: IconLeaf,
+    id: 'm5',
+    year: '2019', quarter: 'Q1', category: 'Rural', icon: 'leaf',
     headline: 'Reaching the Regions',
     text: 'Three more credit outlets open in Nyagatare, Gicumbi and Huye, bringing the network to six outlets across the Eastern, Northern and Southern Provinces.',
     stat: '6', statLabel: 'Outlets Total', highlight: false,
   },
   {
-    year: '2020', quarter: 'Q3', category: 'Digital', CategoryIcon: IconMobile,
+    id: 'm6',
+    year: '2020', quarter: 'Q3', category: 'Digital', icon: 'mobile',
     headline: 'AB IBAKWE Goes Live',
     text: 'Eight further credit outlets open nationwide (including Nyamagabe, Nyamata, Rubavu, Rusizi, Nyanza and Karongi) and AB IBAKWE launches with MTN Rwanda — a push-and-pull mobile transaction service. The bank also introduces new bancassurance products and agri-value-chain loans.',
     stat: '*182*4#', statLabel: 'AB IBAKWE', highlight: false,
   },
   {
-    year: '2021', quarter: 'Q2', category: 'Innovation', CategoryIcon: IconCpu,
+    id: 'm7',
+    year: '2021', quarter: 'Q2', category: 'Innovation', icon: 'cpu',
     headline: 'Contact Centre & Chatbot',
     text: 'A fully-fledged customer contact centre launches alongside a chatbot solution, as the bank explores further digital channels to widen its service reach and efficiency.',
     stat: '24/7', statLabel: 'Support', highlight: true,
   },
   {
-    year: '2023', quarter: 'Q1', category: 'Digital', CategoryIcon: IconZap,
+    id: 'm8',
+    year: '2023', quarter: 'Q1', category: 'Digital', icon: 'zap',
     headline: 'E-kash Platform Launches',
     text: 'E-kash goes live — a digital payment system that transforms how customers send and receive funds between mobile network operators, banks and telcos, accessible via *540# on any handset.',
     stat: '*540#', statLabel: 'E-kash', highlight: false,
@@ -206,6 +236,43 @@ function use3DTilt(strength = 12) {
   return { ref, onMove, onLeave }
 }
 
+/* Own component so the tilt hook is called at the top level rather than inside
+   the map that renders the row. */
+function StatBlock({ value, suffix, label, Icon }: {
+  value: number; suffix: string; label: string; Icon: typeof IconBuilding
+}) {
+  const { ref, onMove, onLeave } = use3DTilt(16)
+
+  return (
+    <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}
+      style={{
+        flex: '1 1 160px',
+        transformStyle: 'preserve-3d',
+        transition: 'transform 0.15s ease-out',
+        borderRadius: 18,
+      }}
+    >
+      <div style={{
+        background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(186,230,253,0.15)',
+        borderRadius: 18, padding: '22px 24px',
+        backdropFilter: 'blur(12px)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 8px 24px rgba(0,0,0,0.2)',
+      }}>
+        <div style={{ marginBottom: 10 }}><Icon size={22} color="rgba(186,230,253,0.7)" strokeWidth={1.5} /></div>
+        <div style={{
+          fontSize: 38, fontWeight: 900, lineHeight: 1, letterSpacing: '-0.03em',
+          color: '#ffffff', marginBottom: 6, transform: 'translateZ(10px)',
+        }}>
+          <Counter target={value} suffix={suffix} />
+        </div>
+        <div style={{ fontSize: 10.5, color: 'rgba(186,230,253,0.5)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          {label}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── floating 3D orbs canvas ── */
 function OrbCanvas() {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -289,12 +356,10 @@ function buildJourneyPath(count: number): string {
   return d
 }
 
-const JOURNEY_PATH = buildJourneyPath(timeline.length)
-
 /* ── single milestone marker — scroll-linked reveal + hover for full detail ── */
 function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave }: {
   pt: { x: number; y: number }
-  item: typeof timeline[0]
+  item: TimelineEvent
   index: number
   total: number
   progress: MotionValue<number>
@@ -302,6 +367,9 @@ function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave
   onEnter: () => void
   onLeave: () => void
 }) {
+  const categoryIcon = (size: number, color: string) =>
+    createElement(iconFor(item.icon, IconBank), { size, strokeWidth: 2, color })
+
   const start = (index / total) * 0.82
   const end = start + 0.16
   const opacity = useTransform(progress, [start, end], [0, 1])
@@ -349,7 +417,7 @@ function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave
           transition={{ duration: 0.24, ease: 'easeOut' }}
         />
         <g transform="translate(-11, -11)" style={{ pointerEvents: 'none' }}>
-          <item.CategoryIcon size={22} strokeWidth={2} color={item.highlight ? '#ffffff' : '#0284c7'} />
+          {categoryIcon(22, item.highlight ? '#ffffff' : '#0284c7')}
         </g>
       </g>
     </motion.g>
@@ -366,12 +434,17 @@ const EDGE_MARGIN = 14
    container and the visible viewport, so it can never render off-screen or
    underneath the fixed navbar regardless of which marker was hovered. ── */
 function JourneyDetailCard({ item, pt, boundsRef }: {
-  item: typeof timeline[0]
+  item: TimelineEvent
   pt: { x: number; y: number }
   boundsRef: React.RefObject<HTMLDivElement | null>
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState<{ left: number; top: number }>({ left: pt.x - 150, top: pt.y + CARD_GAP })
+  /* Rendered via createElement rather than as <CategoryIcon />: iconFor
+     returns a component looked up by name, and calling it in the render body
+     reads to the linter as defining a new component every render. */
+  const categoryIcon = (size: number, color: string) =>
+    createElement(iconFor(item.icon, IconBank), { size, strokeWidth: 2, color })
 
   useLayoutEffect(() => {
     const place = () => {
@@ -440,7 +513,7 @@ function JourneyDetailCard({ item, pt, boundsRef }: {
               ? '0 8px 20px rgba(14,165,233,0.35)'
               : 'inset 0 0 0 1px rgba(14,165,233,0.18)',
           }}>
-            <item.CategoryIcon size={24} strokeWidth={2} color={item.highlight ? '#fff' : '#0284c7'} />
+            {categoryIcon(24, item.highlight ? '#fff' : '#0284c7')}
           </span>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0ea5e9', marginBottom: 2 }}>
@@ -465,14 +538,7 @@ function JourneyDetailCard({ item, pt, boundsRef }: {
   )
 }
 
-/* Fraction along the path each milestone sits at. The generated path puts a
-   milestone at every crest and trough, and its segments are congruent, so
-   these are exact — no inset fudge needed to keep markers off the line. */
-const MARKER_FRACS = timeline.length > 1
-  ? timeline.map((_, i) => i / (timeline.length - 1))
-  : [0.5]
-
-function JourneyPath() {
+function JourneyPath({ timeline }: { timeline: TimelineEvent[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -480,6 +546,16 @@ function JourneyPath() {
   const [points, setPoints] = useState<{ x: number; y: number }[]>([])
   const [pointsPx, setPointsPx] = useState<{ x: number; y: number }[]>([])
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
+  const journeyPath = useMemo(() => buildJourneyPath(timeline.length), [timeline.length])
+
+  /* Fraction along the path each milestone sits at. The generated path puts a
+     milestone at every crest and trough, and its segments are congruent, so
+     these are exact — no inset fudge needed to keep markers off the line. */
+  const markerFracs = useMemo(
+    () => (timeline.length > 1 ? timeline.map((_, i) => i / (timeline.length - 1)) : [0.5]),
+    [timeline],
+  )
 
   /* pre-sampled points along the path, for cheap nearest-point lookup on hover */
   const samples = useRef<{ x: number; y: number; frac: number }[]>([])
@@ -553,7 +629,7 @@ function JourneyPath() {
 
     const measure = () => {
       const total = path.getTotalLength()
-      const vb = MARKER_FRACS.map(p => {
+      const vb = markerFracs.map(p => {
         const q = path.getPointAtLength(total * p)
         return { x: q.x, y: q.y }
       })
@@ -580,7 +656,11 @@ function JourneyPath() {
     const ro = new ResizeObserver(measure)
     ro.observe(inner)
     return () => ro.disconnect()
-  }, [])
+    /* Re-measures when the milestone list changes, not only on resize: the
+       path is regenerated for a different count, so positions computed against
+       the previous one would leave every marker off its crest once the CMS
+       timeline replaces the fallback. */
+  }, [markerFracs, journeyPath])
 
   return (
     <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden' }}>
@@ -653,12 +733,12 @@ function JourneyPath() {
           </defs>
 
           {/* Ghost path (full trail, very faint) */}
-          <path d={JOURNEY_PATH} fill="none" stroke="rgba(14,165,233,0.08)" strokeWidth={3} strokeLinecap="round" />
+          <path d={journeyPath} fill="none" stroke="rgba(14,165,233,0.08)" strokeWidth={3} strokeLinecap="round" />
 
           {/* Animated drawing path — driven by scroll, overridden while seeking */}
           <motion.path
             ref={pathRef}
-            d={JOURNEY_PATH}
+            d={journeyPath}
             fill="none"
             stroke="url(#journey-path-grad)"
             strokeWidth={3.5}
@@ -670,7 +750,7 @@ function JourneyPath() {
           {/* Invisible fat stroke over the same curve: gives the line a hover
               target so the draw can follow the cursor along it. */}
           <path
-            d={JOURNEY_PATH}
+            d={journeyPath}
             fill="none"
             stroke="transparent"
             strokeWidth={70}
@@ -686,7 +766,7 @@ function JourneyPath() {
               key={i} pt={pt} item={timeline[i]} index={i} total={timeline.length}
               progress={markerProgress}
               active={activeIndex === i}
-              onEnter={() => { setActiveIndex(i); seekTo(MARKER_FRACS[i]) }}
+              onEnter={() => { setActiveIndex(i); seekTo(markerFracs[i]) }}
               onLeave={() => { setActiveIndex(null); releaseSeek() }}
             />
           ))}
@@ -731,21 +811,38 @@ function JourneyPath() {
   )
 }
 
-interface AboutPeople {
+interface AboutContentDoc {
+  headline: string
+  headlineAccent: string
+  narrative: string[]
+  narrativeImage: string
+  vision: VisionMissionItem
+  mission: VisionMissionItem
+}
+
+interface AboutDocument {
+  content: AboutContentDoc
+  timeline: TimelineEvent[]
   management: { id: string; name: string; role: string; image: string; detail: string; bio: string; color: string }[]
-  board: AboutPeople['management']
+  board: AboutDocument['management']
   shareholders: { id: string; name: string; abbr: string; color: string; logo: string; desc: string }[]
 }
 
-/* The CMS models the people grids but not the scroll-animated timeline, whose
-   marker positions are computed at module load from a fixed length. Wiring the
-   timeline would mean rebuilding that animation, so it stays in code for now. */
-function useAboutPeople() {
-  const { data } = useSingleton<Partial<AboutPeople>>('about', {})
+/** Everything the About page reads from the CMS, with the built-in copy as a
+ *  fallback for each part independently. */
+function useAbout() {
+  const { data } = useSingleton<Partial<AboutDocument>>('about', {})
   return {
-    /* `??`, not a length check: an absent key means the About document has
-       never been saved, so the built-in copy stands in. A key that is present
-       but empty means an editor emptied it, and that must show as empty. */
+    /* Merged field by field rather than taken whole: a document saved before
+       vision and mission were part of this page still has a `content` object,
+       and using it as-is would leave those two undefined and take the page
+       down. Spreading keeps the rule below intact — only a genuinely absent
+       field falls back, a field an editor emptied still shows as empty. */
+    content: { ...FALLBACK_ABOUT_CONTENT, ...data.content },
+    /* The timeline is the one exception: the journey animation needs at least
+       one milestone to draw a path at all, so an empty list falls back rather
+       than rendering an empty canvas with a title over it. */
+    timeline: data.timeline?.length ? data.timeline : FALLBACK_TIMELINE,
     management: data.management ?? FALLBACK_MANAGEMENT,
     board: data.board ?? FALLBACK_BOARD,
     shareholders: data.shareholders ?? FALLBACK_SHAREHOLDERS,
@@ -941,10 +1038,8 @@ function ShareholderCard({ s, i }: { s: ShareholderView; i: number }) {
    tilting the card parallaxes the layers against each other instead of
    sliding a flat picture around.
    ══════════════════════════════════════════════════════════════ */
-type VMItem = {
-  index: string
-  glyph: string
-  label: string
+/** The editable half of a vision/mission card, as stored in the CMS. */
+export interface VisionMissionItem {
   statement: string
   plain: string
   meaningHeading: string
@@ -953,7 +1048,16 @@ type VMItem = {
   statLabel: string
 }
 
-const VISION_MISSION: VMItem[] = [
+/* `index`, `glyph` and `label` are presentation, fixed by position — the first
+   card is always "01 ◈ Vision" and the second "02 ◉ Mission". Only the
+   editorial half is authored. */
+type VMItem = VisionMissionItem & {
+  index: string
+  glyph: string
+  label: string
+}
+
+const FALLBACK_VISION_MISSION: VMItem[] = [
   {
     index: '01',
     glyph: '◈',
@@ -989,6 +1093,19 @@ const VISION_MISSION: VMItem[] = [
     statLabel: 'Average SME approval',
   },
 ]
+
+const FALLBACK_ABOUT_CONTENT: AboutContentDoc = {
+  headline: 'Improving Financial Access',
+  headlineAccent: 'Across All of Rwanda',
+  narrative: [
+    'Established in 2014 and headquartered on Nyarugenge Avenue, Kigali, AB Rwanda Plc has grown from a single branch in Nyamirambo to a nationwide network of 47+ branches and rural credit outlets spanning all five provinces.',
+    "Regulated by the National Bank of Rwanda and backed by AccessHolding, KFW and IFC, we are committed to Rwanda's financial inclusion agenda.",
+  ],
+  narrativeImage:
+    'https://images.unsplash.com/photo-1687422808311-a776f467a468?w=700&h=500&fit=crop&auto=format',
+  vision: FALLBACK_VISION_MISSION[0],
+  mission: FALLBACK_VISION_MISSION[1],
+}
 
 function VisionMissionCard({ item, index }: { item: VMItem; index: number }) {
   const reduce = useReducedMotion()
@@ -1240,13 +1357,20 @@ function VisionMissionCard({ item, index }: { item: VMItem; index: number }) {
   )
 }
 
-function VisionMission() {
+function VisionMission({ vision, mission }: { vision: VisionMissionItem; mission: VisionMissionItem }) {
+  /* Presentation is fixed by position — first card is always Vision, second
+     Mission — so only the authored half comes from the CMS. */
+  const items: VMItem[] = [
+    { ...vision, index: '01', glyph: '◈', label: 'Vision' },
+    { ...mission, index: '02', glyph: '◉', label: 'Mission' },
+  ]
+
   return (
     <div
       className="about-vm"
       style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, marginBottom: 40, alignItems: 'start' }}
     >
-      {VISION_MISSION.map((item, i) => (
+      {items.map((item, i) => (
         <VisionMissionCard key={item.label} item={item} index={i} />
       ))}
     </div>
@@ -1256,7 +1380,7 @@ function VisionMission() {
 /* `standalone` = rendered as the /who-we-are page rather than a home
    section, so the first masthead must clear the fixed navbar. */
 export default function About({ standalone = false }: { standalone?: boolean }) {
-  const { management, board, shareholders } = useAboutPeople()
+  const { content, timeline, management, board, shareholders } = useAbout()
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const heroRef = useRef<HTMLDivElement>(null)
 
@@ -1307,13 +1431,13 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
                 fontWeight: 700, fontSize: 'clamp(30px, 4.5vw, 54px)',
                 color: '#ffffff', lineHeight: 1.1, letterSpacing: '-0.01em',
               }}>
-                Improving Financial Access<br />
-                <span style={{ color: '#bae6fd' }}>Across All of Rwanda</span>
+                {content.headline}<br />
+                <span style={{ color: '#bae6fd' }}>{content.headlineAccent}</span>
               </h2>
             </div>
           </R>
 
-          <VisionMission />
+          <VisionMission vision={content.vision} mission={content.mission} />
 
           {/* Photo + copy */}
           <R delay={200}>
@@ -1325,19 +1449,26 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
             }}>
               <div style={{ position: 'relative', minHeight: 280 }}>
                 <img
-                  src="https://images.unsplash.com/photo-1687422808311-a776f467a468?w=700&h=500&fit=crop&auto=format"
+                  src={mediaUrl(content.narrativeImage)}
                   alt="AB Rwanda customer"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', inset: 0 }}
                 />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 55%, rgba(2,30,60,0.75) 100%)' }} />
               </div>
               <div className="about-photo-copy-content" style={{ padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <p style={{ fontSize: 15.5, lineHeight: 1.85, color: 'rgba(255,255,255,0.7)', marginBottom: 18 }}>
-                  Established in 2014 and headquartered on Nyarugenge Avenue, Kigali, AB Rwanda Plc has grown from a single branch in Nyamirambo to a nationwide network of <strong style={{ color: '#bae6fd' }}>47+ branches</strong> and rural credit outlets spanning all five provinces.
-                </p>
-                <p style={{ fontSize: 15.5, lineHeight: 1.85, color: 'rgba(255,255,255,0.7)', margin: 0 }}>
-                  Regulated by the National Bank of Rwanda and backed by AccessHolding, KFW and IFC, we are committed to Rwanda's financial inclusion agenda.
-                </p>
+                {content.narrative.map((paragraph, i) => (
+                  <p
+                    key={i}
+                    style={{
+                      fontSize: 15.5,
+                      lineHeight: 1.85,
+                      color: 'rgba(255,255,255,0.7)',
+                      marginBottom: i === content.narrative.length - 1 ? 0 : 18,
+                    }}
+                  >
+                    {paragraph}
+                  </p>
+                ))}
               </div>
             </div>
           </R>
@@ -1414,44 +1545,16 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
                   { value: 9, suffix: ' yrs', label: 'Years Operating', Icon: IconCalendar },
                   { value: 5, suffix: '', label: 'Provinces Covered', Icon: IconMap },
                   { value: 3, suffix: '', label: 'Loan Products', Icon: IconCoin },
-                ].map((s) => {
-                  const { ref, onMove, onLeave } = use3DTilt(16)
-                  return (
-                    <div key={s.label} ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}
-                      style={{
-                        flex: '1 1 160px',
-                        transformStyle: 'preserve-3d',
-                        transition: 'transform 0.15s ease-out',
-                        borderRadius: 18,
-                      }}
-                    >
-                      <div style={{
-                        background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(186,230,253,0.15)',
-                        borderRadius: 18, padding: '22px 24px',
-                        backdropFilter: 'blur(12px)',
-                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 8px 24px rgba(0,0,0,0.2)',
-                      }}>
-                        <div style={{ marginBottom: 10 }}><s.Icon size={22} color="rgba(186,230,253,0.7)" strokeWidth={1.5} /></div>
-                        <div style={{
-                          fontSize: 38, fontWeight: 900, lineHeight: 1, letterSpacing: '-0.03em',
-                          color: '#ffffff', marginBottom: 6, transform: 'translateZ(10px)',
-                        }}>
-                          <Counter target={s.value} suffix={s.suffix} />
-                        </div>
-                        <div style={{ fontSize: 10.5, color: 'rgba(186,230,253,0.5)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                          {s.label}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+                ].map((s) => (
+                  <StatBlock key={s.label} {...s} />
+                ))}
               </div>
             </R>
           </div>
         </div>
 
         {/* Winding Journey Path */}
-        <JourneyPath />
+        <JourneyPath timeline={timeline} />
       </div>
 
       {/* ─── Management ─── */}

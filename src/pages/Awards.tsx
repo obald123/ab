@@ -3,15 +3,42 @@ import { IconStar, IconUsers, IconCheckCircle, IconArrowRight } from '../compone
 import PageHero from '../components/page/PageHero'
 import SmartImage from '../components/page/SmartImage'
 import { Chip, Section } from '../components/page/ui'
+import { useSingleton } from '../lib/content'
 import {
   AWARD_CRITERIA,
   EMPLOYEE_OF_THE_MONTH,
   EMPLOYEE_OF_THE_YEAR,
   PAST_MONTHLY,
   type Award,
+  type PastAward,
 } from '../data/site'
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
+
+/* The CMS holds the two live winners in named slots rather than a collection —
+   there is only ever one of each — and every metric carries its own id so the
+   editor can reorder them. */
+type Winner = Omit<Award, 'id' | 'metrics'> & {
+  metrics: { id: string; value: string; label: string }[]
+}
+
+interface AwardsDocument {
+  employeeOfYear: Winner
+  employeeOfMonth: Winner
+  pastMonthly: PastAward[]
+}
+
+const withMetricIds = ({ id: _id, ...award }: Award): Winner => ({
+  ...award,
+  metrics: award.metrics.map((m, i) => ({ ...m, id: `m-${String(i + 1)}` })),
+})
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_AWARDS: AwardsDocument = {
+  employeeOfYear: withMetricIds(EMPLOYEE_OF_THE_YEAR),
+  employeeOfMonth: withMetricIds(EMPLOYEE_OF_THE_MONTH),
+  pastMonthly: PAST_MONTHLY,
+}
 
 /* Laurel used as the award seal on both spotlight cards. */
 function Laurel({ size = 22, color = '#0c4a6e' }: { size?: number; color?: string }) {
@@ -27,7 +54,7 @@ function Laurel({ size = 22, color = '#0c4a6e' }: { size?: number; color?: strin
 /* Spotlight card. `tier` changes the whole treatment: the year award is a
    dark, ceremonial panel; the month award is a lighter, more immediate one.
    They deliberately do not look like the same card twice. */
-function Spotlight({ award, tier, index }: { award: Award; tier: 'year' | 'month'; index: number }) {
+function Spotlight({ award, tier, index }: { award: Winner; tier: 'year' | 'month'; index: number }) {
   const isYear = tier === 'year'
 
   return (
@@ -164,7 +191,7 @@ function Spotlight({ award, tier, index }: { award: Award; tier: 'year' | 'month
           <div style={{ display: 'flex', gap: 0, flexWrap: 'wrap' }}>
             {award.metrics.map((m, i) => (
               <div
-                key={m.label}
+                key={m.id}
                 style={{
                   flex: '1 1 110px',
                   padding: '0 16px',
@@ -207,6 +234,8 @@ function Spotlight({ award, tier, index }: { award: Award; tier: 'year' | 'month
 }
 
 export default function Awards() {
+  const { data: awards } = useSingleton<AwardsDocument>('award', FALLBACK_AWARDS)
+
   return (
     <main>
       <PageHero
@@ -245,8 +274,8 @@ export default function Awards() {
 
       <Section style={{ paddingBottom: 40 }}>
         <div style={{ display: 'grid', gap: 26 }}>
-          <Spotlight award={EMPLOYEE_OF_THE_YEAR} tier="year" index={0} />
-          <Spotlight award={EMPLOYEE_OF_THE_MONTH} tier="month" index={1} />
+          <Spotlight award={awards.employeeOfYear} tier="year" index={0} />
+          <Spotlight award={awards.employeeOfMonth} tier="month" index={1} />
         </div>
       </Section>
 
@@ -268,12 +297,12 @@ export default function Awards() {
           </h2>
           <span aria-hidden="true" style={{ flex: 1, height: 1, background: 'rgba(14,165,233,0.18)' }} />
           <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: '#94a3b8' }}>
-            {String(PAST_MONTHLY.length).padStart(2, '0')}
+            {String(awards.pastMonthly.length).padStart(2, '0')}
           </span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-          {PAST_MONTHLY.map((p, i) => (
+          {awards.pastMonthly.map((p, i) => (
             <motion.div
               key={p.id}
               initial={{ opacity: 0, y: 22 }}

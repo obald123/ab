@@ -2,10 +2,26 @@ import { useMemo, useState } from 'react'
 import { IconGavel, IconDownload, IconAlert } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, DeadlineRing, EmptyState, FilterBar, Section, Stamp, type Tone } from '../components/page/ui'
+import { useCollection } from '../lib/content'
 import { TENDERS, daysUntil, formatDate, type Tender, type TenderStatus } from '../data/site'
 
 const PROCUREMENT_EMAIL = 'procurement@abr.rw'
 const STATUSES = ['All', 'Open', 'Closing soon', 'Closed', 'Awarded'] as const
+
+/* As stored in the CMS: `id` is the row id, `reference` the procurement code
+   printed on the notice, and each document carries its own id. */
+type Notice = Omit<Tender, 'id' | 'ref' | 'documents'> & {
+  id: string
+  reference: string
+  documents: { id: string; label: string; size: string }[]
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_TENDERS: Notice[] = TENDERS.map((tender) => ({
+  ...tender,
+  reference: tender.ref,
+  documents: tender.documents.map((doc, i) => ({ ...doc, id: `doc-${String(i + 1)}` })),
+}))
 
 const STATUS_TONE: Record<TenderStatus, Tone> = {
   Open: 'green',
@@ -20,7 +36,7 @@ const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
    a procurement register entry: a monospaced reference heading the card, a
    rubber-stamped status, a tear-off deadline block, and a perforated left
    edge to sell the paper metaphor. */
-function TenderRow({ tender }: { tender: Tender }) {
+function TenderRow({ tender }: { tender: Notice }) {
   const [open, setOpen] = useState(false)
   const remaining = daysUntil(tender.deadline)
   const live = tender.status === 'Open' || tender.status === 'Closing soon'
@@ -60,7 +76,7 @@ function TenderRow({ tender }: { tender: Tender }) {
                 marginBottom: 12,
               }}
             >
-              {tender.ref}
+              {tender.reference}
             </div>
 
             <h3
@@ -165,7 +181,7 @@ function TenderRow({ tender }: { tender: Tender }) {
             <div style={{ display: 'grid', gap: 10, marginBottom: 18 }}>
               {tender.documents.map((d) => (
                 <button
-                  key={d.label}
+                  key={d.id}
                   type="button"
                   style={{
                     display: 'flex',
@@ -194,7 +210,7 @@ function TenderRow({ tender }: { tender: Tender }) {
                 <>
                   Sealed bids must reach the Procurement Committee, AB Bank Rwanda Plc, Nyarugenge Avenue, KN 78 St,
                   Kigali, before <strong>{formatDate(tender.deadline)}</strong>, clearly marked with the reference{' '}
-                  <strong style={{ fontFamily: MONO }}>{tender.ref}</strong>. Queries to{' '}
+                  <strong style={{ fontFamily: MONO }}>{tender.reference}</strong>. Queries to{' '}
                   <a href={`mailto:${PROCUREMENT_EMAIL}`} style={{ color: '#0284c7', fontWeight: 700 }}>
                     {PROCUREMENT_EMAIL}
                   </a>
@@ -214,17 +230,18 @@ function TenderRow({ tender }: { tender: Tender }) {
 export default function Tenders() {
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<string>('All')
+  const { data: tenders } = useCollection<Notice>('tender', FALLBACK_TENDERS)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return TENDERS.filter(
+    return tenders.filter(
       (t) =>
         (status === 'All' || t.status === status) &&
-        (!q || `${t.title} ${t.ref} ${t.category} ${t.summary}`.toLowerCase().includes(q)),
+        (!q || `${t.title} ${t.reference} ${t.category} ${t.summary}`.toLowerCase().includes(q)),
     )
-  }, [query, status])
+  }, [query, status, tenders])
 
-  const live = TENDERS.filter((t) => t.status === 'Open' || t.status === 'Closing soon').length
+  const live = tenders.filter((t) => t.status === 'Open' || t.status === 'Closing soon').length
 
   return (
     <main>
@@ -237,7 +254,7 @@ export default function Tenders() {
           <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
             {[
               [`${live}`, 'Accepting bids'],
-              [`${TENDERS.length}`, 'In the register'],
+              [`${tenders.length}`, 'In the register'],
             ].map(([v, l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
@@ -292,7 +309,7 @@ export default function Tenders() {
         />
 
         <p style={{ fontSize: 13, color: '#647080', marginBottom: 20 }}>
-          Showing <strong>{filtered.length}</strong> of {TENDERS.length} tenders
+          Showing <strong>{filtered.length}</strong> of {tenders.length} tenders
         </p>
 
         {filtered.length === 0 ? (

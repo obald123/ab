@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useSingleton } from '../lib/content'
 import { OPEN_EVENT } from './CookieConsent'
 import logo from '../imports/logo1-transparent.png'
 
@@ -10,21 +11,68 @@ import logo from '../imports/logo1-transparent.png'
    rendered — its `bank-*` colours were undefined) is gone and there is
    exactly one footer again.
 
-   `to` is a route; `hash` is a section of the home one-pager. */
-type QuickLink = { label: string; to?: string; hash?: string }
+   Link groups, the tagline and the bottom bar all come from the CMS `footer`
+   document; the brand column, socials and regulator badges stay in code
+   because they are structural rather than editorial. */
 
-const QUICK_LINKS: QuickLink[] = [
-  { label: 'Who We Are', to: '/who-we-are' },
-  { label: 'What We Offer', hash: '/#products' },
-  { label: 'News & Notices', to: '/media/news' },
-  { label: 'Articles & Insights', to: '/media/articles' },
-  { label: 'Our Branches', hash: '/#branches' },
-  { label: 'Tenders', to: '/tenders' },
-  { label: 'Forms & Downloads', to: '/forms' },
-  { label: 'Careers', to: '/careers' },
-  { label: 'Our People & Awards', to: '/awards' },
-  { label: 'Report an Incident', to: '/report' },
-]
+interface CmsFooterLink {
+  id: string
+  label: string
+  href: string
+}
+
+interface FooterDocument {
+  headline: string
+  subtext: string
+  ctaLabel: string
+  ctaLink: string
+  branchLink: string
+  linkGroups: { id: string; title: string; links: CmsFooterLink[] }[]
+  tagline: string
+  copyright: string
+  bottomLinks: CmsFooterLink[]
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_FOOTER: FooterDocument = {
+  headline: 'The Bank Which Cares For You',
+  subtext:
+    'The Bank Which Cares For You. Providing accessible, responsible financial services to micro, small and medium entrepreneurs across Rwanda since 2014.',
+  ctaLabel: 'Explore Products',
+  ctaLink: '/#products',
+  branchLink: '/#branches',
+  linkGroups: [
+    {
+      id: 'quick',
+      title: 'Quick Links',
+      links: [
+        { id: 'q1', label: 'Who We Are', href: '/who-we-are' },
+        { id: 'q2', label: 'What We Offer', href: '/#products' },
+        { id: 'q3', label: 'News & Notices', href: '/media/news' },
+        { id: 'q4', label: 'Articles & Insights', href: '/media/articles' },
+        { id: 'q5', label: 'Our Branches', href: '/#branches' },
+        { id: 'q6', label: 'Tenders', href: '/tenders' },
+        { id: 'q7', label: 'Forms & Downloads', href: '/forms' },
+        { id: 'q8', label: 'Careers', href: '/careers' },
+        { id: 'q9', label: 'Our People & Awards', href: '/awards' },
+        { id: 'q10', label: 'Report an Incident', href: '/report' },
+      ],
+    },
+  ],
+  tagline: '',
+  copyright: `© ${String(new Date().getFullYear())} AB Bank Rwanda Ltd. All rights reserved.`,
+  bottomLinks: [
+    { id: 'b1', label: 'Privacy Policy', href: '/forms' },
+    { id: 'b2', label: 'Terms of Use', href: '/forms' },
+    { id: 'b3', label: 'Cookie Policy', href: '/forms' },
+  ],
+}
+
+/** A route gets a <Link>; anything containing a hash stays an <a> so the
+ *  browser resolves the anchor. */
+function isRoute(href: string): boolean {
+  return href.startsWith('/') && !href.includes('#')
+}
 
 const SOCIALS = [
   {
@@ -61,6 +109,8 @@ function dim(e: React.MouseEvent<HTMLElement>) {
 }
 
 export default function Footer() {
+  const { data: footer } = useSingleton<FooterDocument>('footer', FALLBACK_FOOTER)
+
   return (
     <footer className="edge-curve-t" style={{ background: '#0284c7', padding: '104px 48px 28px' }}>
       <div style={{ margin: '0 auto' }}>
@@ -96,8 +146,7 @@ export default function Footer() {
               />
             </Link>
             <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320, marginTop: 0 }}>
-              The Bank Which Cares For You. Providing accessible, responsible financial services to micro, small and
-              medium entrepreneurs across Rwanda since 2014.
+              {footer.subtext}
             </p>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 800, marginTop: 12 }}>Dial 5500</p>
 
@@ -139,32 +188,34 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4
-              style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: '#ffffff',
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                marginBottom: 20,
-              }}
-            >
-              Quick Links
-            </h4>
-            {QUICK_LINKS.map((l) =>
-              l.to ? (
-                <Link key={l.label} to={l.to} style={linkStyle} onMouseEnter={lighten} onMouseLeave={dim}>
-                  {l.label}
-                </Link>
-              ) : (
-                <a key={l.label} href={l.hash} style={linkStyle} onMouseEnter={lighten} onMouseLeave={dim}>
-                  {l.label}
-                </a>
-              ),
-            )}
-          </div>
+          {/* Link groups */}
+          {footer.linkGroups.map((group) => (
+            <div key={group.id}>
+              <h4
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  color: '#ffffff',
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  marginBottom: 20,
+                }}
+              >
+                {group.title}
+              </h4>
+              {group.links.map((l) =>
+                isRoute(l.href) ? (
+                  <Link key={l.id} to={l.href} style={linkStyle} onMouseEnter={lighten} onMouseLeave={dim}>
+                    {l.label}
+                  </Link>
+                ) : (
+                  <a key={l.id} href={l.href} style={linkStyle} onMouseEnter={lighten} onMouseLeave={dim}>
+                    {l.label}
+                  </a>
+                ),
+              )}
+            </div>
+          ))}
 
           {/* Regulators */}
           <div>
@@ -236,17 +287,15 @@ export default function Footer() {
             gap: 12,
           }}
         >
-          <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-            © {new Date().getFullYear()} AB Bank Rwanda Ltd. All rights reserved.
-          </p>
+          <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.35)', margin: 0 }}>{footer.copyright}</p>
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
             {/* These were plain <span>s with a click handler — now real links
                 to the published documents, and a real button for the one that
                 opens the cookie dialog. */}
-            {['Privacy Policy', 'Terms of Use', 'Cookie Policy'].map((t) => (
+            {footer.bottomLinks.map((l) => (
               <Link
-                key={t}
-                to="/forms"
+                key={l.id}
+                to={l.href}
                 style={{
                   fontSize: 12,
                   color: 'rgba(255,255,255,0.3)',
@@ -260,7 +309,7 @@ export default function Footer() {
                   e.currentTarget.style.color = 'rgba(255,255,255,0.3)'
                 }}
               >
-                {t}
+                {l.label}
               </Link>
             ))}
             <button

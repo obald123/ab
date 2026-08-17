@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useSingleton } from '../lib/content'
 import logo from '../imports/logo1-transparent.png'
 
 /* `hash` links scroll to a section of the home one-pager; `to` links are
@@ -9,7 +10,42 @@ type NavItem =
   | { label: string; to: string }
   | { label: string; children: { label: string; to: string; desc: string }[] }
 
-const NAV: NavItem[] = [
+/** What the CMS stores: a flat href, plus optional dropdown children. */
+interface CmsNavLink {
+  id: string
+  label: string
+  href: string
+  children: { id: string; label: string; href: string; desc: string }[]
+}
+
+interface NavDocument {
+  links: CmsNavLink[]
+  cta: { ekashLabel: string; ekashCode: string; ctaLabel: string; ctaLink: string }
+}
+
+/* One href field has to cover both kinds of destination, because that is what
+   an editor can reasonably be asked to type. A leading "#" — or a "/#" for a
+   section reached from another route — means a section of the home one-pager
+   and is scrolled to; anything else is a real route. */
+function toNavItem(link: CmsNavLink): NavItem {
+  if (link.children.length > 0) {
+    return {
+      label: link.label,
+      children: link.children.map((child) => ({
+        label: child.label,
+        to: child.href,
+        desc: child.desc,
+      })),
+    }
+  }
+
+  const hashIndex = link.href.indexOf('#')
+  if (hashIndex !== -1) return { label: link.label, hash: link.href.slice(hashIndex) }
+  return { label: link.label, to: link.href }
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_NAV: NavItem[] = [
   { label: 'Who We Are', to: '/who-we-are' },
   { label: 'Products', hash: '#products' },
   { label: 'Branches', hash: '#branches' },
@@ -71,6 +107,15 @@ export default function Navbar() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const menuRef = useRef<HTMLDivElement>(null)
+
+  const { data: navDoc } = useSingleton<NavDocument | null>('nav', null)
+  /* A saved document with no links is an editorial choice and shows as empty;
+     no document at all means the CMS has never been written to, so the
+     built-in menu stands in rather than leaving the site unnavigable. */
+  const NAV = useMemo(
+    () => (navDoc ? navDoc.links.map(toNavItem) : FALLBACK_NAV),
+    [navDoc],
+  )
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 60)

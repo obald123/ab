@@ -2,10 +2,25 @@ import { useMemo, useState } from 'react'
 import { IconBriefcase, IconMapPin, IconCalendar, IconArrowRight, IconSend } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, DeadlineRing, EmptyState, FilterBar, Section } from '../components/page/ui'
+import { useCollection } from '../lib/content'
 import { JOBS, daysUntil, formatDate, type Job } from '../data/site'
 
 const CAREERS_EMAIL = 'careers@abr.rw'
-const DEPARTMENTS = ['All', 'Business', 'IT & Digital', 'Risk & Compliance', 'Operations', 'Human Resources'] as const
+
+/* As stored in the CMS. `id` is the row id (used only as a React key and to
+   scope form field ids); `reference` is the human posting code shown on the
+   card — the two were the same field before this moved into the CMS. */
+type Posting = Omit<Job, 'id'> & { id: string; reference: string }
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_POSTINGS: Posting[] = JOBS.map((job) => ({ ...job, reference: job.id }))
+
+/* Departments are derived from whatever is actually posted rather than fixed
+   in code — an editor adding a role in a new department gets a working filter
+   for it without a deploy. */
+function departmentsOf(jobs: Posting[]): string[] {
+  return ['All', ...new Set(jobs.map((j) => j.department).filter(Boolean))]
+}
 
 /* Each department carries its own colour, so the board scans by hue before
    you read a single word — you find "the IT roles" instantly. This is what
@@ -18,7 +33,7 @@ const DEPT_COLOR: Record<string, string> = {
   'Human Resources': '#db2777',
 }
 
-function closingTone(job: Job) {
+function closingTone(job: Posting) {
   const d = daysUntil(job.closes)
   if (d < 0) return { tone: 'grey' as const, label: 'Closed' }
   if (d <= 7) return { tone: 'amber' as const, label: 'Closing soon' }
@@ -32,7 +47,7 @@ function closingTone(job: Job) {
    real, working route to a real inbox — and it keeps the CV attachment
    in the applicant's hands, which is where it has to be without a
    file-upload endpoint. */
-function ApplyForm({ job, accent, onClose }: { job: Job; accent: string; onClose: () => void }) {
+function ApplyForm({ job, accent, onClose }: { job: Posting; accent: string; onClose: () => void }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [touched, setTouched] = useState(false)
 
@@ -49,10 +64,10 @@ function ApplyForm({ job, accent, onClose }: { job: Job; accent: string; onClose
     setTouched(true)
     if (!valid) return
 
-    const subject = `Application — ${job.title} (${job.id})`
+    const subject = `Application — ${job.title} (${job.reference})`
     const body = [
       `Position: ${job.title}`,
-      `Reference: ${job.id}`,
+      `Reference: ${job.reference}`,
       `Location: ${job.location}`,
       '',
       `Name: ${form.name}`,
@@ -198,7 +213,7 @@ function ErrorText({ children }: { children: React.ReactNode }) {
   )
 }
 
-function JobRow({ job }: { job: Job }) {
+function JobRow({ job }: { job: Posting }) {
   const [open, setOpen] = useState(false)
   const [applying, setApplying] = useState(false)
   const [hover, setHover] = useState(false)
@@ -249,7 +264,7 @@ function JobRow({ job }: { job: Job }) {
                 color: '#94a3b8',
               }}
             >
-              {job.id.toUpperCase()}
+              {job.reference.toUpperCase()}
             </span>
             <span aria-hidden="true" style={{ width: 1, height: 12, background: 'rgba(14,165,233,0.24)' }} />
             <span
@@ -462,17 +477,20 @@ function JobRow({ job }: { job: Job }) {
 export default function Careers() {
   const [query, setQuery] = useState('')
   const [dept, setDept] = useState<string>('All')
+  const { data: jobs } = useCollection<Posting>('career', FALLBACK_POSTINGS)
+
+  const departments = useMemo(() => departmentsOf(jobs), [jobs])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return JOBS.filter(
+    return jobs.filter(
       (j) =>
         (dept === 'All' || j.department === dept) &&
         (!q || `${j.title} ${j.summary} ${j.location} ${j.level}`.toLowerCase().includes(q)),
     )
-  }, [query, dept])
+  }, [query, dept, jobs])
 
-  const openCount = JOBS.filter((j) => daysUntil(j.closes) >= 0).length
+  const openCount = jobs.filter((j) => daysUntil(j.closes) >= 0).length
 
   return (
     <main>
@@ -515,13 +533,13 @@ export default function Careers() {
           query={query}
           onQuery={setQuery}
           placeholder="Search roles by title, location or level"
-          options={DEPARTMENTS}
+          options={departments}
           active={dept}
           onSelect={setDept}
         />
 
         <p style={{ fontSize: 13, color: '#647080', marginBottom: 20 }}>
-          Showing <strong>{filtered.length}</strong> of {JOBS.length} positions
+          Showing <strong>{filtered.length}</strong> of {jobs.length} positions
         </p>
 
         {filtered.length === 0 ? (

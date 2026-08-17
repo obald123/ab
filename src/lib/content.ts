@@ -99,8 +99,17 @@ export function exitPreview(): void {
   window.location.reload()
 }
 
-export type CollectionType = 'ticker' | 'news' | 'rate' | 'product' | 'service' | 'branch'
-export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | 'contact'
+export type CollectionType =
+  | 'ticker'
+  | 'news'
+  | 'rate'
+  | 'product'
+  | 'service'
+  | 'branch'
+  | 'career'
+  | 'tender'
+  | 'form'
+export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | 'contact' | 'award'
 
 interface CollectionResponse<T> {
   kind: 'collection'
