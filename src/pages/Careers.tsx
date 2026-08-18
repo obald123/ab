@@ -4,6 +4,7 @@ import PageHero from '../components/page/PageHero'
 import { Card, Chip, DeadlineRing, EmptyState, FilterBar, Section } from '../components/page/ui'
 import { useCollection } from '../lib/content'
 import { JOBS, daysUntil, formatDate, type Job } from '../data/site'
+import { useT } from '../lib/i18n'
 
 const CAREERS_EMAIL = 'careers@abr.rw'
 
@@ -48,6 +49,7 @@ function closingTone(job: Posting) {
    in the applicant's hands, which is where it has to be without a
    file-upload endpoint. */
 function ApplyForm({ job, accent, onClose }: { job: Posting; accent: string; onClose: () => void }) {
+  const t = useT()
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [touched, setTouched] = useState(false)
 
@@ -149,7 +151,7 @@ function ApplyForm({ job, accent, onClose }: { job: Posting; accent: string; onC
 
       <div style={{ marginBottom: 16 }}>
         <label style={labelStyle} htmlFor={`msg-${job.id}`}>
-          Why you fit this role
+          {t.careers.whyYouFit}
         </label>
         <textarea
           id={`msg-${job.id}`}
@@ -181,7 +183,7 @@ function ApplyForm({ job, accent, onClose }: { job: Posting; accent: string; onC
           }}
         >
           <IconSend size={15} strokeWidth={2} color="#fff" />
-          Compose application
+          {t.careers.composeApplication}
         </button>
         <button
           type="button"
@@ -198,7 +200,7 @@ function ApplyForm({ job, accent, onClose }: { job: Posting; accent: string; onC
             fontFamily: 'inherit',
           }}
         >
-          Cancel
+          {t.common.cancel}
         </button>
       </div>
     </form>
@@ -214,6 +216,7 @@ function ErrorText({ children }: { children: React.ReactNode }) {
 }
 
 function JobRow({ job }: { job: Posting }) {
+  const t = useT()
   const [open, setOpen] = useState(false)
   const [applying, setApplying] = useState(false)
   const [hover, setHover] = useState(false)
@@ -316,10 +319,10 @@ function JobRow({ job }: { job: Posting }) {
                 }}
               >
                 {[
-                  { label: 'Location', value: job.location, Icon: IconMapPin },
-                  { label: 'Contract', value: job.type, Icon: IconBriefcase },
-                  { label: 'Level', value: job.level, Icon: null },
-                  { label: 'Closes', value: formatDate(job.closes), Icon: IconCalendar },
+                  { label: t.list.location, value: job.location, Icon: IconMapPin },
+                  { label: t.list.contract, value: job.type, Icon: IconBriefcase },
+                  { label: t.list.level, value: job.level, Icon: null },
+                  { label: t.careers.closes, value: formatDate(job.closes), Icon: IconCalendar },
                 ].map((m, i) => (
                   <div
                     key={m.label}
@@ -381,7 +384,7 @@ function JobRow({ job }: { job: Posting }) {
                 fontFamily: 'inherit',
               }}
             >
-              {open ? 'Hide details' : 'View full description'}
+              {open ? t.list.hideDetails : t.list.viewFull}
             </button>
             {!closed && !applying && (
               <button
@@ -405,7 +408,7 @@ function JobRow({ job }: { job: Posting }) {
                   boxShadow: `0 8px 20px ${accent}44`,
                 }}
               >
-                Apply now
+                {t.careers.applyNow}
                 <IconArrowRight size={14} strokeWidth={2.4} color="#fff" />
               </button>
             )}
@@ -416,7 +419,7 @@ function JobRow({ job }: { job: Posting }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 28 }}>
                 {[
                   { heading: 'Key responsibilities', items: job.responsibilities },
-                  { heading: 'Requirements', items: job.requirements },
+                  { heading: t.careers.requirements, items: job.requirements },
                 ].map(({ heading, items }) => (
                   <div key={heading}>
                     <h4
@@ -475,6 +478,7 @@ function JobRow({ job }: { job: Posting }) {
 }
 
 export default function Careers() {
+  const t = useT()
   const [query, setQuery] = useState('')
   const [dept, setDept] = useState<string>('All')
   const { data: jobs } = useCollection<Posting>('career', FALLBACK_POSTINGS)
@@ -496,15 +500,15 @@ export default function Careers() {
     <main>
       <PageHero
         Icon={IconBriefcase}
-        eyebrow="Careers"
-        title="Build a career in inclusive finance"
-        lead="We are hiring across credit, digital, risk and branch operations. Every role at AB Bank Rwanda exists to widen access to responsible financial services for Rwandan entrepreneurs and their families."
+        eyebrow={t.heroes.careersEyebrow}
+        title={t.heroes.careersTitle}
+        lead={t.heroes.careersLead}
         meta={
           <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
             {[
-              [`${openCount}`, 'Open positions'],
-              ['47+', 'Branches & outlets'],
-              ['5', 'Provinces'],
+              [`${openCount}`, t.careers.openPositions],
+              ['47+', t.list.branchesOutlets],
+              ['5', t.list.provinces],
             ].map(([v, l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
@@ -532,14 +536,18 @@ export default function Careers() {
         <FilterBar
           query={query}
           onQuery={setQuery}
-          placeholder="Search roles by title, location or level"
+          placeholder={t.careers.searchPlaceholder}
           options={departments}
           active={dept}
           onSelect={setDept}
+          labelFor={(v) => (v === 'All' ? t.common.all : v)}
         />
 
         <p style={{ fontSize: 13, color: '#647080', marginBottom: 20 }}>
-          Showing <strong>{filtered.length}</strong> of {jobs.length} positions
+          {t.list.showing
+            .replace('{shown}', String(filtered.length))
+            .replace('{total}', String(jobs.length))
+            .replace('{noun}', t.list.positions)}
         </p>
 
         {filtered.length === 0 ? (
@@ -554,11 +562,10 @@ export default function Careers() {
 
         <Card style={{ marginTop: 40, padding: 28, background: '#f8fbfe' }}>
           <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>
-            Nothing matching your skills?
+            {t.careers.nothingMatching}
           </h3>
           <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.75, margin: '0 0 14px', maxWidth: 640 }}>
-            We keep speculative applications on file for six months and review them whenever a relevant vacancy opens.
-            Send your CV with a short note about the kind of role you are looking for.
+            {t.list.speculative}
           </p>
           <a
             href={`mailto:${CAREERS_EMAIL}?subject=${encodeURIComponent('Speculative application')}`}

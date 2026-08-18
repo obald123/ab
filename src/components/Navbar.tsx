@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSingleton } from '../lib/content'
 import logo from '../imports/logo1-transparent.png'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useT } from '../lib/i18n'
 
 /* `hash` links scroll to a section of the home one-pager; `to` links are
    real routes. Anything with `children` renders as a dropdown. */
@@ -101,6 +103,7 @@ function hoverOut(e: React.MouseEvent<HTMLElement>) {
 }
 
 export default function Navbar() {
+  const t = useT()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [menu, setMenu] = useState<string | null>(null)
@@ -285,11 +288,15 @@ export default function Navbar() {
             })}
           </nav>
 
+          <div className="nav-lang-desktop" style={{ marginLeft: 14 }}>
+            <LanguageSwitcher />
+          </div>
+
           {/* Mobile hamburger */}
           <button
             onClick={() => setOpen(!open)}
             className="nav-hamburger"
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={open}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8 }}
           >
@@ -382,6 +389,7 @@ export default function Navbar() {
                 </button>
               )
             })}
+            <LanguageSwitcher compact />
           </div>
         </div>
       )}

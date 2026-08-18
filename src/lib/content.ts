@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLocale, type Locale } from './i18n'
 
 /* ═══════════════════════════════════════════════════════════════
    PUBLIC CONTENT
@@ -109,6 +110,8 @@ export type CollectionType =
   | 'career'
   | 'tender'
   | 'form'
+  | 'article'
+  | 'notice'
 export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | 'contact' | 'award'
 
 interface CollectionResponse<T> {
@@ -121,10 +124,13 @@ interface SingletonResponse<T> {
   item: (T & { id: string }) | null
 }
 
-async function fetchContent<R>(type: string, signal: AbortSignal): Promise<R> {
-  const url = previewToken
+async function fetchContent<R>(type: string, signal: AbortSignal, locale: Locale): Promise<R> {
+  const base = previewToken
     ? `${API}/preview/${previewToken}/content/${type}`
     : `${API}/content/${type}`
+  /* English is the stored document, so it needs no parameter — which also
+     keeps the existing URLs, and their cache entries, exactly as they were. */
+  const url = locale === 'en' ? base : `${base}?lang=${locale}`
 
   const response = await fetch(url, { signal })
   if (!response.ok) throw new Error(`Content request failed: ${String(response.status)}`)
@@ -141,6 +147,7 @@ export interface ContentState<T> {
 
 /** Published items of a collection type, with a fallback while offline. */
 export function useCollection<T>(type: CollectionType, fallback: T[]): ContentState<T[]> {
+  const { locale } = useLocale()
   const [state, setState] = useState<ContentState<T[]>>({
     data: fallback,
     loading: true,
@@ -150,7 +157,7 @@ export function useCollection<T>(type: CollectionType, fallback: T[]): ContentSt
   useEffect(() => {
     const controller = new AbortController()
 
-    fetchContent<CollectionResponse<T>>(type, controller.signal)
+    fetchContent<CollectionResponse<T>>(type, controller.signal, locale)
       .then((body) => {
         // The response wins even when empty — see the note at the top.
         setState({ data: body.items, loading: false, degraded: false })
@@ -166,13 +173,14 @@ export function useCollection<T>(type: CollectionType, fallback: T[]): ContentSt
     }
     // `fallback` is a module-level constant at every call site.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type])
+  }, [type, locale])
 
   return state
 }
 
 /** The one published document of a singleton type, with a fallback. */
 export function useSingleton<T>(type: SingletonType, fallback: T): ContentState<T> {
+  const { locale } = useLocale()
   const [state, setState] = useState<ContentState<T>>({
     data: fallback,
     loading: true,
@@ -182,7 +190,7 @@ export function useSingleton<T>(type: SingletonType, fallback: T): ContentState<
   useEffect(() => {
     const controller = new AbortController()
 
-    fetchContent<SingletonResponse<T>>(type, controller.signal)
+    fetchContent<SingletonResponse<T>>(type, controller.signal, locale)
       .then((body) => {
         setState({ data: body.item ?? fallback, loading: false, degraded: false })
       })
@@ -196,7 +204,7 @@ export function useSingleton<T>(type: SingletonType, fallback: T): ContentState<
       controller.abort()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type])
+  }, [type, locale])
 
   return state
 }

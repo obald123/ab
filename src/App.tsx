@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { LocaleProvider } from './lib/i18n'
 import PageShell from './components/page/PageShell'
 import Home from './pages/Home'
 import WhoWeAre from './pages/WhoWeAre'
@@ -13,7 +14,8 @@ import ReportStatus from './pages/ReportStatus'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <LocaleProvider>
+      <BrowserRouter>
       <Routes>
         <Route element={<PageShell />}>
           <Route index element={<Home />} />
@@ -33,6 +35,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </LocaleProvider>
   )
 }

@@ -4,6 +4,7 @@ import PageHero from '../components/page/PageHero'
 import { Card, Chip, DeadlineRing, EmptyState, FilterBar, Section, Stamp, type Tone } from '../components/page/ui'
 import { useCollection } from '../lib/content'
 import { TENDERS, daysUntil, formatDate, type Tender, type TenderStatus } from '../data/site'
+import { useT } from '../lib/i18n'
 
 const PROCUREMENT_EMAIL = 'procurement@abr.rw'
 const STATUSES = ['All', 'Open', 'Closing soon', 'Closed', 'Awarded'] as const
@@ -23,6 +24,18 @@ const FALLBACK_TENDERS: Notice[] = TENDERS.map((tender) => ({
   documents: tender.documents.map((doc, i) => ({ ...doc, id: `doc-${String(i + 1)}` })),
 }))
 
+/* Maps the schema's enum value (stored, filtered on, sent to the API) to its
+   translated label (shown). Keeping them separate means a filter click still
+   sends 'Open' even under a Kinyarwanda interface. */
+function statusLabel(t: ReturnType<typeof useT>, status: TenderStatus): string {
+  return {
+    Open: t.tenders.statusOpen,
+    'Closing soon': t.tenders.statusClosingSoon,
+    Closed: t.tenders.statusClosed,
+    Awarded: t.tenders.statusAwarded,
+  }[status]
+}
+
 const STATUS_TONE: Record<TenderStatus, Tone> = {
   Open: 'green',
   'Closing soon': 'amber',
@@ -37,6 +50,7 @@ const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
    rubber-stamped status, a tear-off deadline block, and a perforated left
    edge to sell the paper metaphor. */
 function TenderRow({ tender }: { tender: Notice }) {
+  const t = useT()
   const [open, setOpen] = useState(false)
   const remaining = daysUntil(tender.deadline)
   const live = tender.status === 'Open' || tender.status === 'Closing soon'
@@ -94,7 +108,7 @@ function TenderRow({ tender }: { tender: Notice }) {
             </h3>
 
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
-              <Chip tone={STATUS_TONE[tender.status]}>{tender.status}</Chip>
+              <Chip tone={STATUS_TONE[tender.status]}>{statusLabel(t, tender.status)}</Chip>
               <Chip tone="grey">{tender.category}</Chip>
             </div>
 
@@ -125,7 +139,7 @@ function TenderRow({ tender }: { tender: Notice }) {
                   padding: '5px 0',
                 }}
               >
-                DEADLINE
+                {t.tenders.deadline}
               </div>
               <div style={{ padding: '8px 0 10px' }}>
                 <div
@@ -153,7 +167,7 @@ function TenderRow({ tender }: { tender: Notice }) {
                 </div>
               </div>
             </div>
-            {live ? <DeadlineRing daysLeft={remaining} windowDays={30} size={62} /> : <Stamp label={tender.status} tone={STATUS_TONE[tender.status]} />}
+            {live ? <DeadlineRing daysLeft={remaining} windowDays={30} size={62} /> : <Stamp label={statusLabel(t, tender.status)} tone={STATUS_TONE[tender.status]} />}
           </div>
         </div>
 
@@ -173,7 +187,7 @@ function TenderRow({ tender }: { tender: Notice }) {
             fontFamily: 'inherit',
           }}
         >
-          {open ? 'Hide documents' : `Tender documents (${tender.documents.length}) & how to bid`}
+          {open ? t.tenders.hideDocuments : `${t.tenders.documentsAndBid} (${String(tender.documents.length)})`}
         </button>
 
         {open && (
@@ -228,6 +242,7 @@ function TenderRow({ tender }: { tender: Notice }) {
 }
 
 export default function Tenders() {
+  const t = useT()
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<string>('All')
   const { data: tenders } = useCollection<Notice>('tender', FALLBACK_TENDERS)
@@ -247,14 +262,14 @@ export default function Tenders() {
     <main>
       <PageHero
         Icon={IconGavel}
-        eyebrow="Tenders"
-        title="Procurement & tender opportunities"
-        lead="AB Bank Rwanda Plc procures goods and services through open, competitive tender. All live opportunities are published here and remain available for reference after closing."
+        eyebrow={t.heroes.tendersEyebrow}
+        title={t.heroes.tendersTitle}
+        lead={t.heroes.tendersLead}
         meta={
           <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
             {[
-              [`${live}`, 'Accepting bids'],
-              [`${tenders.length}`, 'In the register'],
+              [`${live}`, t.tenders.acceptingBids],
+              [`${tenders.length}`, t.tenders.inRegister],
             ].map(([v, l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
@@ -294,26 +309,29 @@ export default function Tenders() {
             <IconAlert size={19} color="#b45309" strokeWidth={2} />
           </span>
           <p style={{ margin: 0, fontSize: 13.5, color: '#7c4a06', lineHeight: 1.7 }}>
-            <strong>AB Bank Rwanda never charges a fee to bid.</strong> We do not use agents or intermediaries to
-            solicit tender participation. Report any request for payment to {PROCUREMENT_EMAIL} or call 5500.
+            {t.heroes.tendersWarning.replace('{email}', PROCUREMENT_EMAIL)}
           </p>
         </Card>
 
         <FilterBar
           query={query}
           onQuery={setQuery}
-          placeholder="Search by title, reference or category"
+          placeholder={t.tenders.searchPlaceholder}
           options={STATUSES}
           active={status}
           onSelect={setStatus}
+          labelFor={(v) => (v === 'All' ? t.common.all : statusLabel(t, v as TenderStatus))}
         />
 
         <p style={{ fontSize: 13, color: '#647080', marginBottom: 20 }}>
-          Showing <strong>{filtered.length}</strong> of {tenders.length} tenders
+          {t.list.showing
+            .replace('{shown}', String(filtered.length))
+            .replace('{total}', String(tenders.length))
+            .replace('{noun}', t.list.tenders)}
         </p>
 
         {filtered.length === 0 ? (
-          <EmptyState message="No tenders match that search. Try a different status or clear the filters." />
+          <EmptyState message={t.tenders.noMatch} />
         ) : (
           <div style={{ display: 'grid', gap: 18 }}>
             {filtered.map((t) => (

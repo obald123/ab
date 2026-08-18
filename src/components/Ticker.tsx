@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useCollection } from '../lib/content'
 import { iconFor } from '../lib/icon-map'
+import { useT } from '../lib/i18n'
 
 /* ── Top announcement bar — sits above the navbar ── */
 
@@ -21,6 +22,7 @@ const FALLBACK: TickerItem[] = [
 ]
 
 export default function Ticker() {
+  const t = useT()
   const { data: items } = useCollection<TickerItem>('ticker', FALLBACK)
   const doubled = [...items, ...items]
 
@@ -54,7 +56,7 @@ export default function Ticker() {
         <span style={{
           fontSize: 9, fontWeight: 900, letterSpacing: '0.18em',
           color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', whiteSpace: 'nowrap',
-        }}>Latest News</span>
+        }}>{t.ticker.latestNews}</span>
       </div>
 
       {/* Edge fade right of label */}
@@ -113,7 +115,7 @@ export default function Ticker() {
           el.querySelector('svg path')?.setAttribute('stroke', '#fca5a5')
         }}
       >
-        Whistleblowing
+        {t.ticker.whistleblowing}
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2l3 3-3 3" stroke="#fca5a5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </Link>
     </div>

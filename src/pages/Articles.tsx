@@ -2,9 +2,12 @@ import { useMemo, useState } from 'react'
 import { IconBookOpen, IconClock, IconArrowRight } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, EmptyState, FilterBar, Section } from '../components/page/ui'
+import { mediaUrl, useCollection } from '../lib/content'
 import { ARTICLES, formatDate, type Article } from '../data/site'
+import { useT } from '../lib/i18n'
 
-const TOPICS = ['All', 'SME Guidance', 'Financial Literacy', 'Security', 'Agriculture', 'Financial Inclusion'] as const
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_ARTICLES: Article[] = ARTICLES
 
 function Byline({ article, light = false }: { article: Article; light?: boolean }) {
   const initials = article.author
@@ -41,6 +44,7 @@ function Byline({ article, light = false }: { article: Article; light?: boolean 
 }
 
 function ReadTime({ mins, light = false }: { mins: number; light?: boolean }) {
+  const t = useT()
   return (
     <span
       style={{
@@ -53,23 +57,32 @@ function ReadTime({ mins, light = false }: { mins: number; light?: boolean }) {
       }}
     >
       <IconClock size={13} strokeWidth={2} color={light ? 'rgba(224,242,254,0.8)' : '#94a3b8'} />
-      {mins} min read
+      {mins} {t.articles.minRead}
     </span>
   )
 }
 
 export default function Articles() {
+  const t = useT()
   const [query, setQuery] = useState('')
   const [topic, setTopic] = useState<string>('All')
+  const { data: articles } = useCollection<Article>('article', FALLBACK_ARTICLES)
+
+  /* Topics come from what is published rather than a fixed list, so an editor
+     writing under a new one gets a filter chip for it without a deploy. */
+  const topics = useMemo(
+    () => ['All', ...new Set(articles.map((a) => a.topic).filter(Boolean))],
+    [articles],
+  )
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return ARTICLES.filter(
+    return articles.filter(
       (a) =>
         (topic === 'All' || a.topic === topic) &&
         (!q || `${a.title} ${a.excerpt} ${a.author} ${a.topic}`.toLowerCase().includes(q)),
     )
-  }, [query, topic])
+  }, [query, topic, articles])
 
   const [lead, ...rest] = filtered
 
@@ -77,23 +90,24 @@ export default function Articles() {
     <main>
       <PageHero
         Icon={IconBookOpen}
-        eyebrow="Insights"
-        title="Articles & financial guidance"
-        lead="Practical explainers written by our own credit, risk and finance teams. Not bank news — this is the reading that helps you make a better decision about borrowing, saving and protecting your money."
+        eyebrow={t.heroes.insightsEyebrow}
+        title={t.heroes.insightsTitle}
+        lead={t.heroes.insightsLead}
       />
 
       <Section>
         <FilterBar
           query={query}
           onQuery={setQuery}
-          placeholder="Search articles by title, topic or author"
-          options={TOPICS}
+          placeholder={t.articles.searchPlaceholder}
+          options={topics}
           active={topic}
           onSelect={setTopic}
+          labelFor={(v) => (v === 'All' ? t.common.all : v)}
         />
 
         {filtered.length === 0 ? (
-          <EmptyState message="No articles match that search. Try another topic or clear the filters." />
+          <EmptyState message={t.articles.noMatch} />
         ) : (
           <>
             {/* Lead article */}
@@ -153,7 +167,7 @@ export default function Articles() {
                 </div>
                 <div style={{ position: 'relative', minHeight: 280 }}>
                   <img
-                    src={lead.image}
+                    src={mediaUrl(lead.image)}
                     alt=""
                     loading="lazy"
                     style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
@@ -167,7 +181,7 @@ export default function Articles() {
               {rest.map((a) => (
                 <Card key={a.id} interactive style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                   <img
-                    src={a.image}
+                    src={mediaUrl(a.image)}
                     alt=""
                     loading="lazy"
                     style={{ width: '100%', height: 178, objectFit: 'cover', display: 'block' }}
@@ -204,7 +218,7 @@ export default function Articles() {
                       >
                         <span style={{ fontSize: 11.5, color: '#94a3b8', fontWeight: 700 }}>{formatDate(a.published)}</span>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 800, color: '#0ea5e9' }}>
-                          Read article
+                          {t.articles.readArticle}
                           <IconArrowRight size={13} strokeWidth={2.4} color="#0ea5e9" />
                         </span>
                       </div>

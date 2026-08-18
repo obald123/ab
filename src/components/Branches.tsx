@@ -6,6 +6,7 @@ import { IconMapPin } from './Icons'
 import pinBlueUrl from '../imports/icons/pin-blue.svg'
 import pinGreyUrl from '../imports/icons/pin-grey.svg'
 import { useCollection } from '../lib/content'
+import { useT } from '../lib/i18n'
 
 /* ══════════════════════════════════════════════
    Branch data — sourced from abr.rw/our-branches/
@@ -110,6 +111,7 @@ function popupHtml(b: Branch) {
 }
 
 export default function Branches() {
+  const t = useT()
   // center roughly on Rwanda
   const center: [number, number] = [-1.95, 30.06]
   const mapRef = useRef<HTMLDivElement | null>(null)
@@ -172,10 +174,10 @@ export default function Branches() {
           viewport={{ once: true, margin: '-100px' }}
           style={{ textAlign: 'center', marginBottom: 28 }}
         >
-          <span className="section-pill section-pill--icon"><IconMapPin size={14} strokeWidth={2} color="#0ea5e9" />Locations</span>
-          <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', color: '#0284c7', letterSpacing: '-0.02em' }}>Our Branch Network</h2>
+          <span className="section-pill section-pill--icon"><IconMapPin size={14} strokeWidth={2} color="#0ea5e9" />{t.branchesSection.eyebrow}</span>
+          <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', color: '#0284c7', letterSpacing: '-0.02em' }}>{t.branchesSection.heading}</h2>
           <p style={{ color: '#647080', marginTop: 8, maxWidth: 560, marginInline: 'auto' }}>
-            {branches.length} branches and credit outlets across Rwanda. Hover a marker to see the branch name, address and contact details.
+            {branches.length} {t.branchesSection.lead}
           </p>
         </motion.div>
 

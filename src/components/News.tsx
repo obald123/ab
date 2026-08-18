@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { IconNews } from './Icons'
 import { mediaUrl, useCollection } from '../lib/content'
+import { useT } from '../lib/i18n'
 
 interface Article {
   category: string
@@ -44,6 +45,7 @@ const FALLBACK: Article[] = [
 ]
 
 export default function News() {
+  const t = useT()
   const { data: articles } = useCollection<Article>('news', FALLBACK)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -84,13 +86,13 @@ export default function News() {
         {/* Header */}
         <div data-reveal className="news-header" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 52 }}>
           <div>
-            <span className="section-pill section-pill--icon"><IconNews size={14} strokeWidth={2} color="#0ea5e9" />Media & News</span>
+            <span className="section-pill section-pill--icon"><IconNews size={14} strokeWidth={2} color="#0ea5e9" />{t.newsSection.eyebrow}</span>
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 700, fontSize: 'clamp(26px, 3.5vw, 44px)',
               color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.01em',
             }}>
-              Latest from AB Rwanda
+              {t.newsSection.heading}
             </h2>
           </div>
           <a href="#news" style={{
@@ -110,7 +112,7 @@ export default function News() {
               el.style.color = '#0ea5e9'
             }}
           >
-            View all news
+            {t.newsSection.viewAll}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -189,7 +191,7 @@ export default function News() {
                 onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '12px' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '8px' }}
               >
-                Read full story
+                {t.newsSection.readFullStory}
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -256,7 +258,7 @@ export default function News() {
                   {article.excerpt.slice(0, 120)}…
                 </p>
                 <span style={{ fontSize: 13, fontWeight: 700, color: '#0ea5e9' }}>
-                  Read more →
+                  {`${t.newsSection.readMore} \u2192`}
                 </span>
               </div>
             </div>

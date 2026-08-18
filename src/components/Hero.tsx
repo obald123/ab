@@ -14,6 +14,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'framer-motion'
+import { useT } from '../lib/i18n'
 
 /* ══════════════════════════════════════════════
    BRAND TOKENS  (from logo exactly)
@@ -83,6 +84,7 @@ function StoryReel({
   driftX: MotionValue<number>
   driftY: MotionValue<number>
 }) {
+  const t = useT()
   const reduce = useReducedMotion()
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -118,7 +120,7 @@ function StoryReel({
       className="hero-reel"
       role="group"
       aria-roledescription="carousel"
-      aria-label="Our story"
+      aria-label={t.home.heroStory}
       onMouseEnter={hold}
       onMouseLeave={release}
       onFocusCapture={hold}
@@ -375,6 +377,7 @@ interface HeroDocument {
 }
 
 export default function Hero() {
+  const t = useT()
   const [heroSlide, setHeroSlide] = useState(0)
 
   /* A `null` fallback distinguishes the two cases precisely: no document yet
@@ -724,7 +727,7 @@ export default function Hero() {
                 el.style.boxShadow = '0 12px 35px rgba(0,0,0,0.22)'
               }}
             >
-              Open an Account
+              {t.home.heroOpenAccount}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" stroke={BD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -758,7 +761,7 @@ export default function Hero() {
                 el.style.transform = ''
               }}
             >
-              Explore Products
+              {t.home.heroExploreProducts}
             </a>
           </motion.div>
 
@@ -781,10 +784,10 @@ export default function Hero() {
             }}
           >
             {[
-              { v: 47, s: '+', l: 'Branches' },
-              { v: 200, s: 'K+', l: 'Customers' },
-              { v: 9, s: '+', l: 'Years' },
-              { v: 15, s: '+', l: 'Products' },
+              { v: 47, s: '+', l: t.home.statBranches },
+              { v: 200, s: 'K+', l: t.home.statCustomers },
+              { v: 9, s: '+', l: t.home.statYears },
+              { v: 15, s: '+', l: t.home.statProducts },
             ].map((s, i) => (
               <div
                 key={i}

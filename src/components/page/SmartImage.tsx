@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from 'react'
+import { mediaUrl } from '../../lib/content'
 
 /* Remote editorial images are the one thing on these pages we do not
    control. If one fails or is still in flight, this degrades to a branded
@@ -29,7 +30,7 @@ export default function SmartImage({
     >
       {state !== 'error' && (
         <img
-          src={src}
+          src={mediaUrl(src)}
           alt={alt}
           loading="lazy"
           decoding="async"

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useT } from '../../lib/i18n'
 
 type IconComp = (p: { size?: number; color?: string; strokeWidth?: number }) => ReactNode
 
@@ -18,6 +19,7 @@ export default function PageHero({
   lead: string
   meta?: ReactNode
 }) {
+  const t = useT()
   return (
     <header
       style={{
@@ -41,7 +43,7 @@ export default function PageHero({
         }}
       />
       <div style={{ position: 'relative', maxWidth: 1180, margin: '0 auto' }}>
-        <nav aria-label="Breadcrumb" style={{ marginBottom: 18 }}>
+        <nav aria-label={t.page.breadcrumb} style={{ marginBottom: 18 }}>
           <Link
             to="/"
             style={{
@@ -52,7 +54,7 @@ export default function PageHero({
               letterSpacing: '0.04em',
             }}
           >
-            Home
+            {t.page.home}
           </Link>
           <span style={{ color: 'rgba(186,230,253,0.4)', margin: '0 8px', fontSize: 12 }}>/</span>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#bae6fd', letterSpacing: '0.04em' }}>{eyebrow}</span>

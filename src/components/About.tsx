@@ -5,6 +5,7 @@ import { iconFor } from '../lib/icon-map'
 /* Timeline milestone icons now come from the CMS by name, resolved through
    iconFor — only icons used directly in fixed page furniture are imported. */
 import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconRoute, IconUsers, IconBriefcase, IconHandshake } from './Icons'
+import { useT } from '../lib/i18n'
 
 /* ── data ──
    The timeline, vision/mission and company narrative all come from the CMS
@@ -539,6 +540,7 @@ function JourneyDetailCard({ item, pt, boundsRef }: {
 }
 
 function JourneyPath({ timeline }: { timeline: TimelineEvent[] }) {
+  const t = useT()
   const containerRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -674,7 +676,7 @@ function JourneyPath({ timeline }: { timeline: TimelineEvent[] }) {
           boxShadow: '0 2px 12px rgba(14,165,233,0.08)',
         }}>
           <IconRoute size={15} strokeWidth={2} color="#0ea5e9" />
-          Our Journey
+          {t.about.journey}
         </span>
         <h2 style={{
           fontWeight: 900, fontSize: 'clamp(24px, 3.5vw, 42px)', color: '#0284c7',
@@ -683,7 +685,7 @@ function JourneyPath({ timeline }: { timeline: TimelineEvent[] }) {
           Tracing Our <span style={{ color: '#0ea5e9' }}>Growth &amp; Impact</span>
         </h2>
         <p style={{ fontSize: 13, color: '#647080', marginTop: 8 }}>
-          Hover or tap a milestone to read the full story.
+          {t.about.journeyHint}
         </p>
       </div>
 
@@ -884,7 +886,7 @@ function ManagementCard({ m, i }: { m: (typeof FALLBACK_MANAGEMENT)[0]; i: numbe
               width: 110, height: 110, borderRadius: 24, overflow: 'hidden',
               margin: '0 auto', boxShadow: `0 20px 48px ${m.color}22, 0 8px 18px rgba(0,0,0,0.12)`,
             }}>
-              <img src={m.image} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <img src={mediaUrl(m.image)} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
           </div>
 
@@ -924,7 +926,7 @@ function BoardCard({ b, i }: { b: (typeof FALLBACK_BOARD)[0]; i: number }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1 }}>
             <div style={{ width: 106, height: 106, borderRadius: 22, overflow: 'hidden', boxShadow: `0 18px 42px ${b.color}22, 0 8px 18px rgba(0,0,0,0.1)` }}>
-              <img src={b.image} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <img src={mediaUrl(b.image)} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
             <div style={{ textAlign: 'center' }}>
               <p style={{ fontWeight: 900, fontSize: 15.5, color: '#0284c7', marginBottom: 8 }}>{b.name}</p>
@@ -994,7 +996,7 @@ function ShareholderCard({ s, i }: { s: ShareholderView; i: number }) {
               background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: `0 10px 28px ${s.color}22, 0 4px 8px rgba(0,0,0,0.06)`,
             }}>
-              {s.logo ? <img src={s.logo} alt={s.name + ' logo'} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} /> : <span style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}>{s.abbr}</span>}
+              {s.logo ? <img src={mediaUrl(s.logo)} alt={s.name + ' logo'} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }} /> : <span style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}>{s.abbr}</span>}
             </div>
             {/* Shadow plane */}
             <div style={{
@@ -1004,7 +1006,7 @@ function ShareholderCard({ s, i }: { s: ShareholderView; i: number }) {
             }} />
             {/* small shareholder badge */}
             {s.shareIcon && (
-              <img src={s.shareIcon} alt={s.name + ' share icon'} style={{ position: 'absolute', top: -12, right: -12, width: 44, height: 44 }} />
+              <img src={mediaUrl(s.shareIcon)} alt={s.name + ' share icon'} style={{ position: 'absolute', top: -12, right: -12, width: 44, height: 44 }} />
             )}
           </div>
 
@@ -1024,7 +1026,7 @@ function ShareholderCard({ s, i }: { s: ShareholderView; i: number }) {
 
 /* ── main component ── */
 /* ══════════════════════════════════════════════════════════════
-   VISION & MISSION
+   {t.about.visionMission}
 
    The formal statements are kept verbatim — they are the board-approved
    wording. What is added underneath is the plain-language reading and
@@ -1380,6 +1382,7 @@ function VisionMission({ vision, mission }: { vision: VisionMissionItem; mission
 /* `standalone` = rendered as the /who-we-are page rather than a home
    section, so the first masthead must clear the fixed navbar. */
 export default function About({ standalone = false }: { standalone?: boolean }) {
+  const t = useT()
   const { content, timeline, management, board, shareholders } = useAbout()
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const heroRef = useRef<HTMLDivElement>(null)
@@ -1424,7 +1427,7 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
                 background: 'rgba(186,230,253,0.12)', border: '1.5px solid rgba(186,230,253,0.25)', color: '#bae6fd',
               }}>
                 <IconBank size={14} strokeWidth={2} color="#bae6fd" />
-                Who We Are
+                {t.about.whoWeAre}
               </span>
               <h2 style={{
                 fontFamily: 'var(--font-serif)',
@@ -1523,17 +1526,17 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
                 background: 'rgba(186,230,253,0.1)', border: '1.5px solid rgba(186,230,253,0.22)', color: '#bae6fd',
               }}>
                 <IconRoute size={15} strokeWidth={2} color="#bae6fd" />
-                Our Journey
+                {t.about.journey}
               </span>
               <h2 style={{
                 fontWeight: 900, fontSize: 'clamp(34px, 5.5vw, 68px)',
                 color: '#ffffff', lineHeight: 1.04, letterSpacing: '-0.03em', marginBottom: 18,
               }}>
-                A Decade of<br />
-                <span style={{ color: '#bae6fd' }}>Growth & Impact</span>
+                {t.about.journeyHeading}<br />
+                <span style={{ color: '#bae6fd' }}>{t.about.journeyAccent}</span>
               </h2>
               <p style={{ fontSize: 17, color: 'rgba(186,230,253,0.58)', maxWidth: 480, lineHeight: 1.75, marginBottom: 48 }}>
-                From a single branch in Nyamirambo to a nationwide network — nine years of expanding financial access.
+                {t.about.journeyLead}
               </p>
             </R>
 
@@ -1566,9 +1569,9 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
         }} />
         <div style={{ margin: '0 auto', padding: '0 48px' }}>
           <R style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span className="section-pill section-pill--icon"><IconUsers size={14} strokeWidth={2} color="#0ea5e9" />Leadership</span>
+            <span className="section-pill section-pill--icon"><IconUsers size={14} strokeWidth={2} color="#0ea5e9" />{t.about.leadership}</span>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0284c7', letterSpacing: '-0.025em' }}>
-              Management Team
+              {t.about.management}
             </h2>
           </R>
           <div className="about-management" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 22 }}>
@@ -1588,7 +1591,7 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
           <R style={{ textAlign: 'center', marginBottom: 52 }}>
             <span className="section-pill section-pill--icon"><IconBriefcase size={14} strokeWidth={2} color="#0ea5e9" />Board</span>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0284c7', letterSpacing: '-0.025em' }}>
-              Board of Directors
+              {t.about.board}
             </h2>
           </R>
           <div className="about-board" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 22 }}>
@@ -1614,9 +1617,9 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
 
         <div style={{ margin: '0 auto', padding: '0 48px' }}>
           <R style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="section-pill section-pill--icon"><IconHandshake size={14} strokeWidth={2} color="#0ea5e9" />Ownership</span>
+            <span className="section-pill section-pill--icon"><IconHandshake size={14} strokeWidth={2} color="#0ea5e9" />{t.about.ownership}</span>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0284c7', letterSpacing: '-0.025em' }}>
-              Our Shareholders
+              {t.about.shareholders}
             </h2>
           </R>
           <div className="about-shareholders" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>

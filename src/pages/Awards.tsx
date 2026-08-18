@@ -4,6 +4,7 @@ import PageHero from '../components/page/PageHero'
 import SmartImage from '../components/page/SmartImage'
 import { Chip, Section } from '../components/page/ui'
 import { useSingleton } from '../lib/content'
+import { useT } from '../lib/i18n'
 import {
   AWARD_CRITERIA,
   EMPLOYEE_OF_THE_MONTH,
@@ -55,6 +56,7 @@ function Laurel({ size = 22, color = '#0c4a6e' }: { size?: number; color?: strin
    dark, ceremonial panel; the month award is a lighter, more immediate one.
    They deliberately do not look like the same card twice. */
 function Spotlight({ award, tier, index }: { award: Winner; tier: 'year' | 'month'; index: number }) {
+  const t = useT()
   const isYear = tier === 'year'
 
   return (
@@ -109,7 +111,7 @@ function Spotlight({ award, tier, index }: { award: Winner; tier: 'year' | 'mont
             }}
           >
             <Laurel size={16} color={isYear ? '#0c4a6e' : '#ffffff'} />
-            {isYear ? 'Employee of the Year' : 'Employee of the Month'}
+            {isYear ? t.awards.employeeOfYear : t.awards.employeeOfMonth}
           </div>
         </div>
 
@@ -234,21 +236,22 @@ function Spotlight({ award, tier, index }: { award: Winner; tier: 'year' | 'mont
 }
 
 export default function Awards() {
+  const t = useT()
   const { data: awards } = useSingleton<AwardsDocument>('award', FALLBACK_AWARDS)
 
   return (
     <main>
       <PageHero
         Icon={IconStar}
-        eyebrow="Our People"
-        title="Recognising the people behind the numbers"
-        lead="Every month one colleague is nominated by peers and managers for work that measurably changed a customer's situation. Each year, one of those twelve is chosen for sustained impact across the network."
+        eyebrow={t.heroes.peopleEyebrow}
+        title={t.heroes.peopleTitle}
+        lead={t.heroes.peopleLead}
         meta={
           <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
             {[
-              ['12', 'Awards a year'],
-              ['700+', 'Colleagues eligible'],
-              ['2018', 'Programme running since'],
+              ['12', t.awards.awardsAYear],
+              ['700+', t.awards.colleaguesEligible],
+              ['2018', t.awards.runningSince],
             ].map(([v, l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
@@ -293,7 +296,7 @@ export default function Awards() {
               letterSpacing: '-0.015em',
             }}
           >
-            Roll of honour
+            {t.awards.rollOfHonour}
           </h2>
           <span aria-hidden="true" style={{ flex: 1, height: 1, background: 'rgba(14,165,233,0.18)' }} />
           <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: '#94a3b8' }}>
@@ -363,7 +366,7 @@ export default function Awards() {
       <div style={{ background: '#f8fbfe', borderTop: '1px solid rgba(14,165,233,0.12)' }}>
         <Section style={{ padding: '56px 0 72px' }}>
           <div style={{ maxWidth: 620, marginBottom: 30 }}>
-            <Chip tone="blue">How winners are chosen</Chip>
+            <Chip tone="blue">{t.awards.howChosen}</Chip>
             <h2
               style={{
                 fontFamily: 'var(--font-serif)',
@@ -375,7 +378,7 @@ export default function Awards() {
                 margin: '14px 0 12px',
               }}
             >
-              Nominated by colleagues, decided on evidence
+              {t.awards.howChosenHeading}
             </h2>
             <p style={{ fontSize: 15, color: '#647080', lineHeight: 1.78, margin: 0 }}>
               Any colleague can nominate any other. Nominations go to a panel drawn from branch management, HR and the
@@ -423,10 +426,10 @@ export default function Awards() {
               <IconUsers size={26} strokeWidth={1.8} color="#bae6fd" />
               <div>
                 <div style={{ fontSize: 16.5, fontWeight: 800, color: '#ffffff', marginBottom: 3 }}>
-                  Want to work somewhere that notices?
+                  {t.awards.hiringTitle}
                 </div>
                 <div style={{ fontSize: 13.5, color: 'rgba(224,242,254,0.75)' }}>
-                  We are hiring across credit, digital, risk and branch operations.
+                  {t.awards.hiringBody}
                 </div>
               </div>
             </div>
@@ -446,7 +449,7 @@ export default function Awards() {
                 whiteSpace: 'nowrap',
               }}
             >
-              See open roles
+              {t.awards.seeOpenRoles}
               <IconArrowRight size={15} strokeWidth={2.4} color="#0c4a6e" />
             </a>
           </div>

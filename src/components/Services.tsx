@@ -23,6 +23,7 @@ import {
   IconGrid,
 } from './Icons'
 import { useCollection } from '../lib/content'
+import { useT } from '../lib/i18n'
 
 type IconComp = React.FC<{ size?: number; color?: string; strokeWidth?: number }>
 type Service = { title: string; description: string; Icon: IconComp; highlight?: string }
@@ -172,6 +173,7 @@ const CHAPTERS: Chapter[] = [
 
 /* ── Card ── */
 function ServiceCard({ service, chapter, index }: { service: Service; chapter: Chapter; index: number }) {
+  const t = useT()
   const [hover, setHover] = useState(false)
   return (
     <motion.article
@@ -273,7 +275,7 @@ function ServiceCard({ service, chapter, index }: { service: Service; chapter: C
           color: chapter.accent,
         }}
       >
-        Learn more
+        {t.common.learnMore}
         <svg
           width="12"
           height="12"
@@ -302,16 +304,53 @@ interface CmsService {
 /* Merges CMS services into the hardcoded chapters. Icons are not modelled in
    the CMS, so each chapter reuses its own icons in order and repeats the last
    one if editors add more services than there are icons. */
+/* Tab text is translated; `tab` itself stays English because every CMS
+   service is matched on it. */
+function tabLabel(t: ReturnType<typeof useT>, tab: string): string {
+  return (
+    { Personal: t.chapters.tabPersonal, Business: t.chapters.tabBusiness, Loans: t.chapters.tabLoans }[tab] ??
+    tab
+  )
+}
+
 function useChapters(): Chapter[] {
   const { data: services, degraded } = useCollection<CmsService>('service', [])
+  const t = useT()
+
+  /* The chapter copy is page furniture rather than CMS content, so it is
+     overlaid from the dictionary here — keeping `tab` untouched, because it is
+     the key each service is matched on. */
+  const translateChapter = (chapter: Chapter): Chapter => {
+    const byTab: Record<string, Partial<Chapter>> = {
+      Personal: {
+        kicker: t.chapters.personalKicker,
+        title: t.chapters.personalTitle,
+        titleAccent: t.chapters.personalAccent,
+        lead: t.chapters.personalLead,
+      },
+      Business: {
+        kicker: t.chapters.businessKicker,
+        title: t.chapters2.businessTitle,
+        titleAccent: t.chapters.businessAccent,
+        lead: t.chapters2.businessLead,
+      },
+      Loans: {
+        kicker: t.chapters.loansKicker,
+        title: t.chapters2.loansTitle,
+        titleAccent: t.chapters.loansAccent,
+        lead: t.chapters2.loansLead,
+      },
+    }
+    return { ...chapter, ...byTab[chapter.tab] }
+  }
 
   return useMemo(() => {
     // Only an unreachable API falls back; a chapter the editors have left
     // empty renders empty rather than showing built-in services beside real
     // ones, which would be indistinguishable to a reader.
-    if (degraded) return CHAPTERS
+    if (degraded) return CHAPTERS.map(translateChapter)
 
-    return CHAPTERS.map((chapter) => {
+    return CHAPTERS.map(translateChapter).map((chapter) => {
       const forTab = services.filter((s) => s.tab === chapter.tab)
 
       return {
@@ -327,11 +366,12 @@ function useChapters(): Chapter[] {
         })),
       }
     })
-  }, [services, degraded])
+  }, [services, degraded, t])
 }
 
 /* ── The pinned chapter panel ── */
 function PinnedServices() {
+  const t = useT()
   const sectionRef = useRef<HTMLElement>(null)
   const [index, setIndex] = useState(0)
   const chapters = useChapters()
@@ -476,10 +516,10 @@ function PinnedServices() {
               }}
             >
               <IconGrid size={14} strokeWidth={2} color={chapter.accent} />
-              Our Services
+              {t.services.eyebrow}
             </span>
 
-            <div role="tablist" aria-label="Service categories" style={{ display: 'flex', gap: 6 }}>
+            <div role="tablist" aria-label={t.services.categories} style={{ display: 'flex', gap: 6 }}>
               {chapters.map((c, i) => {
                 const on = i === index
                 return (
@@ -506,7 +546,7 @@ function PinnedServices() {
                       transition: 'color 0.25s, background 0.25s, border-color 0.25s',
                     }}
                   >
-                    {c.tab}
+                    {tabLabel(t, c.tab)}
                   </button>
                 )
               })}
@@ -649,10 +689,10 @@ function PinnedServices() {
                       color: chapter.sub,
                     }}
                   >
-                    Keep scrolling — next
+                    {t.services.keepScrolling}
                   </span>
                   <span style={{ display: 'block', fontSize: 16, fontWeight: 900, color: chapter.fg }}>
-                    {next.tab} Banking
+                    {t.campaignStats.bankingSuffix.replace('{tab}', tabLabel(t, next.tab))}
                   </span>
                 </span>
                 <span
@@ -708,7 +748,7 @@ function PinnedServices() {
                     textDecoration: 'none',
                   }}
                 >
-                  Talk to an Advisor
+                  {t.services.talkToAdvisor}
                 </a>
                 <a
                   href="#products"

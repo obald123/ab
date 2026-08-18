@@ -1305,6 +1305,9 @@ body.a11y-large-text { font-size: 1.12rem; }
 @media (max-width: 1023px) {
   .nav-desktop-links { display: none !important; }
   .nav-hamburger { display: flex !important; }
+  /* The drawer carries its own flat language row, so the pill would be a
+     second, redundant control on small screens. */
+  .nav-lang-desktop { display: none !important; }
 }
 @media (min-width: 1024px) {
   .nav-hamburger { display: none !important; }

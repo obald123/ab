@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { IconClock, IconSend, IconCheckCircle, IconShield } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, Section, type Tone } from '../components/page/ui'
+import { useT } from '../lib/i18n'
 import {
   lookupIncident,
   addIncidentMessage,
@@ -15,11 +16,14 @@ import {
    session system. A closed case is read-only in the UI as well as the API —
    there is nothing left to do with it besides read the outcome. */
 
-const STATUS_LABEL: Record<IncidentStatusView['status'], string> = {
-  received: 'Received',
-  under_review: 'Under review',
-  action_taken: 'Action taken',
-  closed: 'Closed',
+/* The key is the status the API returns; only the text shown is translated. */
+function statusLabel(t: ReturnType<typeof useT>, status: IncidentStatusView['status']): string {
+  return {
+    received: t.status.received,
+    under_review: t.status.underReview,
+    action_taken: t.status.actionTaken,
+    closed: t.status.closed,
+  }[status]
 }
 
 const STATUS_TONE: Record<IncidentStatusView['status'], Tone> = {
@@ -51,6 +55,7 @@ function formatDate(iso: string): string {
 }
 
 function LookupForm({ onFound }: { onFound: (incident: IncidentStatusView, passphrase: string) => void }) {
+  const t = useT()
   const [reference, setReference] = useState('')
   const [passphrase, setPassphrase] = useState('')
   const [loading, setLoading] = useState(false)
@@ -78,7 +83,7 @@ function LookupForm({ onFound }: { onFound: (incident: IncidentStatusView, passp
     <Card style={{ padding: '32px 30px', maxWidth: 480, margin: '0 auto' }}>
       <form onSubmit={(e) => void handleSubmit(e)}>
         <label htmlFor="status-reference" style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-          Reference number
+          {t.status.referenceLabel}
         </label>
         <input
           id="status-reference"
@@ -92,7 +97,7 @@ function LookupForm({ onFound }: { onFound: (incident: IncidentStatusView, passp
         />
 
         <label htmlFor="status-passphrase" style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-          Passphrase
+          {t.status.passphraseLabel}
         </label>
         <input
           id="status-passphrase"
@@ -123,7 +128,7 @@ function LookupForm({ onFound }: { onFound: (incident: IncidentStatusView, passp
             opacity: loading ? 0.7 : 1,
           }}
         >
-          {loading ? 'Checking…' : 'Check status'}
+          {loading ? t.status.checking : t.status.check}
         </button>
       </form>
 
@@ -136,6 +141,7 @@ function LookupForm({ onFound }: { onFound: (incident: IncidentStatusView, passp
 }
 
 function IncidentThread({ incident, passphrase }: { incident: IncidentStatusView; passphrase: string }) {
+  const t = useT()
   const [messages, setMessages] = useState(incident.messages)
   const [status, setStatus] = useState(incident.status)
   const [reply, setReply] = useState('')
@@ -173,7 +179,7 @@ function IncidentThread({ incident, passphrase }: { incident: IncidentStatusView
           <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 18, fontWeight: 800, color: '#0284c7' }}>
             {incident.reference}
           </span>
-          <Chip tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Chip>
+          <Chip tone={STATUS_TONE[status]}>{statusLabel(t, status)}</Chip>
         </div>
         <p style={{ fontSize: 13, color: '#647080' }}>
           {incident.category} · Submitted {formatDate(incident.createdAt)}
@@ -224,7 +230,7 @@ function IncidentThread({ incident, passphrase }: { incident: IncidentStatusView
               textAlign: 'center',
             }}
           >
-            This case is closed. It no longer accepts new messages.
+            {t.status.closedNotice}
           </div>
         ) : (
           <form onSubmit={(e) => void handleReply(e)}>
@@ -272,6 +278,7 @@ function IncidentThread({ incident, passphrase }: { incident: IncidentStatusView
 }
 
 export default function ReportStatus() {
+  const t = useT()
   const [found, setFound] = useState<{ incident: IncidentStatusView; passphrase: string } | null>(null)
 
   return (
@@ -294,7 +301,7 @@ export default function ReportStatus() {
           <IconShield size={13} strokeWidth={2} />
           Haven't reported yet?{' '}
           <Link to="/report" style={{ color: '#0ea5e9', fontWeight: 700, textDecoration: 'none' }}>
-            Start a report
+            {t.status.startReport}
           </Link>
         </p>
       </Section>

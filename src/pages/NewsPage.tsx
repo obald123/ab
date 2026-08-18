@@ -3,7 +3,26 @@ import { IconNews, IconAlert, IconArrowRight, IconCalendar } from '../components
 import PageHero from '../components/page/PageHero'
 import SmartImage from '../components/page/SmartImage'
 import { Chip, Section, type Tone } from '../components/page/ui'
+import { useCollection } from '../lib/content'
 import { NOTICES, formatDate, type NoticeLevel } from '../data/site'
+import { useT } from '../lib/i18n'
+
+/* As stored in the CMS: `reference` is the printed notice code — `ref` was the
+   name the hardcoded array used. */
+interface PublicNotice {
+  id: string
+  reference: string
+  title: string
+  level: NoticeLevel
+  effective: string
+  body: string
+}
+
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_NOTICES: PublicNotice[] = NOTICES.map(({ ref, ...notice }) => ({
+  ...notice,
+  reference: ref,
+}))
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
 
@@ -89,27 +108,34 @@ function DateRail({ iso }: { iso: string }) {
 type Tab = 'press' | 'notices'
 
 export default function NewsPage() {
+  const t = useT()
   const [tab, setTab] = useState<Tab>('press')
-  const [openNotice, setOpenNotice] = useState<string | null>(NOTICES[0]?.id ?? null)
+  const { data: notices } = useCollection<PublicNotice>('notice', FALLBACK_NOTICES)
+  /* Null means "the reader has not chosen one", which resolves to the first
+     notice below. Derived rather than seeded into state, because the ids
+     change under it when the CMS answers and replaces the fallback — seeding
+     state from the first render would leave nothing open at that point. */
+  const [openNotice, setOpenNotice] = useState<string | null>(null)
+  const openNoticeId = openNotice ?? notices[0]?.id ?? null
   const [lead, ...rest] = PRESS
 
   return (
     <main>
       <PageHero
         Icon={IconNews}
-        eyebrow="Media"
-        title="News, press releases & public notices"
-        lead="Official announcements from AB Bank Rwanda Plc — product launches, network milestones, corporate results, and the regulatory notices that may affect your account."
+        eyebrow={t.heroes.mediaEyebrow}
+        title={t.heroes.mediaTitle}
+        lead={t.heroes.mediaLead}
       />
 
       <Section>
         {/* Tabs — press releases and notices are both "media", but one is
             promotional and one is contractual, so they are kept apart. */}
-        <div role="tablist" aria-label="Media type" style={{ display: 'flex', gap: 8, marginBottom: 34, flexWrap: 'wrap' }}>
+        <div role="tablist" aria-label={t.newsPage.mediaType} style={{ display: 'flex', gap: 8, marginBottom: 34, flexWrap: 'wrap' }}>
           {(
             [
-              ['press', 'Press releases', PRESS.length],
-              ['notices', 'Public notices', NOTICES.length],
+              ['press', t.heroes.pressReleases, PRESS.length],
+              ['notices', t.newsPage.publicNotices, notices.length],
             ] as const
           ).map(([id, label, count]) => {
             const on = tab === id
@@ -263,7 +289,7 @@ export default function NewsPage() {
                         color: '#bae6fd',
                       }}
                     >
-                      Read the full release
+                      {t.newsPage.readFullRelease}
                       <IconArrowRight size={14} strokeWidth={2.4} color="#bae6fd" />
                     </span>
                   </div>
@@ -281,9 +307,9 @@ export default function NewsPage() {
         ) : (
           /* ── Public notices: a formal register, not a feed ── */
           <div style={{ display: 'grid', gap: 14 }}>
-            {NOTICES.map((notice) => {
+            {notices.map((notice) => {
               const L = LEVEL[notice.level]
-              const open = openNotice === notice.id
+              const open = openNoticeId === notice.id
               return (
                 <article
                   key={notice.id}
@@ -314,7 +340,7 @@ export default function NewsPage() {
                           padding: '3px 9px',
                         }}
                       >
-                        {notice.ref}
+                        {notice.reference}
                       </span>
                       <Chip tone={L.tone}>{notice.level}</Chip>
                       {notice.level === 'Urgent' && (
@@ -333,7 +359,7 @@ export default function NewsPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        Effective {formatDate(notice.effective)}
+                        {t.newsPage.effective} {formatDate(notice.effective)}
                       </span>
                     </div>
 

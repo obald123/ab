@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useSingleton } from '../lib/content'
+import { useT } from '../lib/i18n'
 import { OPEN_EVENT } from './CookieConsent'
 import logo from '../imports/logo1-transparent.png'
 
@@ -87,11 +88,6 @@ const SOCIALS = [
   },
 ]
 
-const REGULATORS = [
-  { href: 'https://www.bnr.rw/', lines: ['National Bank of Rwanda (BNR)', 'Licence No. BNR/D&LIC/000020'] },
-  { href: 'https://www.fic.gov.rw/', lines: ['Rwanda Financial Intelligence Unit', '(RFICA Member)'] },
-]
-
 const linkStyle: React.CSSProperties = {
   display: 'block',
   fontSize: 13.5,
@@ -109,6 +105,7 @@ function dim(e: React.MouseEvent<HTMLElement>) {
 }
 
 export default function Footer() {
+  const t = useT()
   const { data: footer } = useSingleton<FooterDocument>('footer', FALLBACK_FOOTER)
 
   return (
@@ -127,7 +124,7 @@ export default function Footer() {
                 flattening the globe into a silhouette. */}
             <Link
               to="/"
-              aria-label="AB Bank Rwanda — home"
+              aria-label={t.nav.homeAria}
               style={{
                 display: 'inline-block',
                 marginBottom: 22,
@@ -148,7 +145,7 @@ export default function Footer() {
             <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 320, marginTop: 0 }}>
               {footer.subtext}
             </p>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 800, marginTop: 12 }}>Dial 5500</p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 800, marginTop: 12 }}>{t.footer.dial}</p>
 
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
               {SOCIALS.map((s) => (
@@ -217,35 +214,9 @@ export default function Footer() {
             </div>
           ))}
 
-          {/* Regulators */}
+          {/* Membership badge. The regulator links themselves now come from
+              the CMS `footer` document, alongside every other footer link. */}
           <div>
-            <h4
-              style={{
-                fontSize: 13,
-                fontWeight: 800,
-                color: '#ffffff',
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                marginBottom: 20,
-              }}
-            >
-              Regulated By
-            </h4>
-            {REGULATORS.map(({ href, lines }) => (
-              <a
-                key={href}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ ...linkStyle, lineHeight: 1.7, marginBottom: 16, padding: 0 }}
-                onMouseEnter={lighten}
-                onMouseLeave={dim}
-              >
-                {lines[0]}
-                <br />
-                {lines[1]}
-              </a>
-            ))}
             <div
               style={{
                 marginTop: 16,
@@ -265,7 +236,7 @@ export default function Footer() {
                   textTransform: 'uppercase',
                 }}
               >
-                Member
+                {t.footer.member}
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)' }}>
                 AccessGroup · SMART Campaign
@@ -331,7 +302,7 @@ export default function Footer() {
                 e.currentTarget.style.color = 'rgba(255,255,255,0.3)'
               }}
             >
-              Cookie Settings
+              {t.footer.cookieSettings}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { API_ROOT, exitPreview, previewToken } from '../lib/content'
+import { useT } from '../lib/i18n'
 
 /* The one thing that distinguishes a staging preview from the live site.
    Without it, an unpublished page is indistinguishable from a published one —
@@ -17,6 +18,7 @@ type State =
   | { status: 'expired' }
 
 export default function PreviewBanner() {
+  const t = useT()
   const [state, setState] = useState<State>({ status: 'checking' })
 
   useEffect(() => {
@@ -84,7 +86,7 @@ export default function PreviewBanner() {
           onClick={exitPreview}
           className="rounded-full border border-white/40 px-3 py-0.5 text-[11.5px] font-semibold transition-colors hover:bg-white/15"
         >
-          Exit preview
+          {t.preview.exit}
         </button>
       </div>
     </div>

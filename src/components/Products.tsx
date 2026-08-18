@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { useCollection } from '../lib/content'
 import { motion } from 'framer-motion'
 import { IconCoin, IconTrendUp, IconLeaf, IconBank, IconCreditCard, IconExchange, IconGlobe, IconShield, IconMobile, IconZap, IconPercent, IconUsers, IconMapPin, IconCalculator, IconPen } from './Icons'
+import { useT } from '../lib/i18n'
 
 /* ── Quick access bar ── */
 const quickLinks = [
@@ -97,6 +98,7 @@ const FALLBACK: Record<Cat, ProductCard[]> = {
 }
 
 function Card({ item }: { item: ProductCard }) {
+  const t = useT()
   const ref = useRef<HTMLDivElement>(null)
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -143,7 +145,7 @@ function Card({ item }: { item: ProductCard }) {
           borderRadius: 100, padding: '3px 12px', fontSize: 9.5,
           fontWeight: 800, color: '#ffffff', letterSpacing: '0.12em', marginBottom: 18,
         }}>
-          ★ POPULAR CHOICE
+          {`\u2605 ${t.products.popular}`}
         </div>
 
         <div style={{
@@ -187,7 +189,7 @@ function Card({ item }: { item: ProductCard }) {
             onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '12px' }}
             onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '7px' }}
           >
-            Learn more
+            {t.common.learnMore}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -283,6 +285,7 @@ interface CmsProduct {
 }
 
 export default function Products() {
+  const t = useT()
   const [active, setActive] = useState<Cat>('Loans')
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -405,26 +408,26 @@ export default function Products() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <div style={{ width: 32, height: 2, background: '#0ea5e9', borderRadius: 2 }} />
-              <span style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: '0.18em', color: '#0ea5e9', textTransform: 'uppercase' }}>What We Offer</span>
+              <span style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: '0.18em', color: '#0ea5e9', textTransform: 'uppercase' }}>{t.products.eyebrow}</span>
             </div>
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 700, fontSize: 'clamp(30px, 4.2vw, 52px)',
               color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.01em', marginBottom: 18,
             }}>
-              Tailored Financial Solutions<br />
-              <span className="text-gradient-product">for Every Rwandan</span>
+              {t.products.heading}<br />
+              <span className="text-gradient-product">{t.products.headingAccent}</span>
             </h2>
             <p style={{ fontSize: 16, color: '#647080', maxWidth: 480, lineHeight: 1.78 }}>
-              Accessible, transparent, and responsible — built for entrepreneurs and families across all provinces.
+              {t.products.lead}
             </p>
           </div>
           {/* Side stats panel */}
           <div className="products-side-stats" style={{ display: 'flex', flexDirection: 'column', gap: 0, background: '#ffffff', borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(14,165,233,0.09)', boxShadow: '0 4px 20px rgba(14,165,233,0.07)', minWidth: 200 }}>
             {[
-              { value: '47+', label: 'Branches', color: '#0ea5e9' },
-              { value: '15+', label: 'Products', color: '#0284c7' },
-              { value: '200K+', label: 'Customers', color: '#38bdf8' },
+              { value: '47+', label: t.home.statBranches, color: '#0ea5e9' },
+              { value: '15+', label: t.home.statProducts, color: '#0284c7' },
+              { value: '200K+', label: t.home.statCustomers, color: '#38bdf8' },
             ].map((s, i) => (
               <div key={i} style={{ padding: '18px 24px', borderBottom: i < 2 ? '1px solid rgba(14,165,233,0.07)' : 'none', display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ width: 3, height: 32, background: s.color, borderRadius: 2, flexShrink: 0 }} />
@@ -457,7 +460,7 @@ export default function Products() {
                 boxShadow: active === cat ? '0 6px 20px rgba(14,165,233,0.3)' : 'none',
               }}>
                 {(() => { const CatIcon = catIcons[cat]; return <CatIcon size={14} color={active === cat ? '#ffffff' : '#647080'} strokeWidth={2} /> })()}
-                {cat}
+                {t.productCategories[cat]}
               </button>
             ))}
           </div>
@@ -492,10 +495,10 @@ export default function Products() {
           <div className="products-cta" style={{ position: 'relative', padding: '44px 56px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
             <div>
               <p style={{ fontSize: 22, fontWeight: 900, color: '#ffffff', marginBottom: 8, letterSpacing: '-0.01em' }}>
-                Ready to get started?
+                {t.products.ctaTitle}
               </p>
               <p style={{ fontSize: 15, color: 'rgba(186,230,253,0.65)' }}>
-                Visit any of our 47+ branches or dial <strong style={{ color: '#bae6fd' }}>*540#</strong> to access eKash.
+                {t.products.ctaBody}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
@@ -516,7 +519,7 @@ export default function Products() {
                   el.style.boxShadow = '0 8px 28px rgba(0,0,0,0.2)'
                 }}
               >
-                Find a Branch
+                {t.products.findBranch}
               </a>
               <a href="#products" style={{
                 padding: '13px 30px', borderRadius: 11,
@@ -536,7 +539,7 @@ export default function Products() {
                   el.style.background = 'rgba(186,230,253,0.06)'
                 }}
               >
-                All Products →
+                {`${t.products.allProducts} \u2192`}
               </a>
             </div>
           </div>

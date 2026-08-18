@@ -107,6 +107,7 @@ export function FilterBar({
   options,
   active,
   onSelect,
+  labelFor,
 }: {
   query: string
   onQuery: (v: string) => void
@@ -114,6 +115,12 @@ export function FilterBar({
   options: readonly string[]
   active: string
   onSelect: (v: string) => void
+  /** Renders an option's visible text separately from its filter value — for
+   *  a status like `'Open'` that is compared against CMS data in English but
+   *  should read as translated text on the button. Defaults to the value
+   *  itself, which is already user-facing for topics and categories pulled
+   *  straight from published content. */
+  labelFor?: (value: string) => string
 }) {
   return (
     <div style={{ marginBottom: 34 }}>
@@ -158,7 +165,7 @@ export function FilterBar({
                 transition: 'background 0.18s, color 0.18s, border-color 0.18s',
               }}
             >
-              {o}
+              {labelFor ? labelFor(o) : o}
             </button>
           )
         })}

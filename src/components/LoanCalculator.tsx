@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useT } from '../lib/i18n'
 
 /* ══════════════════════════════════════════════
    LOAN CALCULATOR
@@ -232,6 +233,7 @@ interface Terms {
 const INITIAL: Terms = { amount: 5_000_000, months: 24, rate: 12 }
 
 export default function LoanCalculator() {
+  const t = useT()
   /* What is typed and what has been calculated are held apart, so the figures
      on the right keep describing the quote you actually asked for while you
      are still editing the fields on the left. */
@@ -327,7 +329,7 @@ export default function LoanCalculator() {
             transition: 'opacity 0.6s ease, transform 0.6s ease',
           }}
         >
-          <span className="section-pill">Loan Calculator</span>
+          <span className="section-pill">{t.calculator.eyebrow}</span>
           <h2
             style={{
               fontWeight: 900,
@@ -337,11 +339,10 @@ export default function LoanCalculator() {
               lineHeight: 1.1,
             }}
           >
-            Know the cost <span style={{ color: '#0ea5e9' }}>before you borrow</span>
+            {t.calculator.heading}
           </h2>
           <p style={{ fontSize: 15, color: '#647080', maxWidth: 540, margin: '14px auto 0', lineHeight: 1.65 }}>
-            Adjust the amount, term and rate — the repayment updates as you go. Estimates only; your
-            final offer depends on assessment.
+            {t.calculator.lead}
           </p>
         </div>
 
@@ -364,7 +365,7 @@ export default function LoanCalculator() {
             {/* Product presets */}
             <div style={{ marginBottom: 26 }}>
               <div style={{ fontSize: 12.5, fontWeight: 700, color: '#647080', marginBottom: 10 }}>
-                Start from a product
+                {t.calculator.startFrom}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {PRESETS.map((preset) => {
@@ -411,7 +412,7 @@ export default function LoanCalculator() {
             </div>
 
             <Control
-              label="Loan amount"
+              label={t.calculator.loanAmount}
               suffix="RWF"
               value={draft.amount}
               /* Floored at 0, not at a product minimum: a field that silently
@@ -429,7 +430,7 @@ export default function LoanCalculator() {
             <div style={{ marginBottom: 4 }}>
               <div
                 role="tablist"
-                aria-label="Tenure unit"
+                aria-label={t.calculator.tenureUnit}
                 style={{ display: 'inline-flex', gap: 4, background: '#f1f7fc', borderRadius: 10, padding: 4, marginBottom: 14 }}
               >
                 {(['months', 'years'] as const).map((option) => (
@@ -471,8 +472,8 @@ export default function LoanCalculator() {
             </div>
 
             <Control
-              label="Loan tenure"
-              suffix={unit === 'months' ? 'Months' : 'Years'}
+              label={t.calculator.tenure}
+              suffix={unit === 'months' ? t.calculator.months : t.calculator.years}
               value={tenureValue}
               min={1}
               max={tenureMax}
@@ -484,8 +485,8 @@ export default function LoanCalculator() {
             />
 
             <Control
-              label="Interest rate"
-              suffix="% per year"
+              label={t.calculator.interestRate}
+              suffix={t.calculator.perYear}
               value={draft.rate}
               min={1}
               max={30}
@@ -523,7 +524,7 @@ export default function LoanCalculator() {
                 e.currentTarget.style.boxShadow = '0 8px 24px rgba(2,132,199,0.28)'
               }}
             >
-              Calculate loan
+              {t.calculator.calculate}
             </button>
 
             {/* Says plainly that the figures shown are for the previous terms,
@@ -553,7 +554,7 @@ export default function LoanCalculator() {
             }}
           >
             <div style={{ fontSize: 12.5, fontWeight: 700, color: 'rgba(186,230,253,0.7)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              Your monthly repayment
+              {t.calculator.monthlyRepayment}
             </div>
 
             {/* Hero number — the one figure people came for. */}
@@ -573,18 +574,18 @@ export default function LoanCalculator() {
               </span>
             </div>
             <div style={{ fontSize: 12.5, color: 'rgba(186,230,253,0.5)', marginBottom: 22 }}>
-              every month for {months} month{months === 1 ? '' : 's'}
+              {t.calculator.everyMonthFor} {months} {months === 1 ? t.calculator.months.replace(/s$/, '') : t.calculator.months}
             </div>
 
-            <Figure label="Total amount to pay" value={`RWF ${rwf(result.total)}`} strong />
-            <Figure label="Total interest" value={`RWF ${rwf(result.interest)}`} />
+            <Figure label={t.calculator.totalToPay} value={`RWF ${rwf(result.total)}`} strong />
+            <Figure label={t.calculator.totalInterest} value={`RWF ${rwf(result.interest)}`} />
 
             {/* ── Cost breakdown ──
                 Two categories, so a single proportion bar is the right form:
                 it reads as "how much of what I hand over is the loan itself". */}
             <div style={{ marginTop: 22 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(186,230,253,0.72)', marginBottom: 9 }}>
-                What you repay
+                {t.calculator.whatYouRepay}
               </div>
 
               <div
@@ -614,8 +615,8 @@ export default function LoanCalculator() {
                   on colour alone. */}
               <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                 {[
-                  { key: 'Principal', color: PRINCIPAL, share: principalShare, value: amount },
-                  { key: 'Interest', color: INTEREST, share: interestShare, value: result.interest },
+                  { key: t.calculator.principal, color: PRINCIPAL, share: principalShare, value: amount },
+                  { key: t.calculator.interest, color: INTEREST, share: interestShare, value: result.interest },
                 ].map((series) => (
                   <div key={series.key} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                     <span
@@ -645,10 +646,10 @@ export default function LoanCalculator() {
                 }}
               >
                 <div style={{ fontSize: 12, color: 'rgba(186,230,253,0.7)', marginBottom: 3 }}>
-                  Against the {pct1(MARKET_RATE)}% national average
+                  {t.calculator.againstAverage.replace('16.0', pct1(MARKET_RATE))}
                 </div>
                 <div style={{ fontSize: 15.5, fontWeight: 900, color: '#bae6fd' }}>
-                  You keep RWF {rwf(result.saving)}
+                  {t.calculator.youKeep} RWF {rwf(result.saving)}
                 </div>
               </div>
             )}
@@ -673,7 +674,7 @@ export default function LoanCalculator() {
                 padding: 0,
               }}
             >
-              {showSchedule ? 'Hide' : 'Show'} repayment schedule
+              {showSchedule ? t.calculator.hideSchedule : t.calculator.showSchedule}
               <svg
                 width="13"
                 height="13"
@@ -704,12 +705,12 @@ export default function LoanCalculator() {
             }}
           >
             <div style={{ padding: '18px 24px 12px', fontSize: 13.5, fontWeight: 800, color: '#0284c7' }}>
-              Year-by-year breakdown
+              {t.calculator.scheduleTitle}
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <caption className="sr-only">
-                  Principal and interest paid each year, with the remaining balance.
+                  {t.calculator.scheduleLead}
                 </caption>
                 <thead>
                   <tr style={{ background: '#f6fbff' }}>

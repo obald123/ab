@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useT } from '../lib/i18n'
 
 function loadScript(src: string, id: string): Promise<void> {
   return new Promise((resolve) => {
@@ -11,13 +12,14 @@ function loadScript(src: string, id: string): Promise<void> {
 }
 
 function FBFallback() {
+  const t = useT()
   return (
     <div style={{ padding: 24, textAlign: 'center' }}>
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" strokeWidth={1.5} style={{ marginBottom: 12 }}>
         <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
       </svg>
       <p style={{ fontSize: 13, color: '#647080', lineHeight: 1.6 }}>
-        Follow us on Facebook for the latest updates, promotions and financial tips.
+        {t.social.facebookBody}
       </p>
       <a
         href="https://www.facebook.com/abbankrwanda"
@@ -31,13 +33,14 @@ function FBFallback() {
         onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = '#0284c7' }}
         onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = '#0ea5e9' }}
       >
-        Visit Our Facebook Page
+        {t.social.visitFacebook}
       </a>
     </div>
   )
 }
 
 export default function SocialFeed() {
+  const t = useT()
   const [visible, setVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -77,13 +80,13 @@ export default function SocialFeed() {
             color: '#0284c7', borderRadius: 100, padding: '5px 18px', fontSize: 11.5, fontWeight: 700,
             letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 18,
           }}>
-            Stay Connected
+            {t.social.eyebrow}
           </span>
           <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0284c7', letterSpacing: '-0.025em', lineHeight: 1.1 }}>
-            Follow Us on <span style={{ color: '#0ea5e9' }}>Social Media</span>
+            {t.social.heading} <span style={{ color: '#0ea5e9' }}>{t.social.headingAccent}</span>
           </h2>
           <p style={{ fontSize: 15, color: '#647080', maxWidth: 520, margin: '14px auto 0', lineHeight: 1.65 }}>
-            Stay up to date with our latest news, financial tips and community stories.
+            {t.social.lead}
           </p>
         </div>
 
@@ -157,10 +160,10 @@ export default function SocialFeed() {
                 </svg>
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0284c7', marginBottom: 8 }}>
-                Connect with us on LinkedIn
+                {t.social.linkedinTitle}
               </h3>
               <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.65, maxWidth: 280, marginBottom: 24 }}>
-                Follow our professional updates, career opportunities and industry insights for Rwanda's financial sector.
+                {t.social.linkedinBody}
               </p>
               <a
                 href="https://rw.linkedin.com/company/ab-bank-rwanda-limited"
@@ -180,7 +183,7 @@ export default function SocialFeed() {
                   <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
                   <circle cx="4" cy="4" r="2" />
                 </svg>
-                Follow on LinkedIn
+                {t.social.followLinkedin}
               </a>
               <span style={{ fontSize: 11, color: '#94a3b8', marginTop: 14 }}>1,300+ followers</span>
             </div>

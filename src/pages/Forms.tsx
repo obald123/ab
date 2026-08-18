@@ -4,6 +4,7 @@ import PageHero from '../components/page/PageHero'
 import { EmptyState, FilterBar, Section } from '../components/page/ui'
 import { useCollection } from '../lib/content'
 import { FORMS, formatDate, type FormDoc } from '../data/site'
+import { useT } from '../lib/i18n'
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
 
@@ -20,6 +21,7 @@ const TYPE_COLOR: Record<FormDoc['fileType'], string> = {
    is drawn as a sheet of paper with a folded corner and its file type
    printed on it — the thing you are about to receive is the thing you see. */
 function FormTile({ doc }: { doc: FormDoc }) {
+  const t = useT()
   const [hover, setHover] = useState(false)
   const color = TYPE_COLOR[doc.fileType]
 
@@ -133,7 +135,7 @@ function FormTile({ doc }: { doc: FormDoc }) {
         >
           <span>{doc.size}</span>
           <span aria-hidden="true">·</span>
-          <span>Updated {formatDate(doc.updated)}</span>
+          <span>{t.forms.updated} {formatDate(doc.updated)}</span>
           <span
             style={{
               marginLeft: 'auto',
@@ -150,7 +152,7 @@ function FormTile({ doc }: { doc: FormDoc }) {
             }}
           >
             <IconDownload size={14} strokeWidth={2.2} color="#0ea5e9" />
-            Download
+            {t.common.download}
           </span>
         </span>
       </span>
@@ -159,6 +161,7 @@ function FormTile({ doc }: { doc: FormDoc }) {
 }
 
 export default function Forms() {
+  const t = useT()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<string>('All')
   const { data: docs } = useCollection<FormDoc>('form', FALLBACK_FORMS)
@@ -193,14 +196,14 @@ export default function Forms() {
     <main>
       <PageHero
         Icon={IconFileText}
-        eyebrow="Forms & Downloads"
-        title="Bank forms, tariffs & statements"
-        lead="Every form you need to open an account, apply for a loan, enrol in insurance or update your records — plus our published tariff guide, terms and audited financial statements."
+        eyebrow={t.heroes.formsEyebrow}
+        title={t.heroes.formsTitle}
+        lead={t.heroes.formsLead}
         meta={
           <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
             {[
-              [`${docs.length}`, 'Documents'],
-              [`${categories.length - 1}`, 'Categories'],
+              [`${docs.length}`, t.forms.documents],
+              [`${categories.length - 1}`, t.forms.categories],
             ].map(([v, l]) => (
               <div key={l}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
@@ -229,10 +232,11 @@ export default function Forms() {
           <FilterBar
             query={query}
             onQuery={setQuery}
-            placeholder="Search forms and documents"
+            placeholder={t.forms.searchPlaceholder}
             options={categories}
             active={category}
             onSelect={setCategory}
+            labelFor={(v) => (v === 'All' ? t.common.all : v)}
           />
         </div>
 
@@ -286,12 +290,10 @@ export default function Forms() {
           </span>
           <div>
             <h3 style={{ fontSize: 15.5, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>
-              Prefer to collect a form in person?
+              {t.forms.collectInPerson}
             </h3>
             <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.75, margin: 0, maxWidth: 640 }}>
-              Every form on this page is also available at any of our 47+ branches and credit outlets across the five
-              provinces. Branch staff will help you complete it. Call <strong>5500</strong> if you are unsure which form
-              applies to you.
+              {t.heroes.formsCollect}
             </p>
           </div>
         </div>

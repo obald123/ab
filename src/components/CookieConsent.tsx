@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IconShield, IconZap, IconChart, IconCheck } from './Icons'
+import { useT } from '../lib/i18n'
+import type { Dictionary } from '../locales/en'
 
 /* ══════════════════════════════════════════════
    Cookie consent — GDPR-style popup.
@@ -24,29 +26,33 @@ type StoredConsent = CookiePrefs & { version: number; decidedAt: string }
 const ALL_ON: CookiePrefs = { necessary: true, functional: true, analytics: true }
 const ALL_OFF: CookiePrefs = { necessary: true, functional: false, analytics: false }
 
-const CATEGORIES = [
-  {
-    key: 'necessary' as const,
-    Icon: IconShield,
-    title: 'Strictly Necessary',
-    locked: true,
-    desc: 'Required for the site to function — security, session handling and remembering your cookie choice. These cannot be switched off.',
-  },
-  {
-    key: 'functional' as const,
-    Icon: IconZap,
-    title: 'Functional',
-    locked: false,
-    desc: 'Remember your preferences, such as accessibility settings and your branch or language selection, to enhance your browsing experience.',
-  },
-  {
-    key: 'analytics' as const,
-    Icon: IconChart,
-    title: 'Analytics',
-    locked: false,
-    desc: 'Help us understand how visitors use the site so we can improve it. All traffic data is aggregated and anonymous.',
-  },
-]
+/* Built from the dictionary rather than declared as a constant, so the three
+   categories change language with everything else. */
+function categoriesFor(t: Dictionary) {
+  return [
+    {
+      key: 'necessary' as const,
+      Icon: IconShield,
+      title: t.cookies.necessaryTitle,
+      locked: true,
+      desc: t.cookies.necessaryBody,
+    },
+    {
+      key: 'functional' as const,
+      Icon: IconZap,
+      title: t.cookies.preferencesTitle,
+      locked: false,
+      desc: t.cookies.preferencesBody,
+    },
+    {
+      key: 'analytics' as const,
+      Icon: IconChart,
+      title: t.cookies.analyticsTitle,
+      locked: false,
+      desc: t.cookies.analyticsBody,
+    },
+  ]
+}
 
 /* ── stored consent helpers ── */
 export function getStoredConsent(): CookiePrefs | null {
@@ -105,6 +111,8 @@ function Toggle({ on, disabled, onChange, label }: {
 }
 
 export default function CookieConsent() {
+  const t = useT()
+  const categories = categoriesFor(t)
   const [open, setOpen] = useState(false)
   const [customizing, setCustomizing] = useState(false)
   const [prefs, setPrefs] = useState<CookiePrefs>(ALL_OFF)
@@ -253,19 +261,19 @@ export default function CookieConsent() {
                   fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 700,
                   color: INK, margin: 0, letterSpacing: '-0.01em',
                 }}>
-                  We value your privacy
+                  {t.cookies.title}
                 </h2>
               </div>
 
               <p id="cookie-consent-body" style={{ fontSize: 14, color: MUTED, lineHeight: 1.68, margin: 0 }}>
                 We use cookies to enhance your browsing experience, and analyze our traffic.
-                By clicking <strong style={{ color: INK, fontWeight: 700 }}>"Accept All"</strong>, you consent to our use of cookies.{' '}
+                {t.cookies.intro}{' '}
                 <Link
                   to="/forms"
                   onClick={() => setOpen(false)}
                   style={{ color: BLUE_DARK, fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 3 }}
                 >
-                  Cookie Policy
+                  {t.cookies.policy}
                 </Link>
               </p>
             </div>
@@ -282,7 +290,7 @@ export default function CookieConsent() {
                   style={{ overflow: 'hidden' }}
                 >
                   <div style={{ padding: '20px 26px 4px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {CATEGORIES.map(({ key, Icon, title, locked, desc }) => {
+                    {categories.map(({ key, Icon, title, locked, desc }) => {
                       const on = key === 'necessary' ? true : prefs[key]
                       return (
                         <div key={key} style={{
@@ -308,7 +316,7 @@ export default function CookieConsent() {
                                   color: BLUE_DARK, background: 'rgba(14,165,233,0.12)',
                                   padding: '2px 7px', borderRadius: 999,
                                 }}>
-                                  Always on
+                                  {t.cookies.alwaysOn}
                                 </span>
                               )}
                             </div>
@@ -346,7 +354,7 @@ export default function CookieConsent() {
                   onMouseLeave={e => hover(e, false, 'primary')}
                 >
                   <IconCheck size={16} color="#fff" strokeWidth={2.5} />
-                  Save Preferences
+                  {t.cookies.savePreferences}
                 </button>
               ) : (
                 <button
@@ -356,7 +364,7 @@ export default function CookieConsent() {
                   onMouseEnter={e => hover(e, true, 'ghost')}
                   onMouseLeave={e => hover(e, false, 'ghost')}
                 >
-                  Customize
+                  {t.cookies.customize}
                 </button>
               )}
               <button
@@ -366,7 +374,7 @@ export default function CookieConsent() {
                 onMouseEnter={e => hover(e, true, 'outline')}
                 onMouseLeave={e => hover(e, false, 'outline')}
               >
-                Reject All
+                {t.cookies.rejectAll}
               </button>
               <button
                 type="button"
@@ -375,7 +383,7 @@ export default function CookieConsent() {
                 onMouseEnter={e => hover(e, true, 'primary')}
                 onMouseLeave={e => hover(e, false, 'primary')}
               >
-                Accept All
+                {t.cookies.acceptAll}
               </button>
             </div>
           </motion.div>

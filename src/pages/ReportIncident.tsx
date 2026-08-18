@@ -12,6 +12,7 @@ import {
 } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, Section } from '../components/page/ui'
+import { useT } from '../lib/i18n'
 import {
   submitIncident,
   uploadIncidentAttachment,
@@ -21,7 +22,7 @@ import {
 } from '../lib/incidents'
 
 /* ═══════════════════════════════════════════════════════════════
-   REPORT AN INCIDENT
+   {t.report.eyebrow}
 
    Deliberately not a single long form. The two things people bring
    here — "the app charged me twice" and "a colleague is taking
@@ -36,30 +37,42 @@ import {
    never silently vanish into a demo.
    ═══════════════════════════════════════════════════════════════ */
 
-const SERVICE_CATEGORIES = [
-  'Card / ATM',
-  'Mobile or Internet Banking',
-  'Branch service',
-  'Fees or charges',
-  'Loan or account issue',
-  'Something else',
-]
+/* The `value` is what gets submitted and what an admin reads in the triage
+   queue; only the `label` is translated. Without that split, a report filed
+   through the Kinyarwanda interface would arrive categorised in Kinyarwanda
+   and would not group with the same category filed in English. */
+type Dict = ReturnType<typeof useT>
 
-const MISCONDUCT_CATEGORIES = [
-  'Bribery or corruption',
-  'Fraud',
-  'Harassment or discrimination',
-  'Conflict of interest',
-  'Policy or procedure violation',
-  'Something else',
-]
+function serviceCategories(t: Dict): { value: string; label: string }[] {
+  return [
+    { value: 'Card / ATM', label: t.report.catCard },
+    { value: 'Mobile or Internet Banking', label: t.report.catDigital },
+    { value: 'Branch service', label: t.report.catBranch },
+    { value: 'Fees or charges', label: t.report.catFees },
+    { value: 'Loan or account issue', label: t.report.catLoan },
+    { value: 'Something else', label: t.report.catOther },
+  ]
+}
 
-const SEVERITIES: { value: Severity; label: string; hint: string }[] = [
-  { value: 'low', label: 'Low', hint: 'No urgency — a suggestion or minor issue' },
-  { value: 'medium', label: 'Medium', hint: 'Affects you, no immediate risk' },
-  { value: 'high', label: 'High', hint: 'Ongoing harm or financial loss' },
-  { value: 'critical', label: 'Critical', hint: 'Active danger or money being lost right now' },
-]
+function misconductCategories(t: Dict): { value: string; label: string }[] {
+  return [
+    { value: 'Bribery or corruption', label: t.report.catBribery },
+    { value: 'Fraud', label: t.report.catFraud },
+    { value: 'Harassment or discrimination', label: t.report.catHarassment },
+    { value: 'Conflict of interest', label: t.report.catConflict },
+    { value: 'Policy or procedure violation', label: t.report.catPolicy },
+    { value: 'Something else', label: t.report.catOther },
+  ]
+}
+
+function severities(t: Dict): { value: Severity; label: string; hint: string }[] {
+  return [
+    { value: 'low', label: t.report.severityLow, hint: t.report.severityLowHint },
+    { value: 'medium', label: t.report.severityMedium, hint: t.report.severityMediumHint },
+    { value: 'high', label: t.report.severityHigh, hint: t.report.severityHighHint },
+    { value: 'critical', label: t.report.severityCritical, hint: t.report.severityCriticalHint },
+  ]
+}
 
 const MIN_DESCRIPTION = 30
 const MIN_PASSPHRASE = 4
@@ -130,6 +143,7 @@ function FieldError({ message }: { message?: string }) {
 
 /* ── Step 0: track chooser ── */
 function TrackChoice({ onChoose }: { onChoose: (track: IncidentTrack) => void }) {
+  const t = useT()
   return (
     <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
       <button
@@ -160,7 +174,7 @@ function TrackChoice({ onChoose }: { onChoose: (track: IncidentTrack) => void })
           <IconAlert size={22} color="#0284c7" strokeWidth={2} />
         </span>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
-          A problem with a service
+          {t.report.trackService}
         </h3>
         <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.6, marginBottom: 16 }}>
           A failed transaction, a card, the app, or something at a branch. We will need your
@@ -199,7 +213,7 @@ function TrackChoice({ onChoose }: { onChoose: (track: IncidentTrack) => void })
           <IconGavel size={22} color="#b45309" strokeWidth={2} />
         </span>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
-          Misconduct or wrongdoing
+          {t.report.trackMisconduct}
         </h3>
         <p style={{ fontSize: 13.5, color: '#647080', lineHeight: 1.6, marginBottom: 16 }}>
           Fraud, bribery, harassment, or a conflict of interest involving anyone at the bank. You
@@ -214,6 +228,7 @@ function TrackChoice({ onChoose }: { onChoose: (track: IncidentTrack) => void })
 }
 
 export default function ReportIncident() {
+  const t = useT()
   const [step, setStep] = useState<Step>('track')
   const [form, setForm] = useState<FormState>(BLANK)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -241,11 +256,11 @@ export default function ReportIncident() {
     setErrors((e) => ({ ...e, [key]: '' }))
   }
 
-  const categories = form.track === 'misconduct' ? MISCONDUCT_CATEGORIES : SERVICE_CATEGORIES
+  const categories = form.track === 'misconduct' ? misconductCategories(t) : serviceCategories(t)
 
   function validateDetails(): boolean {
     const next: Record<string, string> = {}
-    if (!form.category) next.category = 'Choose a category.'
+    if (!form.category) next.category = t.report.errCategory
     if (form.description.trim().length < MIN_DESCRIPTION) {
       next.description = `Tell us a bit more — at least ${String(MIN_DESCRIPTION)} characters.`
     }
@@ -255,15 +270,15 @@ export default function ReportIncident() {
 
   function validateIdentity(): boolean {
     const next: Record<string, string> = {}
-    if (form.anonymous === null) next.anonymous = 'Choose whether to include your details.'
+    if (form.anonymous === null) next.anonymous = t.report.errIdentity
     if (form.anonymous === false && !form.email.trim() && !form.phone.trim()) {
-      next.contact = 'Add an email or phone number so we can reach you.'
+      next.contact = t.report.errContact
     }
     if (form.passphrase.length < MIN_PASSPHRASE) {
       next.passphrase = `Use at least ${String(MIN_PASSPHRASE)} characters.`
     }
     if (form.passphrase !== form.passphraseConfirm) {
-      next.passphraseConfirm = 'The two passphrases do not match.'
+      next.passphraseConfirm = t.report.errPassphraseMatch
     }
     setErrors(next)
     return Object.keys(next).length === 0
@@ -452,8 +467,8 @@ export default function ReportIncident() {
             >
               <option value="">Choose one…</option>
               {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+                <option key={c.value} value={c.value}>
+                  {c.label}
                 </option>
               ))}
             </select>
@@ -470,7 +485,7 @@ export default function ReportIncident() {
               aria-labelledby="severity-label"
               style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8, marginBottom: 22 }}
             >
-              {SEVERITIES.map((s) => {
+              {severities(t).map((s) => {
                 const active = form.severity === s.value
                 return (
                   <button
@@ -526,7 +541,7 @@ export default function ReportIncident() {
                   type="text"
                   value={form.department}
                   onChange={(e) => set('department', e.target.value)}
-                  placeholder="If you know it"
+                  placeholder={t.report.ifYouKnowIt}
                   style={inputStyle}
                 />
               </div>
@@ -538,7 +553,7 @@ export default function ReportIncident() {
               value={form.description}
               onChange={(e) => set('description', e.target.value)}
               rows={6}
-              placeholder="Describe what happened, as much detail as you can share."
+              placeholder={t.report.describePlaceholder}
               style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.6 }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
@@ -633,7 +648,7 @@ export default function ReportIncident() {
                   if (validateDetails()) setStep('identity')
                 }}
               >
-                Continue
+                {t.report.continue}
               </NavButton>
             </div>
           </Card>
@@ -660,10 +675,10 @@ export default function ReportIncident() {
                 }}
               >
                 <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a', marginBottom: 3 }}>
-                  Share my details
+                  {t.report.shareDetails}
                 </div>
                 <div style={{ fontSize: 12, color: '#647080', lineHeight: 1.5 }}>
-                  We can update you directly and reach you if we need more information.
+                  {t.report.shareDetailsHint}
                 </div>
               </button>
               <button
@@ -682,7 +697,7 @@ export default function ReportIncident() {
                   <IconShield size={14} color={accent} strokeWidth={2.2} /> Stay anonymous
                 </div>
                 <div style={{ fontSize: 12, color: '#647080', lineHeight: 1.5 }}>
-                  We never see who you are. You can still get updates using your reference below.
+                  {t.report.anonymousHint}
                 </div>
               </button>
             </div>
@@ -749,7 +764,7 @@ export default function ReportIncident() {
             <label htmlFor="incident-passphrase" style={labelStyle}>Choose a passphrase</label>
             <p style={{ fontSize: 12.5, color: '#647080', marginBottom: 10, lineHeight: 1.6 }}>
               This — together with your reference number — is how you check on this report later.
-              We cannot recover it if you lose it, so save it somewhere safe.
+              {t.report.passphraseWarning}
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
@@ -765,13 +780,13 @@ export default function ReportIncident() {
                 <FieldError message={errors.passphrase} />
               </div>
               <div>
-                <label htmlFor="incident-passphrase-confirm" className="sr-only">Confirm passphrase</label>
+                <label htmlFor="incident-passphrase-confirm" className="sr-only">{t.report.confirmPassphrase}</label>
                 <input
                   id="incident-passphrase-confirm"
                   type="password"
                   value={form.passphraseConfirm}
                   onChange={(e) => set('passphraseConfirm', e.target.value)}
-                  placeholder="Confirm passphrase"
+                  placeholder={t.report.confirmPassphrase}
                   style={inputStyle}
                   autoComplete="new-password"
                 />
@@ -799,19 +814,22 @@ export default function ReportIncident() {
         {step === 'review' && form.track && (
           <Card style={{ padding: '32px 30px', maxWidth: 640, margin: '0 auto' }}>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 18 }}>
-              Review before sending
+              {t.report.reviewHeading}
             </h3>
 
-            <ReviewRow label="Type" value={form.track === 'misconduct' ? 'Misconduct report' : 'Service issue'} />
-            <ReviewRow label="Category" value={form.category} />
-            <ReviewRow label="Severity" value={SEVERITIES.find((s) => s.value === form.severity)?.label ?? ''} />
-            {form.occurredAt && <ReviewRow label="When" value={form.occurredAt} />}
-            {form.location && <ReviewRow label="Where" value={form.location} />}
+            <ReviewRow label={t.report.fieldType} value={form.track === 'misconduct' ? 'Misconduct report' : 'Service issue'} />
+            <ReviewRow label={t.report.fieldCategory} value={form.category} />
             <ReviewRow
-              label="Identity"
+              label={t.report.fieldSeverity}
+              value={severities(t).find((s) => s.value === form.severity)?.label ?? ''}
+            />
+            {form.occurredAt && <ReviewRow label={t.report.fieldWhen} value={form.occurredAt} />}
+            {form.location && <ReviewRow label={t.report.fieldWhere} value={form.location} />}
+            <ReviewRow
+              label={t.report.fieldIdentity}
               value={form.anonymous ? 'Anonymous — no details shared' : form.email || form.phone || 'Details shared'}
             />
-            <ReviewRow label="Attachments" value={attachmentNames.length ? attachmentNames.join(', ') : 'None'} />
+            <ReviewRow label={t.report.fieldAttachments} value={attachmentNames.length ? attachmentNames.join(', ') : 'None'} />
 
             <div style={{ marginTop: 16, padding: '12px 14px', borderRadius: 10, background: '#f8fbfe' }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
@@ -826,7 +844,7 @@ export default function ReportIncident() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 30 }}>
               <NavButton onClick={() => setStep('identity')} disabled={submitting}>
-                Back
+                {t.report.back}
               </NavButton>
               <NavButton primary accent={accent} onClick={() => void handleSubmit()} disabled={submitting}>
                 <IconSend size={14} strokeWidth={2.2} />
@@ -905,6 +923,7 @@ function NavButton({
 }
 
 function SuccessScreen({ reference }: { reference: string }) {
+  const t = useT()
   const [copied, setCopied] = useState(false)
 
   function copyReference() {
@@ -932,7 +951,7 @@ function SuccessScreen({ reference }: { reference: string }) {
           <IconCheckCircle size={30} color="#15803d" strokeWidth={2} />
         </div>
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 10 }}>
-          Report received
+          {t.report.received}
         </h1>
         <p style={{ fontSize: 14.5, color: '#647080', lineHeight: 1.7, marginBottom: 28 }}>
           Thank you. Save your reference number below — together with the passphrase you chose,
@@ -941,7 +960,7 @@ function SuccessScreen({ reference }: { reference: string }) {
 
         <Card style={{ padding: '24px 26px', textAlign: 'left' }}>
           <div style={{ fontSize: 11, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-            Your reference number
+            {t.report.yourReference}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
             <span
@@ -1006,7 +1025,7 @@ function SuccessScreen({ reference }: { reference: string }) {
             }}
           >
             <IconClock size={15} strokeWidth={2.2} />
-            Check status later
+            {t.report.checkStatus}
           </Link>
           <Link
             to="/"
@@ -1022,7 +1041,7 @@ function SuccessScreen({ reference }: { reference: string }) {
               textDecoration: 'none',
             }}
           >
-            Back to home
+            {t.report.backHome}
           </Link>
         </div>
       </div>

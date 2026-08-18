@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus } from 'lucide-react'
 import { IconSend } from './Icons'
 import { useSingleton } from '../lib/content'
+import { useT } from '../lib/i18n'
 
 interface ContactDocument {
   info: {
@@ -45,6 +46,7 @@ const FALLBACK: ContactDocument = {
 }
 
 export default function Contact() {
+  const t = useT()
   const { data: contact } = useSingleton<ContactDocument>('contact', FALLBACK)
   const { smartValues, branches } = contact
   const containerRef = useRef<HTMLDivElement>(null)
@@ -213,17 +215,17 @@ export default function Contact() {
               padding: '5px 18px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.75)',
               letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 16,
             }}>
-              Our Commitment
+              {t.contact.commitment}
             </div>
             <h2 style={{
               fontFamily: 'var(--font-serif)',
               fontWeight: 700, fontSize: 'clamp(24px, 3.5vw, 40px)',
               color: '#ffffff', lineHeight: 1.1, letterSpacing: '-0.01em',
             }}>
-              The SMART Campaign
+              {t.contact.smartCampaign}
             </h2>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.68)', marginTop: 12, maxWidth: 460, margin: '12px auto 0' }}>
-              AB Rwanda is a proud signatory of the SMART Campaign — our pledge to put client protection at the heart of every product and service.
+              {t.smart.pledge}
             </p>
           </div>
 
@@ -275,12 +277,12 @@ export default function Contact() {
       <div style={{ background: '#ffffff', padding: '80px 48px' }}>
         <div style={{ margin: '0 auto' }}>
           <div data-reveal style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span className="section-pill section-pill--icon"><IconSend size={14} strokeWidth={2} color="#0ea5e9" />Get in Touch</span>
+            <span className="section-pill section-pill--icon"><IconSend size={14} strokeWidth={2} color="#0ea5e9" />{t.contact.eyebrow}</span>
             <h2 style={{
               fontWeight: 800, fontSize: 'clamp(24px, 3.5vw, 40px)',
               color: '#0284c7', lineHeight: 1.1, letterSpacing: '-0.02em',
             }}>
-              We Are Here for You
+              {t.contact.heading}
             </h2>
           </div>
 
@@ -314,7 +316,7 @@ export default function Contact() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>Our Location</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>{t.contact.location}</h3>
               <p style={{ fontSize: 14, color: '#647080', lineHeight: 1.7 }}>
                 Nyarugenge Avenue<br />
                 KN 78 St<br />
@@ -350,7 +352,7 @@ export default function Contact() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>Call or Write</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>{t.contact.callOrWrite}</h3>
               <p style={{ fontSize: 15, color: '#0ea5e9', fontWeight: 800, marginBottom: 6 }}>
                 5500
               </p>
@@ -390,7 +392,7 @@ export default function Contact() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#ffffff', marginBottom: 12 }}>Bank Digitally</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#ffffff', marginBottom: 12 }}>{t.contact.bankDigitally}</h3>
               <p style={{ fontSize: 26, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: 6 }}>
                 *540#
               </p>
@@ -418,23 +420,23 @@ export default function Contact() {
 
           {/* Contact form */}
           <div data-reveal style={{ marginTop: 40, display: 'flex', gap: 24, alignItems: 'flex-start' }}>
-            <form onSubmit={handleSubmit} style={{ flex: 1, background: '#ffffff', border: '1px solid rgba(14,165,233,0.06)', borderRadius: 12, padding: 22 }} aria-label="Contact form">
+            <form onSubmit={handleSubmit} style={{ flex: 1, background: '#ffffff', border: '1px solid rgba(14,165,233,0.06)', borderRadius: 12, padding: 22 }} aria-label={t.contact.formLabel}>
               <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
                 <label style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>Name</div>
+                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>{t.contact.name}</div>
                   <input name="name" value={formState.name} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
                 </label>
                 <label style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>Email</div>
+                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>{t.contact.email}</div>
                   <input name="email" type="email" value={formState.email} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
                 </label>
               </div>
               <label style={{ display: 'block', marginBottom: 12 }}>
-                <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>Message</div>
+                <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>{t.contact.message}</div>
                 <textarea name="message" value={formState.message} onChange={handleChange} rows={5} required style={{ width: '100%', padding: '12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
               </label>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <button type="submit" style={{ background: '#0ea5e9', color: '#fff', padding: '10px 18px', borderRadius: 10, border: 'none', fontWeight: 800 }}>Send Message</button>
+                <button type="submit" style={{ background: '#0ea5e9', color: '#fff', padding: '10px 18px', borderRadius: 10, border: 'none', fontWeight: 800 }}>{t.contact.send}</button>
                 {submitted && <div role="status" aria-live="polite" style={{ color: '#2b7a3a', fontWeight: 700 }}>Message sent — thank you.</div>}
               </div>
             </form>
@@ -445,7 +447,7 @@ export default function Contact() {
 
           {/* Branch list */}
           <div data-reveal style={{ marginTop: 48 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0284c7', marginBottom: 20 }}>Key Branches</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0284c7', marginBottom: 20 }}>{t.contact.keyBranches}</h3>
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               {branches.map(b => (
                 <div key={b.name} style={{
@@ -470,13 +472,13 @@ export default function Contact() {
 
       {/* Floating accessibility FAB + panel */}
       <div className="a11y-fab" aria-hidden={false}>
-        <button aria-label="Toggle accessibility menu" onClick={() => setA11yOpen(s => !s)} className="a11y-fab-button">
+        <button aria-label={t.a11y.toggleMenu} onClick={() => setA11yOpen(s => !s)} className="a11y-fab-button">
           <PersonStanding size={26} />
         </button>
         {a11yOpen && (
           <>
             <div className="a11y-backdrop" onClick={() => setA11yOpen(false)} />
-            <div role="dialog" aria-modal="true" aria-label="Accessibility menu" className="a11y-panel" onClick={(e) => e.stopPropagation()}>
+            <div role="dialog" aria-modal="true" aria-label={t.a11y.menu} className="a11y-panel" onClick={(e) => e.stopPropagation()}>
               <div className="a11y-panel-header">
                 <div className="a11y-panel-header-title">
                   <div className="a11y-panel-header-icon"><PersonStanding size={16} /></div>

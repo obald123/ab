@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { useSingleton } from '../lib/content'
 import { IconMobile, IconTrendUp, IconHeart } from './Icons'
+import { useT } from '../lib/i18n'
 
 const B = '#0ea5e9'
 const GL = '#9fa8b8'
@@ -142,6 +143,7 @@ function useCampaign(): CampaignDocument {
 
 /* ── Campaign countdown banner ── */
 function CampaignBanner() {
+  const t = useT()
   const { banner } = useCampaign()
   const launch = useMemo(() => {
     const parsed = new Date(banner.launchDate)
@@ -157,31 +159,31 @@ function CampaignBanner() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(186,230,253,0.18)', border: '1px solid rgba(186,230,253,0.45)', borderRadius: 100, padding: '5px 18px', marginBottom: 22 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#bae6fd', display: 'block', animation: 'blink 1.4s ease-in-out infinite' }} />
-            <span style={{ fontSize: 10.5, fontWeight: 900, color: '#bae6fd', letterSpacing: '0.14em' }}>GRAND CAMPAIGN · LAUNCH 15 AUGUST 2026</span>
+            <span style={{ fontSize: 10.5, fontWeight: 900, color: '#bae6fd', letterSpacing: '0.14em' }}>{t.campaign2.bannerLabel}</span>
           </div>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(26px,3.5vw,44px)', fontWeight: 700, color: '#ffffff', lineHeight: 1.1, marginBottom: 16 }}>
-            Empowering Rwanda,<br /><span style={{ color: '#bae6fd' }}>One Account at a Time</span>
+            {t.campaign2.bannerHeading}<br /><span style={{ color: '#bae6fd' }}>{t.campaign2.bannerAccent}</span>
           </h2>
           <p style={{ fontSize: 15.5, color: 'rgba(255,255,255,0.62)', lineHeight: 1.75, maxWidth: 480, marginBottom: 32 }}>
-            Open any new account before August 15 and get 3 months of zero fees, a free debit card, and exclusive campaign rewards.
+            {t.campaign2.bannerLead}
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#bae6fd', color: '#0284c7', padding: '13px 28px', borderRadius: 10, fontWeight: 900, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(186,230,253,0.35)', transition: 'transform 0.2s,box-shadow 0.2s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-2px)'; el.style.boxShadow='0 14px 36px rgba(186,230,253,0.5)' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow='0 8px 24px rgba(186,230,253,0.35)' }}>
-              Claim Your Offer
+              {t.campaign.claimOffer}
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 7.5h9M8.5 4l4 3.5-4 3.5" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
             <a href="#about" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.32)', color: 'rgba(255,255,255,0.95)', padding: '13px 28px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none', background: 'rgba(255,255,255,0.08)', transition: 'border-color 0.2s,color 0.2s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor='rgba(255,255,255,0.65)'; el.style.color='#ffffff' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor='rgba(255,255,255,0.32)'; el.style.color='rgba(255,255,255,0.95)' }}>
-              Learn More
+              {t.campaign.learnMore}
             </a>
           </div>
         </div>
         {/* Countdown */}
         <div className="campaign-countdown" style={{ textAlign: 'center', minWidth: 230 }}>
-          <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', marginBottom: 14 }}>Offer ends in</p>
+          <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', marginBottom: 14 }}>{t.campaign.offerEndsIn}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
             {([['d', cd.d], ['h', cd.h], ['m', cd.m], ['s', cd.s]] as [string, number][]).map(([lbl, val]) => (
               <div key={lbl} style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 12, padding: '14px 6px', backdropFilter: 'blur(8px)' }}>
@@ -190,7 +192,7 @@ function CampaignBanner() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 12 }}>Until campaign closes</p>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 12 }}>{t.campaign.untilClose}</p>
         </div>
       </div>
     </div>
@@ -199,6 +201,7 @@ function CampaignBanner() {
 
 /* ── Product card ── */
 function ProductCard({ p, index }: { p: CampaignProduct; index: number }) {
+  const t = useT()
   const Icon = p.Icon ?? IconMobile
   const tilt = use3DTilt(8)
   const [visible, setVisible] = useState(false)
@@ -244,7 +247,7 @@ function ProductCard({ p, index }: { p: CampaignProduct; index: number }) {
           <a href="#contact" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24, padding: '13px 0', borderRadius: 10, background: p.accent, color: '#fff', fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: `0 6px 20px ${p.accent}40`, transition: 'transform 0.2s,box-shadow 0.2s' }}
             onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-2px)'; el.style.boxShadow=`0 10px 28px ${p.accent}55` }}
             onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow=`0 6px 20px ${p.accent}40` }}>
-            Apply Now
+            {t.campaign.applyNow}
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </a>
         </div>
@@ -255,6 +258,7 @@ function ProductCard({ p, index }: { p: CampaignProduct; index: number }) {
 
 /* ── Stats strip ── */
 function StatsStrip() {
+  const t = useT()
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
   useEffect(() => {
@@ -262,10 +266,10 @@ function StatsStrip() {
     if (ref.current) obs.observe(ref.current); return () => obs.disconnect()
   }, [])
   const statsData = [
-    { value: 94, suffix: '%', label: 'Customer satisfaction' },
-    { value: 48, suffix: 'h', label: 'Loan approval time' },
-    { value: 12, suffix: '+', label: 'African corridors' },
-    { value: 200, suffix: 'K+', label: 'Customers served' },
+    { value: 94, suffix: '%', label: t.campaignStats.satisfaction },
+    { value: 48, suffix: 'h', label: t.campaignStats.approvalTime },
+    { value: 12, suffix: '+', label: t.campaignStats.corridors },
+    { value: 200, suffix: 'K+', label: t.campaignStats.customersServed },
   ]
   return (
     <div ref={ref} className="campaign-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, background: 'rgba(14,165,233,0.08)', borderRadius: 20, overflow: 'hidden', marginTop: 56 }}>
@@ -275,6 +279,7 @@ function StatsStrip() {
 }
 
 export default function Campaign() {
+  const t = useT()
   const { products } = useCampaign()
 
   return (
@@ -284,14 +289,14 @@ export default function Campaign() {
         {/* Section header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
           <div style={{ width: 36, height: 2, background: '#0ea5e9', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: '#0ea5e9', textTransform: 'uppercase' }}>New Products &amp; Campaigns</span>
+          <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: '#0ea5e9', textTransform: 'uppercase' }}>{t.campaign2.eyebrow}</span>
         </div>
         <div className="campaign-header" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'end', marginBottom: 48 }}>
           <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, color: '#0c4a6e', lineHeight: 1.1 }}>
-            Built for Rwanda's<br /><span style={{ color: '#0ea5e9' }}>Next Chapter</span>
+            {t.campaign2.heading}<br /><span style={{ color: '#0ea5e9' }}>{t.campaign2.headingAccent}</span>
           </h2>
           <p style={{ fontSize: 16, color: '#647080', lineHeight: 1.75, maxWidth: 400, marginLeft: 'auto' }}>
-            We're launching three powerful new products this August designed to serve more Rwandans — whether you're saving, growing a business, or sending money home.
+            {t.campaign2.lead}
           </p>
         </div>
 
@@ -309,19 +314,19 @@ export default function Campaign() {
         {/* Bottom CTA */}
         <div className="campaign-bottom-cta" style={{ marginTop: 56, padding: '52px', background: 'linear-gradient(135deg,#0c4a6e,#0ea5e9)', borderRadius: 24, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 15% 50%,rgba(186,230,253,0.12) 0%,transparent 50%),radial-gradient(circle at 85% 50%,rgba(2,132,199,0.2) 0%,transparent 50%)', pointerEvents: 'none' }} />
-          <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.42)', textTransform: 'uppercase', marginBottom: 16, position: 'relative' }}>Limited time offer</p>
-          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(22px,3vw,36px)', fontWeight: 900, color: '#ffffff', marginBottom: 12, position: 'relative' }}>Ready to get started?</h3>
+          <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.42)', textTransform: 'uppercase', marginBottom: 16, position: 'relative' }}>{t.campaign.limitedOffer}</p>
+          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(22px,3vw,36px)', fontWeight: 900, color: '#ffffff', marginBottom: 12, position: 'relative' }}>{t.campaign.ctaTitle}</h3>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.58)', marginBottom: 32, position: 'relative' }}>Visit any branch or dial *540# to open your account today.</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', position: 'relative', flexWrap: 'wrap' }}>
             <a href="#branches" style={{ background: '#ffffff', color: '#0ea5e9', padding: '14px 34px', borderRadius: 10, fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', transition: 'transform 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform='translateY(-2px)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform='' }}>
-              Find a Branch
+              {t.campaign.findBranch}
             </a>
             <a href="tel:*540" style={{ border: '1.5px solid rgba(255,255,255,0.35)', color: '#ffffff', padding: '14px 34px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none', background: 'rgba(255,255,255,0.08)', transition: 'border-color 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.7)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.35)' }}>
-              Dial *540#
+              {t.campaign.dial}
             </a>
           </div>
         </div>
