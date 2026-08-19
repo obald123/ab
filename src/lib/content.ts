@@ -43,6 +43,17 @@ const PREVIEW_STORAGE_KEY = 'abr.preview.token'
 /** 32 random bytes, base64url — the shape the API issues. */
 const PREVIEW_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
 
+/* Whole-site preview session — opened with `?preview-session=<token>` from
+   the CMS's Preview Site screen, rather than `?preview=<token>` for one
+   approved change. Kept as an entirely separate credential from the one
+   above rather than unifying them: the two are different in kind (a person's
+   everything-they-have-staged vs. one specific pending request), the backend
+   already treats them as separate Redis key spaces, and mixing them into one
+   stored value would mean a stale single-approval link silently winning over
+   a live session, or vice versa, depending on which happened to be read
+   first — worth avoiding for the sake of sharing a few lines. */
+const PREVIEW_SESSION_STORAGE_KEY = 'abr.preview.session'
+
 /* Storage access throws rather than returning null when the browser has
    blocked it — private modes, embedded webviews, "block third-party cookies".
    This runs at module scope, so an uncaught throw here would take down the
@@ -56,25 +67,27 @@ function safeSessionStorage(): Storage | null {
   }
 }
 
-function readPreviewToken(): string | null {
+/** Shared by both preview credentials — same token shape, same
+ *  URL-then-sessionStorage precedence, same address-bar scrubbing. */
+function readPreviewToken(queryParam: string, storageKey: string): string | null {
   if (typeof window === 'undefined') return null
 
   try {
     const store = safeSessionStorage()
 
-    const fromUrl = new URLSearchParams(window.location.search).get('preview')
+    const fromUrl = new URLSearchParams(window.location.search).get(queryParam)
     if (fromUrl && PREVIEW_TOKEN_PATTERN.test(fromUrl)) {
-      store?.setItem(PREVIEW_STORAGE_KEY, fromUrl)
+      store?.setItem(storageKey, fromUrl)
 
       // Strip it from the address bar so the credential is not shared by a
       // copied link, a bookmark, or an outbound Referer.
       const cleaned = new URL(window.location.href)
-      cleaned.searchParams.delete('preview')
+      cleaned.searchParams.delete(queryParam)
       window.history.replaceState(null, '', cleaned.toString())
       return fromUrl
     }
 
-    const stored = store?.getItem(PREVIEW_STORAGE_KEY)
+    const stored = store?.getItem(storageKey)
     return stored && PREVIEW_TOKEN_PATTERN.test(stored) ? stored : null
   } catch {
     // Not previewing is always a safe answer: the site shows live content.
@@ -82,11 +95,21 @@ function readPreviewToken(): string | null {
   }
 }
 
-/** Non-null only while this tab is previewing an unpublished change. */
-export const previewToken: string | null = readPreviewToken()
+/** Non-null only while this tab is previewing one approved-but-unpublished
+ *  change (opened from the Approvals queue). */
+export const previewToken: string | null = readPreviewToken('preview', PREVIEW_STORAGE_KEY)
+
+/** Non-null only while this tab is under a whole-site preview session
+ *  (opened from the CMS's Preview Site screen) — see the note above
+ *  PREVIEW_SESSION_STORAGE_KEY for why this is a separate credential rather
+ *  than a variant of `previewToken`. */
+export const previewSessionToken: string | null = readPreviewToken(
+  'preview-session',
+  PREVIEW_SESSION_STORAGE_KEY,
+)
 
 export function isPreviewing(): boolean {
-  return previewToken !== null
+  return previewToken !== null || previewSessionToken !== null
 }
 
 /** Leaves preview mode for this tab and reloads onto live content. */
@@ -94,6 +117,7 @@ export function exitPreview(): void {
   if (typeof window === 'undefined') return
   try {
     safeSessionStorage()?.removeItem(PREVIEW_STORAGE_KEY)
+    safeSessionStorage()?.removeItem(PREVIEW_SESSION_STORAGE_KEY)
   } catch {
     // Reloading still drops out of preview for this navigation.
   }
@@ -125,9 +149,14 @@ interface SingletonResponse<T> {
 }
 
 async function fetchContent<R>(type: string, signal: AbortSignal, locale: Locale): Promise<R> {
-  const base = previewToken
-    ? `${API}/preview/${previewToken}/content/${type}`
-    : `${API}/content/${type}`
+  /* Session takes precedence: it is the newer, broader credential, and a tab
+     is never expected to hold both at once — the two screens that mint them
+     (Approvals, and Preview Site) do not link to each other. */
+  const base = previewSessionToken
+    ? `${API}/preview/session/${previewSessionToken}/content/${type}`
+    : previewToken
+      ? `${API}/preview/${previewToken}/content/${type}`
+      : `${API}/content/${type}`
   /* English is the stored document, so it needs no parameter — which also
      keeps the existing URLs, and their cache entries, exactly as they were. */
   const url = locale === 'en' ? base : `${base}?lang=${locale}`

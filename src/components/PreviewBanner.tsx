@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
-import { API_ROOT, exitPreview, previewToken } from '../lib/content'
+import { API_ROOT, exitPreview, previewSessionToken, previewToken } from '../lib/content'
 import { useT } from '../lib/i18n'
 
 /* The one thing that distinguishes a staging preview from the live site.
    Without it, an unpublished page is indistinguishable from a published one —
    which is exactly how draft copy ends up quoted as fact. It is deliberately
-   loud, fixed to the viewport, and cannot be dismissed. */
+   loud, fixed to the viewport, and cannot be dismissed.
 
-interface PreviewInfo {
-  approvalId: string
-  type: string
-}
+   Covers both preview credentials content.ts understands: one approved-but-
+   unpublished change (`previewToken`, opened from the Approvals queue), and a
+   whole-site session showing everything the reviewer currently has staged
+   (`previewSessionToken`, opened from the CMS's Preview Site screen). */
+
+type PreviewInfo = { kind: 'approval'; approvalId: string; type: string } | { kind: 'session' }
 
 type State =
   | { status: 'checking' }
@@ -22,20 +24,37 @@ export default function PreviewBanner() {
   const [state, setState] = useState<State>({ status: 'checking' })
 
   useEffect(() => {
-    if (!previewToken) return
+    if (!previewToken && !previewSessionToken) return
     const controller = new AbortController()
 
     /* One probe against a cheap type, purely to tell "previewing" from
        "this link has expired" — otherwise an expired token looks identical to
        an API outage and the page silently shows built-in fallback copy. */
-    fetch(`${API_ROOT}/preview/${previewToken}/content/settings`, { signal: controller.signal })
+    const probeUrl = previewSessionToken
+      ? `${API_ROOT}/preview/session/${previewSessionToken}/content/settings`
+      : `${API_ROOT}/preview/${previewToken}/content/settings`
+
+    fetch(probeUrl, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
           setState({ status: 'expired' })
           return
         }
-        const body = (await response.json()) as { preview?: PreviewInfo }
-        setState(body.preview ? { status: 'live', info: body.preview } : { status: 'expired' })
+        const body = (await response.json()) as {
+          preview?: { session?: boolean; approvalId?: string; type?: string }
+        }
+        if (!body.preview) {
+          setState({ status: 'expired' })
+        } else if (body.preview.session) {
+          setState({ status: 'live', info: { kind: 'session' } })
+        } else if (body.preview.approvalId && body.preview.type) {
+          setState({
+            status: 'live',
+            info: { kind: 'approval', approvalId: body.preview.approvalId, type: body.preview.type },
+          })
+        } else {
+          setState({ status: 'expired' })
+        }
       })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return
@@ -48,7 +67,7 @@ export default function PreviewBanner() {
     }
   }, [])
 
-  if (!previewToken) return null
+  if (!previewToken && !previewSessionToken) return null
 
   const expired = state.status === 'expired'
 
@@ -77,7 +96,9 @@ export default function PreviewBanner() {
           {expired
             ? 'Showing the live site. Generate a new preview from the CMS to see the pending change.'
             : state.status === 'live'
-              ? `Showing the pending “${state.info.type}” change laid over the live site. Nothing here is visible to the public.`
+              ? state.info.kind === 'session'
+                ? 'Showing every change you currently have staged, laid over the live site. Nothing here is visible to the public.'
+                : `Showing the pending “${state.info.type}” change laid over the live site. Nothing here is visible to the public.`
               : 'Loading the pending change…'}
         </span>
 
