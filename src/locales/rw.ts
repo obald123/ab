@@ -30,6 +30,7 @@ export const rw: Dictionary = {
     noResults: 'Nta cyabonetse kuri iryo shakisha. Gerageza andi magambo cyangwa usibe uko washunguye.',
     required: 'Birakenewe',
     optional: 'Si ngombwa',
+    notReady: 'Ntiraboneka — hamagara 5500 cyangwa usure ishami.',
   },
 
   nav: {

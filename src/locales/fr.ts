@@ -27,6 +27,7 @@ export const fr: Dictionary = {
     noResults: 'Aucun résultat pour cette recherche. Essayez d’autres termes ou effacez les filtres.',
     required: 'Obligatoire',
     optional: 'Facultatif',
+    notReady: 'Pas encore disponible — appelez le 5500 ou rendez-vous en agence.',
   },
 
   nav: {

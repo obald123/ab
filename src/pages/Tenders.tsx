@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { IconGavel, IconDownload, IconAlert } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, DeadlineRing, EmptyState, FilterBar, Section, Stamp, type Tone } from '../components/page/ui'
-import { useCollection } from '../lib/content'
+import { mediaUrl, useCollection } from '../lib/content'
 import { TENDERS, daysUntil, formatDate, type Tender, type TenderStatus } from '../data/site'
 import { useT } from '../lib/i18n'
 
@@ -14,7 +14,14 @@ const STATUSES = ['All', 'Open', 'Closing soon', 'Closed', 'Awarded'] as const
 type Notice = Omit<Tender, 'id' | 'ref' | 'documents'> & {
   id: string
   reference: string
-  documents: { id: string; label: string; size: string }[]
+  documents: {
+    id: string
+    label: string
+    size: string
+    /** Media key/URL from the upload pipeline. Absent on a row created
+     *  before this field existed, or one nobody has attached a file to yet. */
+    file?: string
+  }[]
 }
 
 /** Shown only until the CMS responds, and if it never does. */
@@ -193,31 +200,46 @@ function TenderRow({ tender }: { tender: Notice }) {
         {open && (
           <div style={{ marginTop: 20, borderTop: '1px solid rgba(14,165,233,0.14)', paddingTop: 18 }}>
             <div style={{ display: 'grid', gap: 10, marginBottom: 18 }}>
-              {tender.documents.map((d) => (
-                <button
-                  key={d.id}
-                  type="button"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '12px 14px',
-                    background: '#f8fbfe',
-                    border: '1px solid rgba(14,165,233,0.14)',
-                    borderRadius: 10,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  <IconDownload size={17} color="#0ea5e9" strokeWidth={2} />
-                  <span style={{ flex: 1, fontSize: 13.5, fontWeight: 700, color: '#0f172a' }}>{d.label}</span>
-                  <span style={{ fontFamily: MONO, fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>
-                    PDF · {d.size}
-                  </span>
-                </button>
-              ))}
+              {tender.documents.map((d) => {
+                /* A row created before the document-upload field existed, or
+                   one nobody has attached a file to yet, has no `file` — shown
+                   honestly rather than as a link to nothing. */
+                const ready = Boolean(d.file)
+                return (
+                  <a
+                    key={d.id}
+                    href={ready ? mediaUrl(d.file) : undefined}
+                    target={ready ? '_blank' : undefined}
+                    rel={ready ? 'noopener noreferrer' : undefined}
+                    aria-disabled={!ready}
+                    onClick={(e) => {
+                      if (!ready) e.preventDefault()
+                    }}
+                    aria-label={ready ? `${t.common.download} ${d.label}` : `${d.label} — ${t.common.notReady}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '12px 14px',
+                      background: '#f8fbfe',
+                      border: '1px solid rgba(14,165,233,0.14)',
+                      borderRadius: 10,
+                      cursor: ready ? 'pointer' : 'default',
+                      opacity: ready ? 1 : 0.62,
+                      fontFamily: 'inherit',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <IconDownload size={17} color={ready ? '#0ea5e9' : '#94a3b8'} strokeWidth={2} />
+                    <span style={{ flex: 1, fontSize: 13.5, fontWeight: 700, color: '#0f172a' }}>{d.label}</span>
+                    <span style={{ fontFamily: MONO, fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>
+                      {ready ? `PDF · ${d.size}` : t.common.notReady}
+                    </span>
+                  </a>
+                )
+              })}
             </div>
             <p style={{ fontSize: 13, color: '#647080', lineHeight: 1.75, margin: 0 }}>
               {live ? (

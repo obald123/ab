@@ -364,6 +364,9 @@ export type FormDoc = {
   fileType: 'PDF' | 'DOCX' | 'XLSX'
   size: string
   updated: string
+  /** Media key/URL from the upload pipeline. Absent on a row created before
+   *  this field existed, or one nobody has attached a file to yet. */
+  file?: string
 }
 
 export const FORM_CATEGORIES = [

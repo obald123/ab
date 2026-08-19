@@ -27,6 +27,7 @@ export const en = {
     noResults: 'No results match that search. Try different terms or clear the filters.',
     required: 'Required',
     optional: 'Optional',
+    notReady: 'Not yet available — please call 5500 or visit a branch.',
   },
 
   nav: {

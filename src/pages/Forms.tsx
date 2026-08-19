@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { IconFileText, IconDownload, IconMapPin } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { EmptyState, FilterBar, Section } from '../components/page/ui'
-import { useCollection } from '../lib/content'
+import { mediaUrl, useCollection } from '../lib/content'
 import { FORMS, formatDate, type FormDoc } from '../data/site'
 import { useT } from '../lib/i18n'
 
@@ -24,24 +24,40 @@ function FormTile({ doc }: { doc: FormDoc }) {
   const t = useT()
   const [hover, setHover] = useState(false)
   const color = TYPE_COLOR[doc.fileType]
+  /* Rows created before the document-upload field existed, or one nobody has
+     attached a real file to yet, have no `file` — the tile still renders, but
+     honestly, rather than linking to a file that isn't there. */
+  const ready = Boolean(doc.file)
 
   return (
     <a
-      href="#forms"
+      href={ready ? mediaUrl(doc.file) : undefined}
+      target={ready ? '_blank' : undefined}
+      rel={ready ? 'noopener noreferrer' : undefined}
+      aria-disabled={!ready}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      aria-label={`Download ${doc.title}, ${doc.fileType}, ${doc.size}`}
+      onClick={(e) => {
+        if (!ready) e.preventDefault()
+      }}
+      aria-label={
+        ready
+          ? `${t.common.download} ${doc.title}, ${doc.fileType}, ${doc.size}`
+          : `${doc.title} — ${t.common.notReady}`
+      }
       style={{
         display: 'flex',
         gap: 18,
         alignItems: 'flex-start',
         padding: '20px 22px',
         background: '#ffffff',
-        border: `1px solid ${hover ? 'rgba(14,165,233,0.34)' : 'rgba(14,165,233,0.13)'}`,
+        border: `1px solid ${hover && ready ? 'rgba(14,165,233,0.34)' : 'rgba(14,165,233,0.13)'}`,
         borderRadius: 14,
         textDecoration: 'none',
-        boxShadow: hover ? '0 16px 34px rgba(2,30,60,0.11)' : '0 2px 12px rgba(2,30,60,0.04)',
-        transform: hover ? 'translateY(-3px)' : 'none',
+        cursor: ready ? 'pointer' : 'default',
+        opacity: ready ? 1 : 0.62,
+        boxShadow: hover && ready ? '0 16px 34px rgba(2,30,60,0.11)' : '0 2px 12px rgba(2,30,60,0.04)',
+        transform: hover && ready ? 'translateY(-3px)' : 'none',
         transition: 'transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease',
       }}
     >
@@ -145,14 +161,14 @@ function FormTile({ doc }: { doc: FormDoc }) {
               fontFamily: 'inherit',
               fontSize: 12.5,
               fontWeight: 800,
-              color: '#0ea5e9',
+              color: ready ? '#0ea5e9' : '#94a3b8',
               letterSpacing: 0,
-              transform: hover ? 'translateX(3px)' : 'none',
+              transform: hover && ready ? 'translateX(3px)' : 'none',
               transition: 'transform 0.22s ease',
             }}
           >
-            <IconDownload size={14} strokeWidth={2.2} color="#0ea5e9" />
-            {t.common.download}
+            <IconDownload size={14} strokeWidth={2.2} color={ready ? '#0ea5e9' : '#94a3b8'} />
+            {ready ? t.common.download : t.common.notReady}
           </span>
         </span>
       </span>
