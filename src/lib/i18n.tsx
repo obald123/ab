@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import {
+  createContext,
+  startTransition,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { en } from '../locales/en'
 import { rw } from '../locales/rw'
 import { fr } from '../locales/fr'
@@ -104,7 +112,17 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     rememberLocale(next)
-    setLocaleState(next)
+    /* Changing language re-renders every component on the page and re-requests
+       every CMS document at once. Done as an urgent update that is ~780ms of
+       blocking work on a mid-range phone, which is what the INP warning is
+       measuring: the switcher stays visually stuck until it finishes.
+
+       As a transition, React renders the new language in the background and
+       keeps the tap responsive — the old text stays on screen for a few frames
+       instead of the whole page freezing. */
+    startTransition(() => {
+      setLocaleState(next)
+    })
   }, [])
 
   const value = useMemo(
