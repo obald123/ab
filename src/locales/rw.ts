@@ -459,4 +459,13 @@ export const rw: Dictionary = {
     speculative: 'Dubika ubusabe budasabwe mu gihe cy’amezi atandatu kandi tukabusuzuma buri gihe hafunguwe umwanya ubukwiye. Ohereza CV yawe n’ubutumwa bugufi ku bwoko bw’akazi ushaka.',
   },
 
+  reportHero: {
+    eyebrow: 'Ubufasha',
+    title: 'Tanga ikibazo',
+    lead: 'Tubwire ibyabaye — ikibazo kuri serivisi, cyangwa ikindi gikomeye. Ni wowe uhitamo umwirondoro wawe ushaka gutanga.',
+    emergencyBefore: 'Uri mu kaga, cyangwa amafaranga ari gutwarwa ubu? Hamagara',
+    emergencyAfter: '— ntutegereze iyi fishi.',
+    statusTitle: 'Reba aho ikibazo cyawe kigeze',
+  },
+
 }

@@ -285,8 +285,8 @@ export default function ReportStatus() {
     <>
       <PageHero
         Icon={IconClock}
-        eyebrow="Support"
-        title="Check a report's status"
+        eyebrow={t.reportHero.eyebrow}
+        title={t.reportHero.statusTitle}
         lead="Enter the reference number and passphrase you were given when you submitted a report."
       />
 

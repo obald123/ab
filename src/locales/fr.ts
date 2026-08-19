@@ -456,4 +456,13 @@ export const fr: Dictionary = {
     speculative: 'Nous conservons les candidatures spontanées pendant six mois et les réexaminons dès qu’un poste correspondant s’ouvre. Envoyez votre CV avec quelques lignes sur le type de poste recherché.',
   },
 
+  reportHero: {
+    eyebrow: 'Assistance',
+    title: 'Signaler un incident',
+    lead: 'Dites-nous ce qui s’est passé — un problème de service ou quelque chose de plus grave. Vous choisissez ce que vous révélez de votre identité.',
+    emergencyBefore: 'En danger, ou de l’argent est en train d’être prélevé ? Appelez le',
+    emergencyAfter: '— n’attendez pas ce formulaire.',
+    statusTitle: 'Suivre un signalement',
+  },
+
 }

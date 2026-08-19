@@ -456,6 +456,15 @@ export const en = {
     hideDetails: 'Hide details',
     speculative: 'We keep speculative applications on file for six months and review them whenever a relevant vacancy opens. Send your CV with a short note about the kind of role you are looking for.',
   },
+
+  reportHero: {
+    eyebrow: 'Support',
+    title: 'Report an incident',
+    lead: 'Tell us what happened — a service problem, or something more serious. You choose how much of your identity to share.',
+    emergencyBefore: 'In danger, or money is being taken right now? Call',
+    emergencyAfter: '— don’t wait for this form.',
+    statusTitle: "Check a report's status",
+  },
 } as const
 
 /* `as const` above pins each value to its exact English text, which is what

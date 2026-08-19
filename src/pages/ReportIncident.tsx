@@ -363,9 +363,9 @@ export default function ReportIncident() {
     <>
       <PageHero
         Icon={IconAlert}
-        eyebrow="Support"
-        title="Report an incident"
-        lead="Tell us what happened — a service problem, or something more serious. You choose how much of your identity to share."
+        eyebrow={t.reportHero.eyebrow}
+        title={t.reportHero.title}
+        lead={t.reportHero.lead}
         meta={
           <div
             style={{
@@ -380,11 +380,11 @@ export default function ReportIncident() {
           >
             <IconAlert size={16} color="#fecaca" strokeWidth={2.2} />
             <span style={{ fontSize: 13, color: '#fecaca', fontWeight: 700 }}>
-              In danger, or money is being taken right now? Call{' '}
+              {t.reportHero.emergencyBefore}{' '}
               <a href="tel:5500" style={{ color: '#ffffff', textDecoration: 'underline' }}>
                 5500
               </a>{' '}
-              — don't wait for this form.
+              {t.reportHero.emergencyAfter}
             </span>
           </div>
         }

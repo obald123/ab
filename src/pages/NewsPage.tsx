@@ -29,7 +29,8 @@ const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
 /* Press releases mirror the seed data used by the home-page News section.
    Kept here so this page reads as the full archive rather than the
    three-item teaser the one-pager shows. */
-const PRESS = [
+/** Shown only until the CMS responds, and if it never does. */
+const FALLBACK_PRESS = [
   {
     id: 'p1',
     category: 'Bancassurance',
@@ -79,8 +80,21 @@ const LEVEL: Record<NoticeLevel, { tone: Tone; band: string; ink: string; wash: 
 }
 
 /** Big day / month-year rail — the archive's spine. */
+/* The CMS stores `date` as free text so an editor can write "May 2026" — and
+   its translation is a Kinyarwanda or French month name, which no date parser
+   understands. So the rail is only drawn when the value really is a date;
+   anything else is shown as written. */
 function DateRail({ iso }: { iso: string }) {
   const d = new Date(iso + 'T00:00:00')
+  if (Number.isNaN(d.getTime())) {
+    return (
+      <div style={{ textAlign: 'center', flexShrink: 0, width: 66 }}>
+        <div style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: '#0284c7', lineHeight: 1.5 }}>
+          {iso}
+        </div>
+      </div>
+    )
+  }
   return (
     <div style={{ textAlign: 'center', flexShrink: 0, width: 66 }}>
       <div style={{ fontFamily: 'var(--font-serif)', fontSize: 34, fontWeight: 700, color: '#0284c7', lineHeight: 1 }}>
@@ -109,6 +123,7 @@ type Tab = 'press' | 'notices'
 
 export default function NewsPage() {
   const t = useT()
+  const { data: press } = useCollection<(typeof FALLBACK_PRESS)[number]>('news', FALLBACK_PRESS)
   const [tab, setTab] = useState<Tab>('press')
   const { data: notices } = useCollection<PublicNotice>('notice', FALLBACK_NOTICES)
   /* Null means "the reader has not chosen one", which resolves to the first
@@ -117,7 +132,7 @@ export default function NewsPage() {
      state from the first render would leave nothing open at that point. */
   const [openNotice, setOpenNotice] = useState<string | null>(null)
   const openNoticeId = openNotice ?? notices[0]?.id ?? null
-  const [lead, ...rest] = PRESS
+  const [lead, ...rest] = press
 
   return (
     <main>
@@ -134,7 +149,7 @@ export default function NewsPage() {
         <div role="tablist" aria-label={t.newsPage.mediaType} style={{ display: 'flex', gap: 8, marginBottom: 34, flexWrap: 'wrap' }}>
           {(
             [
-              ['press', t.heroes.pressReleases, PRESS.length],
+              ['press', t.heroes.pressReleases, press.length],
               ['notices', t.newsPage.publicNotices, notices.length],
             ] as const
           ).map(([id, label, count]) => {
@@ -411,7 +426,7 @@ export default function NewsPage() {
   )
 }
 
-function PressRow({ item }: { item: (typeof PRESS)[number] }) {
+function PressRow({ item }: { item: (typeof FALLBACK_PRESS)[number] }) {
   const [hover, setHover] = useState(false)
   return (
     <article
