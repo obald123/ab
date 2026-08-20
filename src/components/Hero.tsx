@@ -399,6 +399,13 @@ export default function Hero() {
      returns fewer slides than the index currently held, reading past the end
      must not survive even one frame. */
   const activeSlide = HERO_SLIDES.length > 0 ? heroSlide % HERO_SLIDES.length : 0
+  /* Only the active slide is ever mounted (see the headline/subtitle blocks
+     below) — a translated line can wrap to more lines than its English
+     original, and a box sized in advance for one language overflows into
+     whatever sits below it for another. Letting the box size itself to
+     whichever slide is actually showing fixes that for any language, not
+     just the ones a fixed height happened to have been tuned for. */
+  const currentSlide: HeroSlide | undefined = HERO_SLIDES[activeSlide]
   const sectionRef = useRef<HTMLElement>(null)
   const rectRef = useRef<DOMRect | null>(null)
   const reduce = useReducedMotion()
@@ -600,46 +607,44 @@ export default function Hero() {
           viewport={{ once: true, margin: '-200px' }}
         >
           <motion.div style={{ opacity: textOpacity, y: textY }}>
-          {/* Headline — rotating, crossfaded to match the subtitle */}
-          <div
-            style={{
-              position: 'relative',
-              minHeight: 'clamp(112px, 15.5vw, 224px)',
-              marginBottom: 16,
-            }}
-          >
-            {HERO_SLIDES.map((slide, i) => (
-              <div
-                key={i}
-                aria-hidden={activeSlide !== i}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  opacity: activeSlide === i ? 1 : 0,
-                  transform: activeSlide === i ? 'translateY(0)' : 'translateY(12px)',
-                  transition: 'opacity 0.5s ease, transform 0.5s ease',
-                  pointerEvents: activeSlide === i ? 'auto' : 'none',
-                }}
-              >
-                <h1 style={{ ...HEADLINE_STYLE, color: '#ffffff' }}>{slide.line1}</h1>
-                {slide.line2 && (
-                  <h1
-                    style={{
-                      ...HEADLINE_STYLE,
-                      backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
-                      backgroundSize: '200% auto',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      animation: 'shimmer 4s linear 1s infinite',
-                    }}
-                  >
-                    {slide.line2}
-                  </h1>
-                )}
-                <h1 style={{ ...HEADLINE_STYLE, color: 'rgba(255,255,255,0.78)' }}>{slide.line3}</h1>
-              </div>
-            ))}
+          {/* Headline — rotating, crossfaded to match the subtitle.
+              Only the active slide is mounted (AnimatePresence swaps it
+              rather than the old approach of stacking every slide absolutely
+              inside a fixed-height box), and `layout` animates the box
+              smoothly to whatever height that slide's own text actually
+              needs — so a language whose lines wrap to more rows than the
+              English original grows the box instead of spilling out of it. */}
+          <div style={{ position: 'relative', marginBottom: 16 }}>
+            <AnimatePresence mode="wait">
+              {currentSlide && (
+                <motion.div
+                  key={activeSlide}
+                  layout
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.45, ease: 'easeOut' }}
+                >
+                  <h1 style={{ ...HEADLINE_STYLE, color: '#ffffff' }}>{currentSlide.line1}</h1>
+                  {currentSlide.line2 && (
+                    <h1
+                      style={{
+                        ...HEADLINE_STYLE,
+                        backgroundImage: `linear-gradient(100deg, ${GL} 0%, #fff 50%, ${GL} 100%)`,
+                        backgroundSize: '200% auto',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        animation: 'shimmer 4s linear 1s infinite',
+                      }}
+                    >
+                      {currentSlide.line2}
+                    </h1>
+                  )}
+                  <h1 style={{ ...HEADLINE_STYLE, color: 'rgba(255,255,255,0.78)' }}>{currentSlide.line3}</h1>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Slide indicators */}
@@ -664,31 +669,32 @@ export default function Hero() {
             ))}
           </div>
 
-          {/* Subtitle — rotating. Absolutely positioned, so the wrapper
-              reserves the height of the tallest slide or the CTA row
-              rides up over the last line. */}
-          <div style={{ position: 'relative', minHeight: 'clamp(92px, 8vw, 108px)', marginBottom: 34 }}>
-            {HERO_SLIDES.map((slide, i) => (
-              <p
-                key={i}
-                aria-hidden={activeSlide !== i}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  fontSize: 17,
-                  color: 'rgba(255,255,255,0.82)',
-                  lineHeight: 1.78,
-                  maxWidth: 470,
-                  margin: 0,
-                  opacity: activeSlide === i ? 1 : 0,
-                  transform: activeSlide === i ? 'translateY(0)' : 'translateY(10px)',
-                  transition: 'opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s',
-                  pointerEvents: activeSlide === i ? 'auto' : 'none',
-                }}
-              >
-                {slide.sub}
-              </p>
-            ))}
+          {/* Subtitle — rotating, same fix as the headline above: only the
+              active slide is mounted, and `layout` grows the box to match
+              its real height instead of a fixed reservation that a longer
+              translation could overflow into the CTA row below. */}
+          <div style={{ position: 'relative', marginBottom: 34 }}>
+            <AnimatePresence mode="wait">
+              {currentSlide && (
+                <motion.p
+                  key={activeSlide}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}
+                  style={{
+                    fontSize: 17,
+                    color: 'rgba(255,255,255,0.82)',
+                    lineHeight: 1.78,
+                    maxWidth: 470,
+                    margin: 0,
+                  }}
+                >
+                  {currentSlide.sub}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* CTA buttons */}

@@ -142,26 +142,52 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
         }
 
         if (googleAnalyticsId) {
-          tags.push(
-            {
-              tag: 'script',
-              attrs: {
-                async: true,
-                src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`,
-              },
-              injectTo: 'head',
-            },
-            {
-              tag: 'script',
-              children: `
+          /* Not loaded unconditionally: gtag.js sets real tracking cookies
+             the moment it loads, so it has to respect the same consent
+             choice the Facebook embed does (see SocialFeed.tsx /
+             lib/cookieConsent.ts) rather than firing before the visitor has
+             answered the cookie banner.
+
+             This runs as a raw injected script, outside the app's module
+             graph, so it can't `import` lib/cookieConsent.ts — the storage
+             key and version are duplicated here instead of coupling this
+             build-time HTML transform to that app-source module. Keep the
+             two in sync if either changes. */
+          tags.push({
+            tag: 'script',
+            children: `
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', ${JSON.stringify(googleAnalyticsId)});
+  (function () {
+    var GA_ID = ${JSON.stringify(googleAnalyticsId)};
+    var CONSENT_KEY = 'abr-cookie-consent';
+    var CONSENT_VERSION = 1;
+    var CONSENT_EVENT = 'abr:cookie-consent';
+    var loaded = false;
+    function hasAnalyticsConsent() {
+      try {
+        var parsed = JSON.parse(localStorage.getItem(CONSENT_KEY) || 'null');
+        return !!parsed && parsed.version === CONSENT_VERSION && parsed.analytics === true;
+      } catch (e) {
+        return false;
+      }
+    }
+    function loadIfConsented() {
+      if (loaded || !hasAnalyticsConsent()) return;
+      loaded = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+      document.head.appendChild(s);
+      gtag('js', new Date());
+      gtag('config', GA_ID);
+    }
+    loadIfConsented();
+    window.addEventListener(CONSENT_EVENT, loadIfConsented);
+  })();
 `,
-              injectTo: 'head',
-            },
-          )
+            injectTo: 'head',
+          })
         }
 
         if (config.accessibility?.addBypassLinks) {
