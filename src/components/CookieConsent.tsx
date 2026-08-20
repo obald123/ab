@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IconShield, IconZap, IconChart, IconCheck } from './Icons'
-import { LANG_STORAGE_KEY, useT } from '../lib/i18n'
+import { useT } from '../lib/i18n'
 import {
   ALL_OFF,
   ALL_ON,
@@ -127,12 +127,15 @@ export default function CookieConsent() {
          control, not just stop writing to it going forward — otherwise a
          choice made here (e.g. after previously accepting) has no visible
          effect until the visitor happens to clear their browser storage
-         themselves. `a11y-state` is owned by Contact.tsx, which also stops
+         themselves. Language is deliberately not cleared here any more: an
+         explicit language pick is honoured regardless of this consent (see
+         lib/i18n.tsx) — a visitor who picks Kinyarwanda should not have it
+         silently revert on the next visit just because they also declined
+         "Preferences". `a11y-state` is owned by Contact.tsx, which stops
          writing to it on its own once `hasFunctionalConsent()` is false —
          not imported by key here to avoid pulling that page's whole module
          into this globally-mounted component's bundle. */
       try {
-        localStorage.removeItem(LANG_STORAGE_KEY)
         localStorage.removeItem('a11y-state')
       } catch {
         /* storage blocked — nothing to clear */

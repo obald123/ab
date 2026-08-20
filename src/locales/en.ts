@@ -66,7 +66,7 @@ export const en = {
       'Required for the site to function, including remembering the choice you make in this banner. This site does not require a login, so no session cookie is set here — the only thing this category stores is your cookie preference itself. It cannot be switched off.',
     preferencesTitle: 'Preferences',
     preferencesBody:
-      'Remember your preferences, such as accessibility settings and your language selection, across visits. If declined, these still work during your visit but are not remembered next time.',
+      'Remember accessibility settings you choose, such as high contrast or larger text, across visits. If declined, they still work during your visit but are not remembered next time. Your language choice is always remembered regardless, since it is not a tracking preference.',
     analyticsTitle: 'Analytics',
     analyticsBody:
       'Help us understand how visitors use the site so we can improve it, and let content embedded from other platforms — such as our Facebook feed — load. All traffic data is aggregated and anonymous; declining keeps the site fully usable and shows a link to Facebook instead of the live feed.',

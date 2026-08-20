@@ -66,7 +66,7 @@ export const fr: Dictionary = {
       'Nécessaires au fonctionnement du site, y compris pour mémoriser le choix que vous faites dans cette bannière. Ce site ne nécessite pas de connexion : aucun cookie de session n’est donc déposé ici — cette catégorie ne stocke que votre préférence en matière de cookies. Elle ne peut pas être désactivée.',
     preferencesTitle: 'Préférences',
     preferencesBody:
-      'Mémorisent vos préférences, comme les paramètres d’accessibilité et le choix de votre langue, d’une visite à l’autre. En cas de refus, ces choix restent actifs pendant votre visite mais ne sont pas mémorisés la prochaine fois.',
+      'Mémorisent les paramètres d’accessibilité que vous choisissez, comme le contraste élevé ou un texte plus grand, d’une visite à l’autre. En cas de refus, ils restent actifs pendant votre visite mais ne sont pas mémorisés la prochaine fois. Votre choix de langue est quant à lui toujours mémorisé, car ce n’est pas une préférence de suivi.',
     analyticsTitle: 'Mesure d’audience',
     analyticsBody:
       'Nous aident à comprendre comment le site est utilisé afin de l’améliorer, et permettent le chargement de contenus intégrés depuis d’autres plateformes — comme notre fil Facebook. Toutes les données sont agrégées et anonymes ; en cas de refus, le site reste pleinement utilisable et un lien vers Facebook s’affiche à la place du fil en direct.',
