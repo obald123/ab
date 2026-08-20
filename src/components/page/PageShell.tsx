@@ -5,6 +5,7 @@ import Navbar from '../Navbar'
 import Footer from '../Footer'
 import CookieConsent from '../CookieConsent'
 import PreviewBanner from '../PreviewBanner'
+import AccessibilityPanel from '../AccessibilityPanel'
 import { isPreviewing } from '../../lib/content'
 
 /** Routed pages don't keep the previous page's scroll position. */
@@ -51,15 +52,20 @@ export default function PageShell() {
       <Ticker />
       <Navbar />
       {/* The one landmark per route — routed pages used to each declare their
-          own <main>, which is what "read this page aloud" (Contact.tsx)
-          targets via document.querySelector('main'). Owning it here instead
-          means every route gets it (including Home, which never had one) and
-          none of them can end up nesting a second <main> inside this one. */}
+          own <main>, which is what "read this page aloud" (AccessibilityPanel)
+          targets by id. Owning it here instead means every route gets it
+          (including Home, which never had one) and none of them can end up
+          nesting a second <main> inside this one. */}
       <main id="a11y-page-content">
         <Outlet />
       </main>
       <Footer />
       <CookieConsent />
+      {/* Mounted once, here, rather than inside whatever page happened to
+          declare it (it used to live in Contact.tsx, reachable only from
+          Home) — every route needs the same accessibility controls, and
+          "read this page aloud" needs to work no matter which page that is. */}
+      <AccessibilityPanel />
     </div>
   )
 }
