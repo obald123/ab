@@ -156,20 +156,32 @@ export default function AccessibilityPanel() {
       return
     }
 
-    // The single landmark PageShell wraps every route in.
-    const main = document.getElementById('a11y-page-content')
-    const text = main?.innerText.trim()
-    if (!text) return
-
+    // Flip the switch and let the browser paint that before doing anything
+    // expensive. `.innerText` forces a synchronous layout over the whole
+    // page — on a content-heavy page that's hundreds of milliseconds of
+    // main-thread work, and doing it before this setState made the click
+    // itself feel frozen (a ~620ms input delay, flagged as a poor INP score
+    // in DevTools' Performance panel). Deferring it to the next frame keeps
+    // the toggle itself instant; the reading starts a beat later instead.
     window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = voiceLangTag(locale)
-    const voice = pickVoice(locale)
-    if (voice) utterance.voice = voice
-    utterance.onend = () => setVoiceOverActive(false)
-    utterance.onerror = () => setVoiceOverActive(false)
-    window.speechSynthesis.speak(utterance)
     setVoiceOverActive(true)
+    requestAnimationFrame(() => {
+      // The single landmark PageShell wraps every route in.
+      const main = document.getElementById('a11y-page-content')
+      const text = main?.innerText.trim()
+      if (!text) {
+        setVoiceOverActive(false)
+        return
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = voiceLangTag(locale)
+      const voice = pickVoice(locale)
+      if (voice) utterance.voice = voice
+      utterance.onend = () => setVoiceOverActive(false)
+      utterance.onerror = () => setVoiceOverActive(false)
+      window.speechSynthesis.speak(utterance)
+    })
   }, [locale, voiceOverActive])
 
   const [a11yOpen, setA11yOpen] = useState(false)
