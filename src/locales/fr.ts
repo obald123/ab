@@ -232,6 +232,13 @@ export const fr: Dictionary = {
     breadcrumb: 'Fil d’Ariane',
   },
 
+  notFound: {
+    eyebrow: 'Page introuvable',
+    title: 'Cette page est introuvable',
+    lead: 'La page que vous cherchez a peut-être été déplacée, renommée, ou n’a jamais existé. Vérifiez le lien, ou revenez à l’accueil.',
+    cta: 'Retour à l’accueil',
+  },
+
   careers: {
     searchPlaceholder: 'Rechercher un poste par intitulé, lieu ou niveau',
     openPositions: 'Postes ouverts',

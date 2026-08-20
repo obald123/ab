@@ -11,6 +11,7 @@ import NewsPage from './pages/NewsPage'
 import Forms from './pages/Forms'
 import ReportIncident from './pages/ReportIncident'
 import ReportStatus from './pages/ReportStatus'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -32,7 +33,7 @@ export default function App() {
           <Route path="news" element={<Navigate to="/media/news" replace />} />
           <Route path="articles" element={<Navigate to="/media/articles" replace />} />
           <Route path="about" element={<Navigate to="/who-we-are" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
       </BrowserRouter>

@@ -233,6 +233,13 @@ export const en = {
     breadcrumb: 'Breadcrumb',
   },
 
+  notFound: {
+    eyebrow: 'Page not found',
+    title: "We can't find that page",
+    lead: "The page you're looking for may have moved, changed address, or never existed. Check the link, or head back to the homepage.",
+    cta: 'Back to homepage',
+  },
+
   careers: {
     searchPlaceholder: 'Search roles by title, location or level',
     openPositions: 'Open positions',

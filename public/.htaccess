@@ -1,0 +1,25 @@
+# Single-page app: every route is handled by React Router client-side, so the
+# server must hand back index.html for any path that isn't a real file —
+# otherwise a refresh (or a direct link) on e.g. /who-we-are either 404s or,
+# on hosts whose default 404 handling redirects to the domain root, silently
+# bounces to "/" and re-detects the browser's language from scratch. That is
+# what "refreshing sends me to the French homepage" actually was: not a
+# language bug, but the deep link getting lost and Home re-rendering in
+# whatever language the visitor's browser prefers.
+#
+# Only relevant on an Apache host (mod_rewrite). Vercel already gets the
+# equivalent behaviour from vercel.json; a host that is neither ignores this
+# file harmlessly.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Real files and directories (assets, this file itself) are served as-is.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Everything else falls through to the app, which renders the matching
+  # route — or the real 404 page if nothing matches.
+  RewriteRule ^ index.html [L]
+</IfModule>

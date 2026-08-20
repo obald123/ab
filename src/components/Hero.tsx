@@ -522,7 +522,9 @@ export default function Hero() {
           y: lineY,
           width: 240,
           pointerEvents: 'none',
-          zIndex: 0,
+          // Above .hero-grid (zIndex 2) so the line draws over the video/
+          // image reel it runs alongside, rather than being hidden behind it.
+          zIndex: 3,
           opacity: lineOpacity,
         }}
       >

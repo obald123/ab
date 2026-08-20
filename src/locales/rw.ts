@@ -235,6 +235,13 @@ export const rw: Dictionary = {
     breadcrumb: 'Inzira',
   },
 
+  notFound: {
+    eyebrow: 'Urupapuro ntirwabonetse',
+    title: 'Ntitwabashije kubona urwo rupapuro',
+    lead: 'Urupapuro washakaga hari ubwo rwimuwe, ihuza ryahindutse, cyangwa ntirwigeze rubaho. Reba ihuza (link), cyangwa usubire ku rupapuro rw’ibanze.',
+    cta: 'Subira ku rupapuro rw’ibanze',
+  },
+
   careers: {
     searchPlaceholder: 'Shakisha imyanya ukoresheje izina, aho iherereye cyangwa urwego',
     openPositions: 'Imyanya ifunguye',
