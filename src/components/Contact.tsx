@@ -3,6 +3,23 @@ import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff
 import { IconSend } from './Icons'
 import { useSingleton } from '../lib/content'
 import { useT } from '../lib/i18n'
+import { hasFunctionalConsent } from '../lib/cookieConsent'
+
+/** Exported so the cookie consent popup can clear it when a visitor declines
+ *  "Preferences" — see CookieConsent.tsx's `persist`. */
+export const A11Y_STORAGE_KEY = 'a11y-state'
+
+/** Accessibility choices apply immediately either way (the panel is a11y
+ *  regardless of any cookie decision) — only whether they *survive a reload*
+ *  is gated, matching the "Preferences" category's own description. */
+function persistA11yState(next: unknown): void {
+  if (!hasFunctionalConsent()) return
+  try {
+    localStorage.setItem(A11Y_STORAGE_KEY, JSON.stringify(next))
+  } catch {
+    /* storage blocked — the choice just won't persist */
+  }
+}
 
 interface ContactDocument {
   info: {
@@ -106,7 +123,7 @@ export default function Contact() {
   })
 
   useEffect(() => {
-    const saved = localStorage.getItem('a11y-state')
+    const saved = localStorage.getItem(A11Y_STORAGE_KEY)
     if (saved) {
       const parsed = JSON.parse(saved)
       setA11yState(parsed)
@@ -133,7 +150,7 @@ export default function Contact() {
   function toggleA11yOption(option: keyof typeof a11yState) {
     setA11yState((current) => {
       const next = { ...current, [option]: !current[option] }
-      localStorage.setItem('a11y-state', JSON.stringify(next))
+      persistA11yState(next)
       applyA11yClasses(next)
       return next
     })
@@ -156,7 +173,7 @@ export default function Contact() {
         highlightFocus: true,
       }
       setA11yState(next)
-      localStorage.setItem('a11y-state', JSON.stringify(next))
+      persistA11yState(next)
       applyA11yClasses(next)
     }
     if (profile === 'navigation') {
@@ -175,7 +192,7 @@ export default function Contact() {
         highlightFocus: true,
       }
       setA11yState(next)
-      localStorage.setItem('a11y-state', JSON.stringify(next))
+      persistA11yState(next)
       applyA11yClasses(next)
     }
     if (profile === 'focus') {
@@ -194,7 +211,7 @@ export default function Contact() {
         highlightFocus: true,
       }
       setA11yState(next)
-      localStorage.setItem('a11y-state', JSON.stringify(next))
+      persistA11yState(next)
       applyA11yClasses(next)
     }
   }
@@ -603,7 +620,7 @@ export default function Contact() {
                   }
                   setA11yState(resetState)
                   applyA11yClasses(resetState)
-                  localStorage.setItem('a11y-state', JSON.stringify(resetState))
+                  persistA11yState(resetState)
                 }}>Reset All</button>
                 <span className="a11y-panel-status">12 options</span>
               </div>

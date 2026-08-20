@@ -63,13 +63,13 @@ export const en = {
     policy: 'Cookie Policy',
     necessaryTitle: 'Strictly Necessary',
     necessaryBody:
-      'Required for the site to function — security, session handling and remembering your cookie choice. These cannot be switched off.',
+      'Required for the site to function, including remembering the choice you make in this banner. This site does not require a login, so no session cookie is set here — the only thing this category stores is your cookie preference itself. It cannot be switched off.',
     preferencesTitle: 'Preferences',
     preferencesBody:
-      'Remember your preferences, such as accessibility settings and your branch or language selection, to enhance your visit.',
+      'Remember your preferences, such as accessibility settings and your language selection, across visits. If declined, these still work during your visit but are not remembered next time.',
     analyticsTitle: 'Analytics',
     analyticsBody:
-      'Help us understand how visitors use the site so we can improve it. All traffic data is aggregated and anonymous.',
+      'Help us understand how visitors use the site so we can improve it, and let content embedded from other platforms — such as our Facebook feed — load. All traffic data is aggregated and anonymous; declining keeps the site fully usable and shows a link to Facebook instead of the live feed.',
   },
 
   home: {

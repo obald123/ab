@@ -66,13 +66,13 @@ export const rw: Dictionary = {
     policy: 'Amabwiriza ya cookies',
     necessaryTitle: 'Ngombwa rwose',
     necessaryBody:
-      'Zikenewe kugira ngo urubuga rukore — umutekano, gucunga igihe uri kuri urubuga, no kwibuka icyo wahisemo kuri cookies. Izi ntizishobora guhagarikwa.',
+      'Zikenewe kugira ngo urubuga rukore, harimo no kwibuka icyo wahisemo kuri iyi banner. Uru rubuga ntirusaba kwinjira (login), bityo nta cookie y’igihe (session) igushyirwaho hano — icyo iki cyiciro cyonyine kibika ni icyo wahisemo ku ma cookies. Ntibishobora guhagarikwa.',
     preferencesTitle: 'Ibyo wahisemo',
     preferencesBody:
-      'Zibuka ibyo wahisemo, nk’igenamiterere ryoroshya ikoreshwa, ishami cyangwa ururimi, kugira ngo urusure rwawe rube rwiza.',
+      'Zibuka ibyo wahisemo, nk’igenamiterere ryoroshya ikoreshwa n’ururimi wahisemo, mu nshuro zizakurikira usuye urubuga. Iyo wanze, ibi bihisemo bikomeza gukora mu gihe cy’urusure ariko ntibizibukwa ubutaha.',
     analyticsTitle: 'Isesengura',
     analyticsBody:
-      'Zidufasha kumenya uko abasura urubuga barukoresha kugira ngo turunonosore. Amakuru yose ahurizwa hamwe kandi ntiyerekana uwo ari we.',
+      'Zidufasha kumenya uko abasura urubuga barukoresha kugira ngo turunonosore, kandi zituma ibintu biva ahandi (nk’urupapuro rwacu rwa Facebook) bigaragara neza. Amakuru yose ahurizwa hamwe kandi ntiyerekana uwo ari we; kwanga ntibibuza urubuga gukora neza, hagaragara gusa ihuza rijya kuri Facebook aho kuba feed nzima.',
   },
   home: {
     heroOpenAccount: 'Fungura Konti',

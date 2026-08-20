@@ -11,6 +11,7 @@ import { en } from '../locales/en'
 import { rw } from '../locales/rw'
 import { fr } from '../locales/fr'
 import type { Dictionary } from '../locales/en'
+import { hasFunctionalConsent } from './cookieConsent'
 
 /* Which language the site is being read in (I18N_PLAN).
  *
@@ -44,7 +45,10 @@ export const LOCALE_SHORT: Record<Locale, string> = {
   fr: 'FR',
 }
 
-const STORAGE_KEY = 'abr.lang'
+/** Exported so the cookie consent popup can clear it when a visitor declines
+ *  "Preferences" — see CookieConsent.tsx's `persist`. */
+export const LANG_STORAGE_KEY = 'abr.lang'
+const STORAGE_KEY = LANG_STORAGE_KEY
 
 export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value)
@@ -63,6 +67,10 @@ function storedLocale(): Locale | null {
 }
 
 function rememberLocale(locale: Locale): void {
+  /* The cookie consent popup's "Preferences" category is explicitly sold as
+     controlling this — declining (or not yet deciding) must mean the choice
+     really doesn't survive a reload, not just that the promise is decorative. */
+  if (!hasFunctionalConsent()) return
   try {
     window.localStorage.setItem(STORAGE_KEY, locale)
   } catch {

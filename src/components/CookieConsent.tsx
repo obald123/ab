@@ -2,29 +2,25 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IconShield, IconZap, IconChart, IconCheck } from './Icons'
-import { useT } from '../lib/i18n'
+import { LANG_STORAGE_KEY, useT } from '../lib/i18n'
+import {
+  ALL_OFF,
+  ALL_ON,
+  getStoredConsent,
+  OPEN_EVENT,
+  persistConsent,
+  type CookiePrefs,
+} from '../lib/cookieConsent'
 import type { Dictionary } from '../locales/en'
 
 /* ══════════════════════════════════════════════
    Cookie consent — GDPR-style popup.
-   Choice is persisted in localStorage; the popup
+   Choice is persisted in localStorage (see lib/cookieConsent); the popup
    only appears when no valid choice is stored.
 ══════════════════════════════════════════════ */
 
-const STORAGE_KEY = 'abr-cookie-consent'
-/* Bump when the cookie categories change — invalidates older stored consent. */
-const CONSENT_VERSION = 1
-
-export type CookiePrefs = {
-  necessary: true
-  functional: boolean
-  analytics: boolean
-}
-
-type StoredConsent = CookiePrefs & { version: number; decidedAt: string }
-
-const ALL_ON: CookiePrefs = { necessary: true, functional: true, analytics: true }
-const ALL_OFF: CookiePrefs = { necessary: true, functional: false, analytics: false }
+export type { CookiePrefs } from '../lib/cookieConsent'
+export { getStoredConsent, OPEN_EVENT } from '../lib/cookieConsent'
 
 /* Built from the dictionary rather than declared as a constant, so the three
    categories change language with everything else. */
@@ -53,23 +49,6 @@ function categoriesFor(t: Dictionary) {
     },
   ]
 }
-
-/* ── stored consent helpers ── */
-export function getStoredConsent(): CookiePrefs | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as StoredConsent
-    if (parsed?.version !== CONSENT_VERSION) return null
-    return { necessary: true, functional: !!parsed.functional, analytics: !!parsed.analytics }
-  } catch {
-    return null
-  }
-}
-
-/* Lets anything on the page reopen the popup, e.g. a "Cookie settings" link:
-   window.dispatchEvent(new Event('abr:open-cookie-settings')) */
-export const OPEN_EVENT = 'abr:open-cookie-settings'
 
 const BLUE = '#0ea5e9'
 const BLUE_DARK = '#0284c7'
@@ -142,16 +121,26 @@ export default function CookieConsent() {
   }, [])
 
   const persist = (next: CookiePrefs) => {
-    const payload: StoredConsent = { ...next, version: CONSENT_VERSION, decidedAt: new Date().toISOString() }
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-    } catch {
-      /* storage blocked (private mode) — the choice just won't persist */
+    persistConsent(next)
+    if (!next.functional) {
+      /* Declining "Preferences" must actually take back what it promises to
+         control, not just stop writing to it going forward — otherwise a
+         choice made here (e.g. after previously accepting) has no visible
+         effect until the visitor happens to clear their browser storage
+         themselves. `a11y-state` is owned by Contact.tsx, which also stops
+         writing to it on its own once `hasFunctionalConsent()` is false —
+         not imported by key here to avoid pulling that page's whole module
+         into this globally-mounted component's bundle. */
+      try {
+        localStorage.removeItem(LANG_STORAGE_KEY)
+        localStorage.removeItem('a11y-state')
+      } catch {
+        /* storage blocked — nothing to clear */
+      }
     }
     setPrefs(next)
     setOpen(false)
     setCustomizing(false)
-    window.dispatchEvent(new CustomEvent('abr:cookie-consent', { detail: next }))
   }
 
   /* Focus the dialog on open and keep Tab inside it while it's up */

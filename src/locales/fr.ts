@@ -63,13 +63,13 @@ export const fr: Dictionary = {
     policy: 'Politique relative aux cookies',
     necessaryTitle: 'Strictement nécessaires',
     necessaryBody:
-      'Nécessaires au fonctionnement du site — sécurité, gestion de session et mémorisation de votre choix en matière de cookies. Ils ne peuvent pas être désactivés.',
+      'Nécessaires au fonctionnement du site, y compris pour mémoriser le choix que vous faites dans cette bannière. Ce site ne nécessite pas de connexion : aucun cookie de session n’est donc déposé ici — cette catégorie ne stocke que votre préférence en matière de cookies. Elle ne peut pas être désactivée.',
     preferencesTitle: 'Préférences',
     preferencesBody:
-      'Mémorisent vos préférences, comme les paramètres d’accessibilité et le choix de votre agence ou de votre langue, pour améliorer votre visite.',
+      'Mémorisent vos préférences, comme les paramètres d’accessibilité et le choix de votre langue, d’une visite à l’autre. En cas de refus, ces choix restent actifs pendant votre visite mais ne sont pas mémorisés la prochaine fois.',
     analyticsTitle: 'Mesure d’audience',
     analyticsBody:
-      'Nous aident à comprendre comment le site est utilisé afin de l’améliorer. Toutes les données sont agrégées et anonymes.',
+      'Nous aident à comprendre comment le site est utilisé afin de l’améliorer, et permettent le chargement de contenus intégrés depuis d’autres plateformes — comme notre fil Facebook. Toutes les données sont agrégées et anonymes ; en cas de refus, le site reste pleinement utilisable et un lien vers Facebook s’affiche à la place du fil en direct.',
   },
   home: {
     heroOpenAccount: 'Ouvrir un compte',

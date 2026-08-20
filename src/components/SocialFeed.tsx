@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useT } from '../lib/i18n'
+import { CONSENT_EVENT, hasAnalyticsConsent, type CookiePrefs } from '../lib/cookieConsent'
 
 function loadScript(src: string, id: string): Promise<void> {
   return new Promise((resolve) => {
@@ -42,6 +43,7 @@ function FBFallback() {
 export default function SocialFeed() {
   const t = useT()
   const [visible, setVisible] = useState(false)
+  const [analyticsAllowed, setAnalyticsAllowed] = useState(() => hasAnalyticsConsent())
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -53,12 +55,26 @@ export default function SocialFeed() {
     return () => obs.disconnect()
   }, [])
 
-  /* load social scripts when visible */
+  /* The Facebook embed sets its own third-party cookies once its SDK loads,
+     so it is gated behind "Analytics" rather than loaded unconditionally.
+     Listening for the consent event (rather than only reading it once) means
+     accepting later in the same tab loads the live feed immediately, and
+     declining later swaps back to the link-out fallback without a reload. */
   useEffect(() => {
-    if (!visible) return
+    const onConsent = (e: Event) => {
+      const detail = (e as CustomEvent<CookiePrefs>).detail
+      setAnalyticsAllowed(!!detail?.analytics)
+    }
+    window.addEventListener(CONSENT_EVENT, onConsent)
+    return () => window.removeEventListener(CONSENT_EVENT, onConsent)
+  }, [])
+
+  /* load social scripts when visible and consented to */
+  useEffect(() => {
+    if (!visible || !analyticsAllowed) return
     /* Facebook SDK */
     loadScript('https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0&appId=0', 'fb-sdk')
-  }, [visible])
+  }, [visible, analyticsAllowed])
 
   return (
     <section ref={ref} style={{ padding: '96px 48px', background: '#ffffff', position: 'relative', overflow: 'hidden' }}>
@@ -108,18 +124,22 @@ export default function SocialFeed() {
               <span style={{ fontSize: 11, color: '#94a3b8', marginLeft: 'auto' }}>Facebook</span>
             </div>
             <div style={{ minHeight: 480, position: 'relative' }}>
-              <div
-                className="fb-page"
-                data-href="https://www.facebook.com/abbankrwanda"
-                data-tabs="timeline"
-                data-width="500"
-                data-height="520"
-                data-small-header="true"
-                data-adapt-container-width="true"
-                data-hide-cover="false"
-                data-show-facepile="true"
-                style={{ minHeight: 480 }}
-              />
+              {analyticsAllowed ? (
+                <div
+                  className="fb-page"
+                  data-href="https://www.facebook.com/abbankrwanda"
+                  data-tabs="timeline"
+                  data-width="500"
+                  data-height="520"
+                  data-small-header="true"
+                  data-adapt-container-width="true"
+                  data-hide-cover="false"
+                  data-show-facepile="true"
+                  style={{ minHeight: 480 }}
+                />
+              ) : (
+                <FBFallback />
+              )}
               <noscript>
                 <FBFallback />
               </noscript>
