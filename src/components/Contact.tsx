@@ -1,9 +1,37 @@
-import { useEffect, useRef, useState } from 'react'
-import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { PersonStanding, Accessibility, TextCursor, AlignJustify, Type, ImageOff, Contrast, Eye, Compass, Target, X, Link, MousePointer2, PauseCircle, BookOpen, Focus, Volume2 } from 'lucide-react'
 import { IconSend } from './Icons'
 import { useSingleton } from '../lib/content'
-import { useT } from '../lib/i18n'
+import { useLocale, useT, type Locale } from '../lib/i18n'
 import { hasFunctionalConsent } from '../lib/cookieConsent'
+
+/* ── Voice over (read page aloud) ──
+   Built on the browser's own speechSynthesis rather than a cloud TTS service:
+   free, no backend, works offline of our own infra. The one real gap is
+   language coverage — no browser or OS ships a Kinyarwanda voice, so `rw`
+   deliberately falls back to reading in English rather than not offering the
+   feature at all in that language. */
+
+/** speechSynthesis.getVoices() can return an empty list on the very first
+ *  call — Chrome loads voices asynchronously and only fires 'voiceschanged'
+ *  once they're ready — so this is read fresh at play time, not cached at
+ *  module scope, in case the first call landed before that event. */
+function pickVoice(locale: Locale): SpeechSynthesisVoice | undefined {
+  const voices = window.speechSynthesis.getVoices()
+  if (voices.length === 0) return undefined
+  // Kinyarwanda has no browser/OS voice anywhere; English is Rwanda's other
+  // official administrative language, so it is the fallback rather than French.
+  const want = locale === 'fr' ? 'fr' : 'en'
+  return (
+    voices.find((v) => v.lang.toLowerCase().startsWith(want)) ??
+    voices.find((v) => v.default) ??
+    voices[0]
+  )
+}
+
+function voiceLangTag(locale: Locale): string {
+  return locale === 'fr' ? 'fr-FR' : 'en-US'
+}
 
 /** Exported so the cookie consent popup can clear it when a visitor declines
  *  "Preferences" — see CookieConsent.tsx's `persist`. */
@@ -64,11 +92,51 @@ const FALLBACK: ContactDocument = {
 
 export default function Contact() {
   const t = useT()
+  const { locale } = useLocale()
   const { data: contact } = useSingleton<ContactDocument>('contact', FALLBACK)
   const { smartValues, branches } = contact
   const containerRef = useRef<HTMLDivElement>(null)
   const [formState, setFormState] = useState({ name: '', email: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
+  const [voiceOverActive, setVoiceOverActive] = useState(false)
+  const [voiceOverSupported, setVoiceOverSupported] = useState(false)
+
+  useEffect(() => {
+    setVoiceOverSupported(typeof window !== 'undefined' && 'speechSynthesis' in window)
+    // Stop mid-sentence if the page unmounts (route change) while reading —
+    // otherwise it keeps narrating a page the visitor has already left.
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+      }
+    }
+  }, [])
+
+  const toggleVoiceOver = useCallback(() => {
+    if (!voiceOverSupported) return
+
+    if (voiceOverActive) {
+      window.speechSynthesis.cancel()
+      setVoiceOverActive(false)
+      return
+    }
+
+    // The single landmark PageShell wraps every route in — see its comment
+    // for why routed pages no longer declare their own <main>.
+    const main = document.getElementById('a11y-page-content')
+    const text = main?.innerText.trim()
+    if (!text) return
+
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = voiceLangTag(locale)
+    const voice = pickVoice(locale)
+    if (voice) utterance.voice = voice
+    utterance.onend = () => setVoiceOverActive(false)
+    utterance.onerror = () => setVoiceOverActive(false)
+    window.speechSynthesis.speak(utterance)
+    setVoiceOverActive(true)
+  }, [locale, voiceOverActive, voiceOverSupported])
 
   useEffect(() => {
     const el = containerRef.current; if (!el) return
@@ -584,6 +652,24 @@ export default function Contact() {
                     <div className="a11y-switch-thumb" />
                   </div>
                 </label>
+                {voiceOverSupported && (
+                  <label className="a11y-toggle-row" data-active={String(voiceOverActive)}>
+                    <div className="a11y-toggle-info">
+                      <div className="a11y-toggle-icon"><Volume2 size={16} /></div>
+                      <span className="a11y-toggle-label">Voice Over</span>
+                    </div>
+                    <div className="a11y-switch">
+                      <input
+                        type="checkbox"
+                        checked={voiceOverActive}
+                        aria-label="Read this page aloud"
+                        onChange={toggleVoiceOver}
+                      />
+                      <div className="a11y-switch-track" />
+                      <div className="a11y-switch-thumb" />
+                    </div>
+                  </label>
+                )}
               </div>
 
               <div className="a11y-panel-section">

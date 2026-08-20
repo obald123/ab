@@ -209,7 +209,7 @@ export default function Forms() {
   }, [filtered, categories])
 
   return (
-    <main>
+    <div>
       <PageHero
         Icon={IconFileText}
         eyebrow={t.heroes.formsEyebrow}
@@ -314,6 +314,6 @@ export default function Forms() {
           </div>
         </div>
       </Section>
-    </main>
+    </div>
   )
 }

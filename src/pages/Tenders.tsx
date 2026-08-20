@@ -281,7 +281,7 @@ export default function Tenders() {
   const live = tenders.filter((t) => t.status === 'Open' || t.status === 'Closing soon').length
 
   return (
-    <main>
+    <div>
       <PageHero
         Icon={IconGavel}
         eyebrow={t.heroes.tendersEyebrow}
@@ -362,6 +362,6 @@ export default function Tenders() {
           </div>
         )}
       </Section>
-    </main>
+    </div>
   )
 }

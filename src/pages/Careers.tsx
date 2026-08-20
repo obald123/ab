@@ -497,7 +497,7 @@ export default function Careers() {
   const openCount = jobs.filter((j) => daysUntil(j.closes) >= 0).length
 
   return (
-    <main>
+    <div>
       <PageHero
         Icon={IconBriefcase}
         eyebrow={t.heroes.careersEyebrow}
@@ -584,6 +584,6 @@ export default function Careers() {
           </a>
         </Card>
       </Section>
-    </main>
+    </div>
   )
 }

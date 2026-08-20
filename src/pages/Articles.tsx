@@ -87,7 +87,7 @@ export default function Articles() {
   const [lead, ...rest] = filtered
 
   return (
-    <main>
+    <div>
       <PageHero
         Icon={IconBookOpen}
         eyebrow={t.heroes.insightsEyebrow}
@@ -230,6 +230,6 @@ export default function Articles() {
           </>
         )}
       </Section>
-    </main>
+    </div>
   )
 }

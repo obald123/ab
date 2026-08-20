@@ -50,7 +50,14 @@ export default function PageShell() {
       <ScrollToTop />
       <Ticker />
       <Navbar />
-      <Outlet />
+      {/* The one landmark per route — routed pages used to each declare their
+          own <main>, which is what "read this page aloud" (Contact.tsx)
+          targets via document.querySelector('main'). Owning it here instead
+          means every route gets it (including Home, which never had one) and
+          none of them can end up nesting a second <main> inside this one. */}
+      <main id="a11y-page-content">
+        <Outlet />
+      </main>
       <Footer />
       <CookieConsent />
     </div>

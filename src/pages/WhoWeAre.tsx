@@ -10,8 +10,8 @@ import About from '../components/About'
    sits at the top of the document rather than halfway down a scroll. */
 export default function WhoWeAre() {
   return (
-    <main>
+    <div>
       <About standalone />
-    </main>
+    </div>
   )
 }

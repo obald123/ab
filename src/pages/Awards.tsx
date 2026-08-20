@@ -240,7 +240,7 @@ export default function Awards() {
   const { data: awards } = useSingleton<AwardsDocument>('award', FALLBACK_AWARDS)
 
   return (
-    <main>
+    <div>
       <PageHero
         Icon={IconStar}
         eyebrow={t.heroes.peopleEyebrow}
@@ -455,6 +455,6 @@ export default function Awards() {
           </div>
         </Section>
       </div>
-    </main>
+    </div>
   )
 }

@@ -135,7 +135,7 @@ export default function NewsPage() {
   const [lead, ...rest] = press
 
   return (
-    <main>
+    <div>
       <PageHero
         Icon={IconNews}
         eyebrow={t.heroes.mediaEyebrow}
@@ -422,7 +422,7 @@ export default function NewsPage() {
           </div>
         )}
       </Section>
-    </main>
+    </div>
   )
 }
 
