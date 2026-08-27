@@ -23,3 +23,20 @@
   # route — or the real 404 page if nothing matches.
   RewriteRule ^ index.html [L]
 </IfModule>
+
+# PWA: the service worker and the web app manifest must never be served stale,
+# or a new deploy is invisible until the browser's HTTP cache happens to
+# expire. The hashed files in /assets/ are fine to cache forever (their names
+# change every build); sw.js and the manifest are not.
+<IfModule mod_headers.c>
+  <FilesMatch "^(sw\.js|registerSW\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# nginx equivalent (if the host is nginx, not Apache — this file is ignored
+# there and the block below has to go in the server config by hand):
+#
+#   location = /sw.js            { add_header Cache-Control "no-cache"; }
+#   location = /manifest.webmanifest { add_header Cache-Control "no-cache"; }
+#   location / { try_files $uri /index.html; }

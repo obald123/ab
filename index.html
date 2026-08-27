@@ -6,7 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><!-- figma:title --></title>
     <!-- figma:head-end -->
-    <link rel="icon" href="/src/imports/logo1-transparent.png" />
+
+    <!-- Icons + PWA. The `/favicon.ico` link and the web app manifest link are
+         injected already (by the Figma site-config plugin and vite-plugin-pwa
+         respectively); the PNG icon and the Apple bits below are not, and have
+         to be declared here. -->
+    <link rel="icon" type="image/png" href="/icons/pwa-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AB Bank" />
   </head>
   <body>
     <!-- figma:body-start -->

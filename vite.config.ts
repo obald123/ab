@@ -1,6 +1,7 @@
 import { defineConfig, type HtmlTagDescriptor, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
 import path from 'node:path'
 
 import siteConfiguration from './.figma/make/site.json'
@@ -17,6 +18,7 @@ export default defineConfig({
     figmaErrorOverlayReplay(),
     figmaReactRefreshBoundaryFallback(),
     figmaMakeKitPlugin({ storiesGlob: '/src/**/*.stories.{ts,tsx,js,jsx}' }),
+    abrPwa(),
   ],
   resolve: {
     alias: {
@@ -35,6 +37,121 @@ export default defineConfig({
     port: parseInt(process.env.PORT || '8443'),
   },
 })
+
+/**
+ * Progressive Web App: installable + offline-capable public site.
+ *
+ * `registerType: 'prompt'` — a bank site must not swap its own code out from
+ * under a visitor mid-session. A new build is picked up only when the visitor
+ * accepts the "refresh for the latest version" prompt (see
+ * src/components/PwaUpdatePrompt.tsx). Registration itself is owned by
+ * src/lib/pwa.ts through the React hook, so `injectRegister` is disabled here
+ * to avoid a second registration from an injected script.
+ *
+ * The service worker is deliberately NOT gated behind cookie consent: it
+ * stores no personal data and is core functionality, not tracking — the same
+ * reasoning already applied to language selection (see src/lib/i18n.tsx).
+ *
+ * Runtime caches match by full-URL RegExp (workbox `generateSW` does not
+ * support function patterns) and start with `https?://<host>/` so they also
+ * match the API on its own origin (abapi.…) without tripping workbox's
+ * cross-origin "match from the start" warning.
+ */
+function abrPwa(): Plugin[] {
+  return VitePWA({
+    registerType: 'prompt',
+    injectRegister: null,
+    includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+    manifest: {
+      name: 'AB Bank Rwanda',
+      short_name: 'AB Bank',
+      description:
+        'AB Bank Rwanda — banking services, news, exchange rates and branch information.',
+      id: '/',
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      lang: 'en',
+      dir: 'ltr',
+      theme_color: '#0ea5e9',
+      background_color: '#ffffff',
+      categories: ['finance', 'business'],
+      icons: [
+        { src: 'icons/pwa-192.png', sizes: '192x192', type: 'image/png' },
+        { src: 'icons/pwa-512.png', sizes: '512x512', type: 'image/png' },
+        {
+          src: 'icons/maskable-512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
+      ],
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html}'],
+      cleanupOutdatedCaches: true,
+      clientsClaim: true,
+      navigateFallback: 'index.html',
+      // The app owns every navigable route; the API and the Figma dev kit must
+      // fall through to the network, not the SPA shell.
+      navigateFallbackDenylist: [/^\/api\//, /^\/\.figma\//],
+      runtimeCaching: [
+        {
+          // Staging preview: token-scoped, unpublished content. Never cache it —
+          // a reviewer must always see the live pending change, and the backend
+          // already sends `no-store` here.
+          urlPattern: /^https?:\/\/[^/]+\/api\/v1\/preview\//,
+          handler: 'NetworkOnly',
+        },
+        {
+          // Published content (ticker, rates, news, hero…). Fresh when online —
+          // rates and the ticker are time-sensitive — with the last-known copy
+          // served offline, mirroring the `degraded` fallback in lib/content.ts.
+          urlPattern: /^https?:\/\/[^/]+\/api\/v1\/content\//,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'abr-content',
+            networkTimeoutSeconds: 3,
+            expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 },
+            cacheableResponse: { statuses: [0, 200] },
+          },
+        },
+        {
+          // Uploaded media: keys are content-addressed and immutable.
+          urlPattern: /^https?:\/\/[^/]+\/api\/v1\/media\//,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'abr-media',
+            expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            cacheableResponse: { statuses: [0, 200] },
+          },
+        },
+        {
+          // Bundled, content-hashed images shipped with the app.
+          urlPattern: /\/assets\/[^?]+\.(?:png|jpe?g|webp|gif|svg)$/,
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'abr-assets',
+            expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
+          },
+        },
+        {
+          // Brand webfonts (Nunito Sans / Playfair) load from Figma's CDN.
+          urlPattern: /^https:\/\/static\.figma\.com\/font\//,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'abr-fonts',
+            expiration: { maxEntries: 12, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            cacheableResponse: { statuses: [0, 200] },
+          },
+        },
+      ],
+    },
+    // The Figma sandbox dev server is always running; a SW there only confuses
+    // the preview. It ships in production builds only.
+    devOptions: { enabled: false },
+  })
+}
 
 type FigmaSiteConfiguration = {
   title?: string

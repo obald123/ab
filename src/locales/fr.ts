@@ -380,6 +380,20 @@ export const fr: Dictionary = {
     exit: 'Quitter l’aperçu',
   },
 
+  pwa: {
+    updateTitle: 'Une nouvelle version est disponible',
+    updateBody: 'Rechargez la page pour obtenir les dernières mises à jour.',
+    updateAction: 'Recharger',
+    offlineReady: 'Prêt à être utilisé hors ligne',
+    installTitle: 'Installer AB Bank',
+    installBody:
+      'Ajoutez l’application à votre écran d’accueil pour un accès rapide, même hors ligne.',
+    installAction: 'Installer',
+    iosInstallBody:
+      'Pour installer : appuyez sur le bouton Partager, puis « Sur l’écran d’accueil ».',
+    dismiss: 'Plus tard',
+  },
+
   chapters: {
     personalKicker: 'Pour vous et votre famille',
     personalTitle: 'La banque du quotidien,',

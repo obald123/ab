@@ -6,6 +6,7 @@ import Footer from '../Footer'
 import CookieConsent from '../CookieConsent'
 import PreviewBanner from '../PreviewBanner'
 import AccessibilityPanel from '../AccessibilityPanel'
+import PwaPrompts from '../PwaPrompts'
 import { isPreviewing } from '../../lib/content'
 
 /** Routed pages don't keep the previous page's scroll position. */
@@ -61,6 +62,10 @@ export default function PageShell() {
       </main>
       <Footer />
       <CookieConsent />
+      {/* Installed-app prompts: "new version available" and "install this
+          app". Mounted here so they exist on every route; both sit under the
+          cookie-consent modal so a first visit answers that first. */}
+      <PwaPrompts />
       {/* Mounted once, here, rather than inside whatever page happened to
           declare it (it used to live in Contact.tsx, reachable only from
           Home) — every route needs the same accessibility controls, and

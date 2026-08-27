@@ -383,6 +383,20 @@ export const rw: Dictionary = {
     exit: 'Sohoka mu igerageza',
   },
 
+  pwa: {
+    updateTitle: 'Verisiyo nshya irahari',
+    updateBody: 'Ongera ufungure kugira ngo ubone ibishya bishya.',
+    updateAction: 'Ongera ufungure',
+    offlineReady: 'Byiteguye gukora nta interineti',
+    installTitle: 'Shyiraho porogaramu ya AB Bank',
+    installBody:
+      'Ongeraho porogaramu ku ntangiriro ya telefoni yawe kugira ngo uyibone vuba, ndetse na nta interineti.',
+    installAction: 'Shyiraho',
+    iosInstallBody:
+      'Kugira ngo uyishyireho: kanda akamenyetso ko gusangira (Share), hanyuma uhitemo “Add to Home Screen”.',
+    dismiss: 'Nyuma',
+  },
+
   chapters: {
     personalKicker: 'Kuri wowe n’umuryango wawe',
     personalTitle: 'Serivisi za banki za buri munsi,',

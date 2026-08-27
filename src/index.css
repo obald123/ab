@@ -1177,6 +1177,96 @@ body.a11y-large-text { font-size: 1.12rem; }
   color: #94a3b8;
 }
 
+/* Voice Over mini player — shown under its toggle once armed */
+.a11y-voice-panel {
+  margin-top: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fbfe;
+  border: 1px solid rgba(2,132,199,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.a11y-voice-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.a11y-voice-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(2,132,199,0.14);
+  background: #ffffff;
+  color: #0284c7;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.a11y-voice-btn:hover {
+  background: rgba(14,165,233,0.08);
+  border-color: rgba(14,165,233,0.3);
+}
+.a11y-voice-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.a11y-voice-btn--primary {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+  border-color: transparent;
+  color: #ffffff;
+}
+.a11y-voice-btn--primary:hover {
+  background: linear-gradient(135deg, #0369a1, #0284c7);
+}
+.a11y-voice-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.a11y-voice-slider-label {
+  flex-shrink: 0;
+  width: 42px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+}
+.a11y-voice-slider {
+  flex: 1;
+  accent-color: #0ea5e9;
+}
+.a11y-voice-slider-value {
+  flex-shrink: 0;
+  width: 32px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0284c7;
+  font-variant-numeric: tabular-nums;
+}
+.a11y-voice-hint {
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Applied to whichever block Voice Over is currently reading, wherever it
+   lands in the page — not scoped under .a11y-panel since the target is real
+   page content, not anything inside the panel itself. */
+.a11y-reading-highlight {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 3px;
+  border-radius: 4px;
+  background: rgba(14,165,233,0.08);
+  scroll-margin-top: 130px;
+}
+
 .a11y-high-contrast {
   background: #050505 !important;
   color: #f8fbfe !important;
