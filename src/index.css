@@ -1,11 +1,13 @@
 @import 'tailwindcss';
 
+/* Self-hosted variable fonts (were loaded from static.figma.com). The files in
+   public/fonts/ are the same faces, converted to real woff2 with `ttf2woff2`. */
 @font-face {
   font-family: 'Nunito Sans';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('https://static.figma.com/font/NunitoSans_YTLC_opsz_wdth_wght__1') format('woff2');
+  src: url('/fonts/nunito-sans.woff2') format('woff2');
 }
 
 @font-face {
@@ -13,7 +15,7 @@
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('https://static.figma.com/font/PlayfairDisplay_wght__1') format('woff2');
+  src: url('/fonts/playfair-display.woff2') format('woff2');
 }
 
 @theme {

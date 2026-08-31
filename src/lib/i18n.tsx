@@ -110,9 +110,9 @@ const LocaleContext = createContext<LocaleContextValue | null>(null)
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale)
 
-  /* `<html lang>` is set at build time from .figma/make/site.json and is always
-     "en", so the runtime has to own it. Screen readers pick pronunciation from
-     this, and it is what tells a browser whether to offer to translate. */
+  /* `<html lang>` is hard-coded to "en" in index.html, so the runtime has to
+     own it. Screen readers pick pronunciation from this, and it is what tells
+     a browser whether to offer to translate. */
   useEffect(() => {
     document.documentElement.lang = locale
   }, [locale])

@@ -1,52 +1,47 @@
 <!doctype html>
 <html lang="en">
   <head>
-    
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AB Bank Rwanda</title>
-    
+    <meta name="description" content="AB Bank Rwanda - Banking Services" />
 
-    <!-- Icons + PWA. The `/favicon.ico` link and the web app manifest link are
-         injected already (by the Figma site-config plugin and vite-plugin-pwa
-         respectively); the PNG icon and the Apple bits below are not, and have
-         to be declared here. -->
-    <link rel="icon" type="image/png" href="/icons/pwa-192.png" sizes="192x192" />
+    <meta property="og:title" content="AB Bank Rwanda" />
+    <meta property="og:description" content="AB Bank Rwanda - Banking Services" />
+
+    <!-- Icons + PWA. The web app manifest link is injected by vite-plugin-pwa. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="256x256" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="AB Bank" />
-    <meta name="description" content="AB Bank Rwanda - Banking Services">
-    <link rel="icon" href="/favicon.ico">
-    <meta property="og:title" content="AB Bank Rwanda">
-    <meta property="og:description" content="AB Bank Rwanda - Banking Services">
+
     <style>
-  .figma-bypass-link {
-    position: fixed;
-    top: 8px;
-    left: 8px;
-    z-index: 2147483647;
-    transform: translateY(-150%);
-    border-radius: 6px;
-    background: #111827;
-    color: #fff;
-    padding: 8px 12px;
-    font: 600 14px/1.2 system-ui, sans-serif;
-    text-decoration: none;
-  }
-  .figma-bypass-link:focus {
-    transform: translateY(0);
-  }
-</style>
-    <script type="module" crossorigin src="/assets/index-L1YtWwbd.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DUHb-XvM.css">
+      /* Keyboard skip link — visible only when focused. */
+      .skip-to-content {
+        position: fixed;
+        top: 8px;
+        left: 8px;
+        z-index: 2147483647;
+        transform: translateY(-150%);
+        border-radius: 6px;
+        background: #111827;
+        color: #fff;
+        padding: 8px 12px;
+        font: 600 14px/1.2 system-ui, sans-serif;
+        text-decoration: none;
+      }
+      .skip-to-content:focus {
+        transform: translateY(0);
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-CAXhVDO0.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BNUC_TTY.css">
   <link rel="manifest" href="/manifest.webmanifest"></head>
   <body>
-    <a class="figma-bypass-link" href="#root">Skip to content</a>
-
-    
-    <div id="root"></div>
-    
+    <a class="skip-to-content" href="#root">Skip to content</a>
+    <div id="root"></div>
   </body>
 </html>

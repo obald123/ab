@@ -383,14 +383,19 @@ export const en = {
 
   pwa: {
     updateTitle: 'A new version is available',
-    updateBody: 'Reload to get the latest updates.',
+    updateBody: 'Reload to get the latest features and fixes.',
     updateAction: 'Reload',
     offlineReady: 'Ready to use offline',
     installTitle: 'Install AB Bank',
-    installBody: 'Add the app to your home screen for quick access, even offline.',
-    installAction: 'Install',
-    iosInstallBody: 'To install: tap the Share button, then “Add to Home Screen”.',
+    installBody: 'Add AB Bank to your home screen for one-tap access that works even offline.',
+    installDone: 'Got it',
     dismiss: 'Not now',
+    iosStep1: 'Tap the Share button in the Safari toolbar',
+    iosStep2: 'Choose “Add to Home Screen”',
+    androidStep1: 'Open the browser menu (⋮)',
+    androidStep2: 'Tap “Add to Home screen” or “Install app”',
+    desktopStep1: 'Click the install icon at the end of the address bar',
+    desktopStep2: 'Confirm with “Install”',
   },
 
   chapters: {

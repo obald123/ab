@@ -382,16 +382,20 @@ export const fr: Dictionary = {
 
   pwa: {
     updateTitle: 'Une nouvelle version est disponible',
-    updateBody: 'Rechargez la page pour obtenir les dernières mises à jour.',
+    updateBody: 'Rechargez la page pour obtenir les dernières nouveautés et corrections.',
     updateAction: 'Recharger',
     offlineReady: 'Prêt à être utilisé hors ligne',
     installTitle: 'Installer AB Bank',
     installBody:
-      'Ajoutez l’application à votre écran d’accueil pour un accès rapide, même hors ligne.',
-    installAction: 'Installer',
-    iosInstallBody:
-      'Pour installer : appuyez sur le bouton Partager, puis « Sur l’écran d’accueil ».',
+      'Ajoutez AB Bank à votre écran d’accueil pour un accès en un geste, même hors ligne.',
+    installDone: 'Compris',
     dismiss: 'Plus tard',
+    iosStep1: 'Appuyez sur le bouton Partager dans la barre d’outils de Safari',
+    iosStep2: 'Choisissez « Sur l’écran d’accueil »',
+    androidStep1: 'Ouvrez le menu du navigateur (⋮)',
+    androidStep2: 'Appuyez sur « Ajouter à l’écran d’accueil » ou « Installer l’application »',
+    desktopStep1: 'Cliquez sur l’icône d’installation au bout de la barre d’adresse',
+    desktopStep2: 'Confirmez avec « Installer »',
   },
 
   chapters: {

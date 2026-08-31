@@ -385,16 +385,20 @@ export const rw: Dictionary = {
 
   pwa: {
     updateTitle: 'Verisiyo nshya irahari',
-    updateBody: 'Ongera ufungure kugira ngo ubone ibishya bishya.',
+    updateBody: 'Ongera ufungure kugira ngo ubone ibishya n’ibyakosowe.',
     updateAction: 'Ongera ufungure',
     offlineReady: 'Byiteguye gukora nta interineti',
-    installTitle: 'Shyiraho porogaramu ya AB Bank',
+    installTitle: 'Shyiraho AB Bank',
     installBody:
-      'Ongeraho porogaramu ku ntangiriro ya telefoni yawe kugira ngo uyibone vuba, ndetse na nta interineti.',
-    installAction: 'Shyiraho',
-    iosInstallBody:
-      'Kugira ngo uyishyireho: kanda akamenyetso ko gusangira (Share), hanyuma uhitemo “Add to Home Screen”.',
+      'Ongeraho AB Bank ku ntangiriro ya telefoni yawe kugira ngo uyibone vuba, ndetse na nta interineti.',
+    installDone: 'Byumvikane',
     dismiss: 'Nyuma',
+    iosStep1: 'Kanda akamenyetso ka Share ku murongo w’ibikoresho bya Safari',
+    iosStep2: 'Hitamo “Add to Home Screen”',
+    androidStep1: 'Fungura menu y’imbuga (⋮)',
+    androidStep2: 'Kanda “Add to Home screen” cyangwa “Install app”',
+    desktopStep1: 'Kanda akamenyetso ko kwinjiza porogaramu ku mpera y’umurongo wa aderesi',
+    desktopStep2: 'Emeza ukanda “Install”',
   },
 
   chapters: {

@@ -26,6 +26,17 @@ export function isIos(): boolean {
   return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1
 }
 
+export type InstallPlatform = 'ios' | 'android' | 'desktop'
+
+/** Which set of "add to home screen" instructions to show. The install card
+ *  never calls the browser's own install prompt — it walks the visitor
+ *  through the browser UI instead — so this only picks the wording. */
+export function installPlatform(): InstallPlatform {
+  if (isIos()) return 'ios'
+  if (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent)) return 'android'
+  return 'desktop'
+}
+
 /** True when the site is already running as an installed app — in which case
  *  no install affordance should show. */
 export function isStandalone(): boolean {
