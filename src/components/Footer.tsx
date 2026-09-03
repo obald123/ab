@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useSingleton } from '../lib/content'
 import { useT } from '../lib/i18n'
 import { OPEN_EVENT } from './CookieConsent'
@@ -107,6 +107,16 @@ function dim(e: React.MouseEvent<HTMLElement>) {
 export default function Footer() {
   const t = useT()
   const { data: footer } = useSingleton<FooterDocument>('footer', FALLBACK_FOOTER)
+  const { pathname } = useLocation()
+
+  /* Already on the home page, <Link to="/"> is inert; take over and scroll
+     back up to the hero. From any other route, let it navigate normally. */
+  function goHome(e: React.MouseEvent) {
+    if (pathname === '/') {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   return (
     <footer className="edge-curve-t" style={{ background: '#0284c7', padding: '104px 48px 28px' }}>
@@ -124,6 +134,7 @@ export default function Footer() {
                 flattening the globe into a silhouette. */}
             <Link
               to="/"
+              onClick={goHome}
               aria-label={t.nav.homeAria}
               style={{
                 display: 'inline-block',

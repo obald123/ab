@@ -70,9 +70,14 @@ const FALLBACK_NAV: NavItem[] = [
   { label: 'Contact', hash: '#contact' },
 ]
 
-function ABLogo() {
+function ABLogo({ onClick }: { onClick: (e: React.MouseEvent) => void }) {
   return (
-    <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+    <Link
+      to="/"
+      onClick={onClick}
+      aria-label="AB Bank Rwanda — home"
+      style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+    >
       <img src={logo} alt="AB Bank Rwanda" style={{ height: 50, width: 'auto' }} />
     </Link>
   )
@@ -151,6 +156,18 @@ export default function Navbar() {
     setOpen(false)
   }
 
+  /* Clicking the logo: from another route, let <Link to="/"> navigate — the
+     ScrollToTop in PageShell then lands it on the hero. Already on the home
+     page, <Link> would be inert, so take over and smooth-scroll back up to the
+     hero from whatever section the reader had scrolled to. */
+  function goHome(e: React.MouseEvent) {
+    closeMenus()
+    if (pathname === '/') {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   /* Section anchors only exist on the home page. From any other route,
      go home first and let the browser resolve the hash after paint. */
   function goToSection(hash: string) {
@@ -183,7 +200,7 @@ export default function Navbar() {
     >
       <div style={{ margin: '0 auto', padding: '0 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 76 }}>
-          <ABLogo />
+          <ABLogo onClick={goHome} />
 
           {/* Desktop nav */}
           <nav className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: 0 }} ref={menuRef}>
