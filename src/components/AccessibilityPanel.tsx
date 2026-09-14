@@ -108,6 +108,12 @@ const BLANK_A11Y_STATE = {
   voicePitch: 1,
 }
 
+/** The footer's "N options" count — derived rather than hand-typed so it
+ *  can't drift from BLANK_A11Y_STATE if a toggle is ever added or removed.
+ *  Voice Over itself isn't in this count: it's separate React state, not one
+ *  of the persisted boolean toggles. */
+const OPTION_COUNT = Object.keys(BLANK_A11Y_STATE).length - 2 // - voiceRate, voicePitch
+
 type A11yState = typeof BLANK_A11Y_STATE
 /** The boolean-only subset `toggleA11yOption` flips — `voiceRate`/`voicePitch`
  *  are numbers with their own dedicated setters, not switches. */
@@ -428,6 +434,108 @@ export default function AccessibilityPanel() {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [a11yOpen])
 
+  // Reading line: keeps --a11y-reading-line-y current so the CSS bands in
+  // .a11y-reading-mask (index.css) track the pointer. Only listens while the
+  // option is on, and clears the property on the way out so the fallback
+  // (a fixed 50vh) is what a later toggle-on starts from, not a stale value.
+  useEffect(() => {
+    if (!a11yState.readingMask) return
+    const root = document.documentElement
+    const onPointerMove = (e: PointerEvent) => {
+      root.style.setProperty('--a11y-reading-line-y', `${String(e.clientY)}px`)
+    }
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove)
+      root.style.removeProperty('--a11y-reading-line-y')
+    }
+  }, [a11yState.readingMask])
+
+  /* Global Alt+Shift shortcuts — chosen because neither browsers (Alt+←/→ is
+   * Back/Forward) nor screen readers (VoiceOver: Control+Option, NVDA/JAWS:
+   * Insert) use that combination. Always listening, not just while the panel
+   * is open, since the whole point is reaching Voice Over without opening it
+   * first. `e.code` (the physical key) is used rather than `e.key` so the
+   * binding doesn't shift with what Alt+Shift produces as a character on a
+   * given OS/layout. Skipped entirely while a real text field has focus. */
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      /* Plain Tab / Shift+Tab also step a paragraph while Voice Over is on —
+       * but ONLY when focus isn't somewhere Tab would normally need to reach:
+       * a real link/button/form field (isInteractive, same check the
+       * hover/click-to-jump effect above uses), or any control inside the
+       * panel itself (its own Play/Pause/Stop buttons and sliders still need
+       * ordinary Tab to reach each other). Without that exemption this would
+       * be a keyboard trap — the one thing an accessibility feature must
+       * never become. Alt+Shift+[ / ] (below) keep working everywhere,
+       * including while focus is on an interactive element, as the
+       * always-safe alternative. */
+      if (e.key === 'Tab' && !e.altKey && !e.ctrlKey && !e.metaKey) {
+        if (!voiceOverEnabled) return
+        const active = document.activeElement
+        const exempt =
+          active instanceof Element && (active.closest('.a11y-panel') !== null || isInteractive(active))
+        if (exempt) return
+        e.preventDefault()
+        if (e.shiftKey) back()
+        else forward()
+        return
+      }
+
+      if (!e.altKey || !e.shiftKey || e.ctrlKey || e.metaKey) return
+
+      const target = e.target
+      const isEditable =
+        target instanceof HTMLElement &&
+        (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable)
+      if (isEditable) return
+
+      switch (e.code) {
+        case 'KeyA':
+          e.preventDefault()
+          setA11yOpen((open) => !open)
+          break
+        case 'KeyV':
+          if (!VOICE_OVER_SUPPORTED) return
+          e.preventDefault()
+          toggleVoiceOver()
+          break
+        case 'KeyP':
+          if (!VOICE_OVER_SUPPORTED) return
+          e.preventDefault()
+          if (!voiceOverEnabled) {
+            // Collect segments and start reading in one step, rather than
+            // requiring a separate "turn it on" press first.
+            toggleVoiceOver()
+            play()
+          } else if (playbackStatus === 'playing') {
+            pause()
+          } else {
+            play()
+          }
+          break
+        case 'KeyS':
+          if (!VOICE_OVER_SUPPORTED) return
+          e.preventDefault()
+          resetReading()
+          break
+        case 'BracketRight':
+          if (!VOICE_OVER_SUPPORTED) return
+          e.preventDefault()
+          forward()
+          break
+        case 'BracketLeft':
+          if (!VOICE_OVER_SUPPORTED) return
+          e.preventDefault()
+          back()
+          break
+        default:
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [voiceOverEnabled, playbackStatus, toggleVoiceOver, play, pause, back, forward, resetReading])
+
   function toggleA11yOption(option: BooleanA11yKey) {
     setA11yState((current) => {
       const next = { ...current, [option]: !current[option] }
@@ -502,7 +610,13 @@ export default function AccessibilityPanel() {
 
   return (
     <div className="a11y-fab" aria-hidden={false}>
-      <button aria-label={t.a11y.toggleMenu} onClick={() => setA11yOpen((s) => !s)} className="a11y-fab-button">
+      <button
+        aria-label={t.a11y.toggleMenu}
+        aria-keyshortcuts="Alt+Shift+A"
+        title={t.a11y.panelShortcutHint}
+        onClick={() => setA11yOpen((s) => !s)}
+        className="a11y-fab-button"
+      >
         <PersonStanding size={26} />
       </button>
       {a11yOpen && (
@@ -520,20 +634,20 @@ export default function AccessibilityPanel() {
             <div className="a11y-panel-header">
               <div className="a11y-panel-header-title">
                 <div className="a11y-panel-header-icon"><PersonStanding size={16} /></div>
-                <span className="a11y-panel-header-text">Accessibility</span>
+                <span className="a11y-panel-header-text">{t.a11y.panelTitle}</span>
               </div>
-              <button type="button" onClick={() => setA11yOpen(false)} aria-label="Close" className="a11y-panel-close">
+              <button type="button" onClick={() => setA11yOpen(false)} aria-label={t.a11y.close} className="a11y-panel-close">
                 <X size={16} />
               </button>
             </div>
 
             <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Content</div>
+              <div className="a11y-panel-section-title">{t.a11y.sectionContent}</div>
               {[
-                { key: 'largeText' as const, label: 'Bigger Text', Icon: Type },
-                { key: 'lineHeight' as const, label: 'Line Height', Icon: AlignJustify },
-                { key: 'letterSpacing' as const, label: 'Letter Spacing', Icon: TextCursor },
-                { key: 'hideImages' as const, label: 'Hide Images', Icon: ImageOff },
+                { key: 'largeText' as const, label: t.a11y.optBiggerText, Icon: Type },
+                { key: 'lineHeight' as const, label: t.a11y.optLineHeight, Icon: AlignJustify },
+                { key: 'letterSpacing' as const, label: t.a11y.optLetterSpacing, Icon: TextCursor },
+                { key: 'hideImages' as const, label: t.a11y.optHideImages, Icon: ImageOff },
               ].map(({ key, label, Icon }) => (
                 <label key={key} htmlFor={`a11y-opt-${key}`} aria-label={label} className="a11y-toggle-row" data-active={String(a11yState[key])}>
                   <div className="a11y-toggle-info">
@@ -550,11 +664,11 @@ export default function AccessibilityPanel() {
             </div>
 
             <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Colors</div>
+              <div className="a11y-panel-section-title">{t.a11y.sectionColors}</div>
               {[
-                { key: 'highContrast' as const, label: 'High Contrast', Icon: Contrast },
-                { key: 'grayscale' as const, label: 'Grayscale', Icon: Accessibility },
-                { key: 'readingMask' as const, label: 'Reading Mask', Icon: Eye },
+                { key: 'highContrast' as const, label: t.a11y.optHighContrast, Icon: Contrast },
+                { key: 'grayscale' as const, label: t.a11y.optGrayscale, Icon: Accessibility },
+                { key: 'readingMask' as const, label: t.a11y.optReadingLine, Icon: Eye },
               ].map(({ key, label, Icon }) => (
                 <label key={key} htmlFor={`a11y-opt-${key}`} aria-label={label} className="a11y-toggle-row" data-active={String(a11yState[key])}>
                   <div className="a11y-toggle-info">
@@ -571,12 +685,12 @@ export default function AccessibilityPanel() {
             </div>
 
             <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Navigation & Motor</div>
+              <div className="a11y-panel-section-title">{t.a11y.sectionNavigation}</div>
               {[
-                { key: 'highlightLinks' as const, label: 'Highlight Links', Icon: Link },
-                { key: 'bigCursor' as const, label: 'Big Cursor', Icon: MousePointer2 },
-                { key: 'highlightFocus' as const, label: 'Focus Outlines', Icon: Focus },
-                { key: 'pauseAnimations' as const, label: 'Pause Animations', Icon: PauseCircle },
+                { key: 'highlightLinks' as const, label: t.a11y.optHighlightLinks, Icon: Link },
+                { key: 'bigCursor' as const, label: t.a11y.optBigCursor, Icon: MousePointer2 },
+                { key: 'highlightFocus' as const, label: t.a11y.optFocusOutlines, Icon: Focus },
+                { key: 'pauseAnimations' as const, label: t.a11y.optPauseAnimations, Icon: PauseCircle },
               ].map(({ key, label, Icon }) => (
                 <label key={key} htmlFor={`a11y-opt-${key}`} aria-label={label} className="a11y-toggle-row" data-active={String(a11yState[key])}>
                   <div className="a11y-toggle-info">
@@ -593,11 +707,11 @@ export default function AccessibilityPanel() {
             </div>
 
             <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Reading</div>
-              <label htmlFor="a11y-opt-dyslexiaFriendly" aria-label="Dyslexia Friendly" className="a11y-toggle-row" data-active={String(a11yState.dyslexiaFriendly)}>
+              <div className="a11y-panel-section-title">{t.a11y.sectionReading}</div>
+              <label htmlFor="a11y-opt-dyslexiaFriendly" aria-label={t.a11y.optDyslexiaFriendly} className="a11y-toggle-row" data-active={String(a11yState.dyslexiaFriendly)}>
                 <div className="a11y-toggle-info">
                   <div className="a11y-toggle-icon"><BookOpen size={16} /></div>
-                  <span className="a11y-toggle-label">Dyslexia Friendly</span>
+                  <span className="a11y-toggle-label">{t.a11y.optDyslexiaFriendly}</span>
                 </div>
                 <div className="a11y-switch">
                   <input id="a11y-opt-dyslexiaFriendly" type="checkbox" checked={a11yState.dyslexiaFriendly} onChange={() => toggleA11yOption('dyslexiaFriendly')} />
@@ -607,17 +721,18 @@ export default function AccessibilityPanel() {
               </label>
               {VOICE_OVER_SUPPORTED && (
                 <>
-                  <label htmlFor="a11y-opt-voiceOver" aria-label="Voice Over" className="a11y-toggle-row" data-active={String(voiceOverEnabled)}>
+                  <label htmlFor="a11y-opt-voiceOver" aria-label={t.a11y.optVoiceOver} className="a11y-toggle-row" data-active={String(voiceOverEnabled)}>
                     <div className="a11y-toggle-info">
                       <div className="a11y-toggle-icon"><Volume2 size={16} /></div>
-                      <span className="a11y-toggle-label">Voice Over</span>
+                      <span className="a11y-toggle-label">{t.a11y.optVoiceOver}</span>
                     </div>
                     <div className="a11y-switch">
                       <input
                         id="a11y-opt-voiceOver"
                         type="checkbox"
                         checked={voiceOverEnabled}
-                        aria-label="Read this page aloud"
+                        aria-label={t.a11y.voiceOverAria}
+                        aria-keyshortcuts="Alt+Shift+V"
                         onChange={toggleVoiceOver}
                       />
                       <div className="a11y-switch-track" />
@@ -628,34 +743,59 @@ export default function AccessibilityPanel() {
                   {voiceOverEnabled && (
                     <div className="a11y-voice-panel">
                       <div className="a11y-voice-transport">
-                        <button type="button" className="a11y-voice-btn" aria-label="Previous paragraph" onClick={back}>
+                        <button
+                          type="button"
+                          className="a11y-voice-btn"
+                          aria-label={t.a11y.voicePrev}
+                          aria-keyshortcuts="Alt+Shift+["
+                          onClick={back}
+                        >
                           <SkipBack size={15} />
                         </button>
                         {playbackStatus === 'playing' ? (
-                          <button type="button" className="a11y-voice-btn a11y-voice-btn--primary" aria-label="Pause" onClick={pause}>
+                          <button
+                            type="button"
+                            className="a11y-voice-btn a11y-voice-btn--primary"
+                            aria-label={t.a11y.voicePause}
+                            aria-keyshortcuts="Alt+Shift+P"
+                            onClick={pause}
+                          >
                             <Pause size={18} />
                           </button>
                         ) : (
-                          <button type="button" className="a11y-voice-btn a11y-voice-btn--primary" aria-label="Play" onClick={play}>
+                          <button
+                            type="button"
+                            className="a11y-voice-btn a11y-voice-btn--primary"
+                            aria-label={t.a11y.voicePlay}
+                            aria-keyshortcuts="Alt+Shift+P"
+                            onClick={play}
+                          >
                             <Play size={18} />
                           </button>
                         )}
                         <button
                           type="button"
                           className="a11y-voice-btn"
-                          aria-label="Stop"
+                          aria-label={t.a11y.voiceStop}
+                          aria-keyshortcuts="Alt+Shift+S"
                           disabled={playbackStatus === 'idle'}
                           onClick={resetReading}
                         >
                           <Square size={14} />
                         </button>
-                        <button type="button" className="a11y-voice-btn" aria-label="Next paragraph" onClick={forward}>
+                        <button
+                          type="button"
+                          className="a11y-voice-btn"
+                          aria-label={t.a11y.voiceNext}
+                          aria-keyshortcuts="Alt+Shift+]"
+                          onClick={forward}
+                        >
                           <SkipForward size={15} />
                         </button>
                       </div>
 
                       <label className="a11y-voice-slider-row">
-                        <span className="a11y-voice-slider-label">Speed</span>
+                        <span className="a11y-voice-slider-label">{t.a11y.voiceSpeed}</span>
                         <input
                           className="a11y-voice-slider"
                           type="range"
@@ -663,14 +803,14 @@ export default function AccessibilityPanel() {
                           max={2}
                           step={0.1}
                           value={a11yState.voiceRate}
-                          aria-label="Reading speed"
+                          aria-label={t.a11y.voiceSpeedAria}
                           onChange={(e) => setVoiceRate(Number(e.target.value))}
                         />
                         <span className="a11y-voice-slider-value">{a11yState.voiceRate.toFixed(1)}×</span>
                       </label>
 
                       <label className="a11y-voice-slider-row">
-                        <span className="a11y-voice-slider-label">Pitch</span>
+                        <span className="a11y-voice-slider-label">{t.a11y.voicePitch}</span>
                         <input
                           className="a11y-voice-slider"
                           type="range"
@@ -678,16 +818,14 @@ export default function AccessibilityPanel() {
                           max={2}
                           step={0.1}
                           value={a11yState.voicePitch}
-                          aria-label="Voice pitch"
+                          aria-label={t.a11y.voicePitchAria}
                           onChange={(e) => setVoicePitch(Number(e.target.value))}
                         />
                         <span className="a11y-voice-slider-value">{a11yState.voicePitch.toFixed(1)}×</span>
                       </label>
 
-                      <p className="a11y-voice-hint">
-                        Hover or tap any paragraph to read from there. Use ⏮ ⏭ to move by
-                        paragraph. Reading stops if you leave this page.
-                      </p>
+                      <p className="a11y-voice-hint">{t.a11y.voiceHint}</p>
+                      <p className="a11y-voice-hint">{t.a11y.voiceShortcuts}</p>
                     </div>
                   )}
                 </>
@@ -695,12 +833,12 @@ export default function AccessibilityPanel() {
             </div>
 
             <div className="a11y-panel-section">
-              <div className="a11y-panel-section-title">Quick Presets</div>
+              <div className="a11y-panel-section-title">{t.a11y.sectionPresets}</div>
               <div className="a11y-profiles">
                 {[
-                  { id: 'vision' as const, label: 'Vision', Icon: Eye },
-                  { id: 'navigation' as const, label: 'Navigation', Icon: Compass },
-                  { id: 'focus' as const, label: 'Focus', Icon: Target },
+                  { id: 'vision' as const, label: t.a11y.presetVision, Icon: Eye },
+                  { id: 'navigation' as const, label: t.a11y.presetNavigation, Icon: Compass },
+                  { id: 'focus' as const, label: t.a11y.presetFocus, Icon: Target },
                 ].map(({ id, label, Icon }) => (
                   <button key={id} type="button" className="a11y-profile-btn" onClick={() => applyProfile(id)}>
                     <div className="a11y-profile-icon"><Icon size={14} /></div>
@@ -710,13 +848,15 @@ export default function AccessibilityPanel() {
               </div>
             </div>
 
+            <p className="a11y-voice-hint" style={{ padding: '0 20px' }}>{t.a11y.panelShortcutHint}</p>
+
             <div className="a11y-panel-footer">
               <button type="button" className="a11y-panel-reset" onClick={() => {
                 setA11yState(BLANK_A11Y_STATE)
                 applyA11yClasses(BLANK_A11Y_STATE)
                 persistA11yState(BLANK_A11Y_STATE)
-              }}>Reset All</button>
-              <span className="a11y-panel-status">12 options</span>
+              }}>{t.a11y.resetAll}</button>
+              <span className="a11y-panel-status">{OPTION_COUNT} {t.a11y.optionsWord}</span>
             </div>
           </div>
         </>
