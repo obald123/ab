@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { IconNews, IconAlert, IconArrowRight, IconCalendar } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import SmartImage from '../components/page/SmartImage'
 import { Chip, Section, type Tone } from '../components/page/ui'
 import { useCollection } from '../lib/content'
-import { NOTICES, formatDate, type NoticeLevel } from '../data/site'
+import { NOTICES, formatDate, formatTimestamp, type NoticeLevel } from '../data/site'
 import { useT } from '../lib/i18n'
+import { FALLBACK_PRESS, type NewsRelease } from '../data/news'
 
 /* As stored in the CMS: `reference` is the printed notice code — `ref` was the
    name the hardcoded array used. */
@@ -26,53 +28,6 @@ const FALLBACK_NOTICES: PublicNotice[] = NOTICES.map(({ ref, ...notice }) => ({
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
 
-/* Press releases mirror the seed data used by the home-page News section.
-   Kept here so this page reads as the full archive rather than the
-   three-item teaser the one-pager shows. */
-/** Shown only until the CMS responds, and if it never does. */
-const FALLBACK_PRESS = [
-  {
-    id: 'p1',
-    category: 'Bancassurance',
-    tag: 'New Product',
-    date: '2026-07-12',
-    title: 'NGOBOKA Life Insurance Now Available at All AB Rwanda Branches',
-    excerpt:
-      'In partnership with Sanlam Vie, AB Rwanda launches NGOBOKA — an accessible life insurance scheme offering individual coverage from RWF 400/month and family protection for spouse and up to four children from RWF 900/month.',
-    image: 'https://images.unsplash.com/photo-1678225894217-ec0de2dc0548?w=1200&h=700&fit=crop&auto=format',
-  },
-  {
-    id: 'p2',
-    category: 'Digital',
-    tag: 'Milestone',
-    date: '2026-05-30',
-    title: 'E-kash Surpasses 50,000 Active Users Across All Networks',
-    excerpt:
-      'Our digital payment platform E-kash — accessible via *540# — now covers all major mobile network operators and partner banks, bringing seamless mobile banking to every corner of Rwanda.',
-    image: 'https://images.unsplash.com/photo-1708772565599-2c4e4b3ed9db?w=600&h=400&fit=crop&auto=format',
-  },
-  {
-    id: 'p3',
-    category: 'Network',
-    tag: 'Expansion',
-    date: '2026-04-08',
-    title: 'AB Rwanda Opens Its 47th Service Point in Ngoma',
-    excerpt:
-      'The new credit outlet extends the bank network deeper into the Eastern Province, serving agri-businesses and traders across the Ngoma catchment area.',
-    image: 'https://images.unsplash.com/photo-1585540083814-ea6ee8af9e4f?w=600&h=400&fit=crop&auto=format',
-  },
-  {
-    id: 'p4',
-    category: 'Corporate',
-    tag: 'Results',
-    date: '2026-04-05',
-    title: 'AB Bank Rwanda Publishes Audited FY2025 Financial Statements',
-    excerpt:
-      'The bank reports continued portfolio growth and improved asset quality for the financial year ended 31 December 2025. Full statements are available on the Forms & Downloads page.',
-    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=400&fit=crop&auto=format',
-  },
-]
-
 const LEVEL: Record<NoticeLevel, { tone: Tone; band: string; ink: string; wash: string }> = {
   Information: { tone: 'blue', band: '#0ea5e9', ink: '#0284c7', wash: 'rgba(14,165,233,0.05)' },
   Important: { tone: 'amber', band: '#d97706', ink: '#b45309', wash: 'rgba(217,119,6,0.05)' },
@@ -85,18 +40,22 @@ const LEVEL: Record<NoticeLevel, { tone: Tone; band: string; ink: string; wash: 
    understands. So the rail is only drawn when the value really is a date;
    anything else is shown as written. */
 function DateRail({ iso }: { iso: string }) {
-  const d = new Date(iso + 'T00:00:00')
+  const t = useT()
+  const d = new Date(iso)
   if (Number.isNaN(d.getTime())) {
     return (
       <div style={{ textAlign: 'center', flexShrink: 0, width: 66 }}>
-        <div style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: '#0284c7', lineHeight: 1.5 }}>
-          {iso}
+        <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: '#0284c7', lineHeight: 1.5 }}>
+          {t.common.uploaded}
         </div>
       </div>
     )
   }
   return (
-    <div style={{ textAlign: 'center', flexShrink: 0, width: 66 }}>
+      <div style={{ textAlign: 'center', flexShrink: 0, width: 82 }}>
+      <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
+        {t.common.uploaded}
+      </div>
       <div style={{ fontFamily: 'var(--font-serif)', fontSize: 34, fontWeight: 700, color: '#0284c7', lineHeight: 1 }}>
         {d.getDate()}
       </div>
@@ -115,15 +74,27 @@ function DateRail({ iso }: { iso: string }) {
         <br />
         {d.getFullYear()}
       </div>
+      <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: '#647080', marginTop: 3 }}>
+        {d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Kigali' })}
+      </div>
     </div>
   )
+}
+
+function publishedAt(createdAt?: string): number {
+  const timestamp = Date.parse(createdAt ?? '')
+  return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp
 }
 
 type Tab = 'press' | 'notices'
 
 export default function NewsPage() {
   const t = useT()
-  const { data: press } = useCollection<(typeof FALLBACK_PRESS)[number]>('news', FALLBACK_PRESS)
+  const { data: press } = useCollection<NewsRelease>('news', FALLBACK_PRESS)
+  const latestFirst = useMemo(
+    () => [...press].sort((a, b) => publishedAt(b.createdAt) - publishedAt(a.createdAt)),
+    [press],
+  )
   const [tab, setTab] = useState<Tab>('press')
   const { data: notices } = useCollection<PublicNotice>('notice', FALLBACK_NOTICES)
   /* Null means "the reader has not chosen one", which resolves to the first
@@ -132,7 +103,7 @@ export default function NewsPage() {
      state from the first render would leave nothing open at that point. */
   const [openNotice, setOpenNotice] = useState<string | null>(null)
   const openNoticeId = openNotice ?? notices[0]?.id ?? null
-  const [lead, ...rest] = press
+  const [lead, ...rest] = latestFirst
 
   return (
     <div>
@@ -193,7 +164,9 @@ export default function NewsPage() {
           })}
         </div>
 
-        {tab === 'press' ? (
+        {tab === 'press' ? latestFirst.length === 0 ? (
+          <p role="status" style={{ color: '#647080', padding: '32px 0' }}>No news releases are available.</p>
+        ) : (
           <>
             {/* ── Lead story: copy sits on the image, newsroom style ── */}
             <article className="news-lead" style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', marginBottom: 8 }}>
@@ -292,9 +265,10 @@ export default function NewsPage() {
                       }}
                     >
                       <IconCalendar size={13} strokeWidth={2} color="rgba(224,242,254,0.7)" />
-                      {formatDate(lead.date)}
+                      {t.common.uploaded} {formatTimestamp(lead.createdAt)}
                     </span>
-                    <span
+                    <Link
+                      to={`/media/news/${encodeURIComponent(lead.id)}`}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -302,11 +276,12 @@ export default function NewsPage() {
                         fontSize: 13.5,
                         fontWeight: 800,
                         color: '#bae6fd',
+                        textDecoration: 'none',
                       }}
                     >
                       {t.newsPage.readFullRelease}
                       <IconArrowRight size={14} strokeWidth={2.4} color="#bae6fd" />
-                    </span>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -374,6 +349,11 @@ export default function NewsPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
+                        {notice.createdAt && (
+                          <span>
+                            {t.common.uploaded} {formatTimestamp(notice.createdAt)}
+                          </span>
+                        )}
                         {t.newsPage.effective} {formatDate(notice.effective)}
                       </span>
                     </div>
@@ -426,11 +406,13 @@ export default function NewsPage() {
   )
 }
 
-function PressRow({ item }: { item: (typeof FALLBACK_PRESS)[number] }) {
+function PressRow({ item }: { item: NewsRelease }) {
   const [hover, setHover] = useState(false)
   return (
-    <article
+    <Link
+      to={`/media/news/${encodeURIComponent(item.id)}`}
       className="press-row"
+      aria-label={`Read full release: ${item.title}`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
@@ -441,9 +423,11 @@ function PressRow({ item }: { item: (typeof FALLBACK_PRESS)[number] }) {
         borderBottom: '1px solid rgba(14,165,233,0.16)',
         background: hover ? 'rgba(14,165,233,0.035)' : 'transparent',
         transition: 'background 0.2s ease',
+        color: 'inherit',
+        textDecoration: 'none',
       }}
     >
-      <DateRail iso={item.date} />
+      <DateRail iso={item.createdAt ?? ''} />
 
       <div
         style={{
@@ -499,6 +483,6 @@ function PressRow({ item }: { item: (typeof FALLBACK_PRESS)[number] }) {
       >
         <IconArrowRight size={15} strokeWidth={2.4} color={hover ? '#fff' : '#0ea5e9'} />
       </span>
-    </article>
+    </Link>
   )
 }

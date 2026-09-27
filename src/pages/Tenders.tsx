@@ -3,7 +3,7 @@ import { IconGavel, IconDownload, IconAlert } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, DeadlineRing, EmptyState, FilterBar, Section, Stamp, type Tone } from '../components/page/ui'
 import { mediaUrl, useCollection } from '../lib/content'
-import { TENDERS, daysUntil, formatDate, type Tender, type TenderStatus } from '../data/site'
+import { TENDERS, daysUntil, formatDate, formatTimestamp, type Tender, type TenderStatus } from '../data/site'
 import { useT } from '../lib/i18n'
 
 const PROCUREMENT_EMAIL = 'procurement@abr.rw'
@@ -14,10 +14,12 @@ const STATUSES = ['All', 'Open', 'Closing soon', 'Closed', 'Awarded'] as const
 type Notice = Omit<Tender, 'id' | 'ref' | 'documents'> & {
   id: string
   reference: string
+  createdAt?: string
   documents: {
     id: string
     label: string
     size: string
+    fileUploadedAt?: string
     /** Media key/URL from the upload pipeline. Absent on a row created
      *  before this field existed, or one nobody has attached a file to yet. */
     file?: string
@@ -27,6 +29,7 @@ type Notice = Omit<Tender, 'id' | 'ref' | 'documents'> & {
 /** Shown only until the CMS responds, and if it never does. */
 const FALLBACK_TENDERS: Notice[] = TENDERS.map((tender) => ({
   ...tender,
+  createdAt: tender.published ? `${tender.published}T09:00:00+02:00` : undefined,
   reference: tender.ref,
   documents: tender.documents.map((doc, i) => ({ ...doc, id: `doc-${String(i + 1)}` })),
 }))
@@ -117,6 +120,14 @@ function TenderRow({ tender }: { tender: Notice }) {
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
               <Chip tone={STATUS_TONE[tender.status]}>{statusLabel(t, tender.status)}</Chip>
               <Chip tone="grey">{tender.category}</Chip>
+              {tender.createdAt && (
+                <time
+                  dateTime={tender.createdAt}
+                  style={{ alignSelf: 'center', color: '#647080', fontSize: 11.5, fontWeight: 700 }}
+                >
+                  {t.common.uploaded} {formatTimestamp(tender.createdAt)}
+                </time>
+              )}
             </div>
 
             <p style={{ fontSize: 14, color: '#647080', lineHeight: 1.72, margin: 0, maxWidth: 660 }}>
@@ -234,7 +245,12 @@ function TenderRow({ tender }: { tender: Notice }) {
                   >
                     <IconDownload size={17} color={ready ? '#0ea5e9' : '#94a3b8'} strokeWidth={2} />
                     <span style={{ flex: 1, fontSize: 13.5, fontWeight: 700, color: '#0f172a' }}>{d.label}</span>
-                    <span style={{ fontFamily: MONO, fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 10.5, color: '#94a3b8', fontWeight: 700, textAlign: 'right' }}>
+                      {d.fileUploadedAt && (
+                        <span style={{ display: 'block', marginBottom: 3 }}>
+                          {t.common.uploaded} {formatTimestamp(d.fileUploadedAt)}
+                        </span>
+                      )}
                       {ready ? `PDF · ${d.size}` : t.common.notReady}
                     </span>
                   </a>

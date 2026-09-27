@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import { motion } from 'framer-motion'
 import { IconMapPin } from './Icons'
 import pinBlueUrl from '../imports/icons/pin-blue.svg'
-import pinGreyUrl from '../imports/icons/pin-grey.svg'
+import pinRedUrl from '../imports/icons/pin-red.svg'
 import { useCollection } from '../lib/content'
 import { useT } from '../lib/i18n'
 
@@ -145,10 +145,10 @@ export default function Branches() {
 
     // Bundled SVG icons (imported as URLs so they survive the production build)
     const blueIcon = L.icon({ iconUrl: pinBlueUrl, iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -32] })
-    const greyIcon = L.icon({ iconUrl: pinGreyUrl, iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -32] })
+    const redIcon = L.icon({ iconUrl: pinRedUrl, iconSize: [28, 36], iconAnchor: [14, 36], popupAnchor: [0, -32] })
 
     branches.forEach((b) => {
-      const icon = b.isHQ ? greyIcon : blueIcon
+      const icon = b.isHQ ? redIcon : blueIcon
       const marker = L.marker([b.lat, b.lng], { icon, riseOnHover: true }).addTo(map)
       marker.bindPopup(popupHtml(b), { closeButton: false, maxWidth: 260 })
 

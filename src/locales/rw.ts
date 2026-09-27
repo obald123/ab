@@ -25,6 +25,7 @@ export const rw: Dictionary = {
     all: 'Byose',
     loading: 'Birimo gutangira…',
     download: 'Kuramo',
+    uploaded: 'Byashyizweho',
     showing: 'Twerekana',
     of: 'muri',
     noResults: 'Nta cyabonetse kuri iryo shakisha. Gerageza andi magambo cyangwa usibe uko washunguye.',

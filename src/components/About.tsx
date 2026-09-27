@@ -1574,7 +1574,7 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
               {t.about.management}
             </h2>
           </R>
-          <div className="about-management" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 22 }}>
+          <div className="about-management about-member-grid">
             {management.map((m, i) => <ManagementCard key={m.name} m={m} i={i} />)}
           </div>
         </div>
@@ -1594,7 +1594,7 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
               {t.about.board}
             </h2>
           </R>
-          <div className="about-board" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 22 }}>
+          <div className="about-board about-member-grid">
             {board.map((b, i) => <BoardCard key={b.name} b={b} i={i} />)}
           </div>
         </div>

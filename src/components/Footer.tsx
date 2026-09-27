@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useSingleton } from '../lib/content'
 import { useT } from '../lib/i18n'
@@ -108,6 +109,23 @@ export default function Footer() {
   const t = useT()
   const { data: footer } = useSingleton<FooterDocument>('footer', FALLBACK_FOOTER)
   const { pathname } = useLocation()
+  const footerRef = useRef<HTMLElement | null>(null)
+  const [footerLogoHidden, setFooterLogoHidden] = useState(false)
+
+  useEffect(() => {
+    function updateLogoVisibility() {
+      const footerTop = footerRef.current?.getBoundingClientRect().top ?? Infinity
+      setFooterLogoHidden(footerTop <= window.innerHeight / 2)
+    }
+
+    updateLogoVisibility()
+    window.addEventListener('scroll', updateLogoVisibility, { passive: true })
+    window.addEventListener('resize', updateLogoVisibility)
+    return () => {
+      window.removeEventListener('scroll', updateLogoVisibility)
+      window.removeEventListener('resize', updateLogoVisibility)
+    }
+  }, [])
 
   /* Already on the home page, <Link to="/"> is inert; take over and scroll
      back up to the hero. From any other route, let it navigate normally. */
@@ -119,7 +137,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="edge-curve-t" style={{ background: '#0284c7', padding: '104px 48px 28px' }}>
+    <footer ref={footerRef} className="edge-curve-t" style={{ background: '#0284c7', padding: '104px 48px 28px' }}>
       <div style={{ margin: '0 auto' }}>
         <div
           className="footer-grid"
@@ -143,6 +161,9 @@ export default function Footer() {
                 borderRadius: 12,
                 padding: '12px 20px',
                 boxShadow: '0 6px 18px rgba(2,30,60,0.16)',
+                opacity: footerLogoHidden ? 0 : 1,
+                visibility: footerLogoHidden ? 'hidden' : 'visible',
+                transition: 'opacity 0.2s ease',
               }}
             >
               <img

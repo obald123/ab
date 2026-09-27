@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { IconBriefcase, IconMapPin, IconCalendar, IconArrowRight, IconSend } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, DeadlineRing, EmptyState, FilterBar, Section } from '../components/page/ui'
@@ -39,6 +39,10 @@ function closingTone(job: Posting) {
   if (d < 0) return { tone: 'grey' as const, label: 'Closed' }
   if (d <= 7) return { tone: 'amber' as const, label: 'Closing soon' }
   return { tone: 'green' as const, label: 'Open' }
+}
+
+function localDayTimestamp(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
 }
 
 /* ── Application form ──
@@ -386,7 +390,32 @@ function JobRow({ job }: { job: Posting }) {
             >
               {open ? t.list.hideDetails : t.list.viewFull}
             </button>
-            {!closed && !applying && (
+            {!closed && job.applicationUrl && (
+              <a
+                href={job.applicationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  background: accent,
+                  border: 'none',
+                  color: '#fff',
+                  borderRadius: 100,
+                  padding: '9px 20px',
+                  fontWeight: 800,
+                  fontSize: 13.5,
+                  textDecoration: 'none',
+                  fontFamily: 'inherit',
+                  boxShadow: `0 8px 20px ${accent}44`,
+                }}
+              >
+                Click here to apply
+                <IconArrowRight size={14} strokeWidth={2.4} color="#fff" />
+              </a>
+            )}
+            {!closed && !applying && !job.applicationUrl && (
               <button
                 onClick={() => {
                   setOpen(true)
@@ -481,20 +510,35 @@ export default function Careers() {
   const t = useT()
   const [query, setQuery] = useState('')
   const [dept, setDept] = useState<string>('All')
+  const [calendarDay, setCalendarDay] = useState(() => localDayTimestamp(new Date()))
   const { data: jobs } = useCollection<Posting>('career', FALLBACK_POSTINGS)
 
-  const departments = useMemo(() => departmentsOf(jobs), [jobs])
+  useEffect(() => {
+    const nextMidnight = new Date()
+    nextMidnight.setHours(24, 0, 0, 0)
+    const timeout = window.setTimeout(
+      () => setCalendarDay(localDayTimestamp(new Date())),
+      nextMidnight.getTime() - Date.now(),
+    )
+    return () => window.clearTimeout(timeout)
+  }, [calendarDay])
+
+  const openJobs = useMemo(
+    () => jobs.filter((job) => new Date(`${job.closes}T00:00:00`).getTime() >= calendarDay),
+    [jobs, calendarDay],
+  )
+  const departments = useMemo(() => departmentsOf(openJobs), [openJobs])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return jobs.filter(
+    return openJobs.filter(
       (j) =>
         (dept === 'All' || j.department === dept) &&
         (!q || `${j.title} ${j.summary} ${j.location} ${j.level}`.toLowerCase().includes(q)),
     )
-  }, [query, dept, jobs])
+  }, [query, dept, openJobs])
 
-  const openCount = jobs.filter((j) => daysUntil(j.closes) >= 0).length
+  const openCount = openJobs.length
 
   return (
     <div>
@@ -546,7 +590,7 @@ export default function Careers() {
         <p style={{ fontSize: 13, color: '#647080', marginBottom: 20 }}>
           {t.list.showing
             .replace('{shown}', String(filtered.length))
-            .replace('{total}', String(jobs.length))
+            .replace('{total}', String(openJobs.length))
             .replace('{noun}', t.list.positions)}
         </p>
 

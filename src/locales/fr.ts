@@ -22,6 +22,7 @@ export const fr: Dictionary = {
     all: 'Tout',
     loading: 'Chargement…',
     download: 'Télécharger',
+    uploaded: 'Mis en ligne',
     showing: 'Affichage de',
     of: 'sur',
     noResults: 'Aucun résultat pour cette recherche. Essayez d’autres termes ou effacez les filtres.',

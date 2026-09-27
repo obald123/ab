@@ -22,6 +22,7 @@ export const en = {
     all: 'All',
     loading: 'Loading…',
     download: 'Download',
+    uploaded: 'Uploaded',
     showing: 'Showing',
     of: 'of',
     noResults: 'No results match that search. Try different terms or clear the filters.',

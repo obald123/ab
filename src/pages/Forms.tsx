@@ -3,13 +3,16 @@ import { IconFileText, IconDownload, IconMapPin } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { EmptyState, FilterBar, Section } from '../components/page/ui'
 import { mediaUrl, useCollection } from '../lib/content'
-import { FORMS, formatDate, type FormDoc } from '../data/site'
+import { FORMS, formatTimestamp, type FormDoc } from '../data/site'
 import { useT } from '../lib/i18n'
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace'
 
 /** Shown only until the CMS responds, and if it never does. */
-const FALLBACK_FORMS: FormDoc[] = FORMS
+const FALLBACK_FORMS: FormDoc[] = FORMS.map((doc) => ({
+  ...doc,
+  createdAt: doc.updated ? `${doc.updated}T09:00:00+02:00` : undefined,
+}))
 
 const TYPE_COLOR: Record<FormDoc['fileType'], string> = {
   PDF: '#b91c1c',
@@ -24,6 +27,7 @@ function FormTile({ doc }: { doc: FormDoc }) {
   const t = useT()
   const [hover, setHover] = useState(false)
   const color = TYPE_COLOR[doc.fileType]
+  const uploadedAt = doc.fileUploadedAt ?? doc.createdAt
   /* Rows created before the document-upload field existed, or one nobody has
      attached a real file to yet, have no `file` — the tile still renders, but
      honestly, rather than linking to a file that isn't there. */
@@ -150,8 +154,11 @@ function FormTile({ doc }: { doc: FormDoc }) {
           }}
         >
           <span>{doc.size}</span>
-          <span aria-hidden="true">·</span>
-          <span>{t.forms.updated} {formatDate(doc.updated)}</span>
+          {uploadedAt && (
+            <time dateTime={uploadedAt}>
+              {t.common.uploaded} {formatTimestamp(uploadedAt)}
+            </time>
+          )}
           <span
             style={{
               marginLeft: 'auto',

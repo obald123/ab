@@ -140,7 +140,7 @@ export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | '
 
 interface CollectionResponse<T> {
   kind: 'collection'
-  items: (T & { id: string })[]
+  items: (T & { id: string; createdAt?: string })[]
 }
 
 interface SingletonResponse<T> {
@@ -174,11 +174,16 @@ export interface ContentState<T> {
   degraded: boolean
 }
 
+export type PublicCollectionItem<T> = T & { createdAt?: string }
+
 /** Published items of a collection type, with a fallback while offline. */
-export function useCollection<T>(type: CollectionType, fallback: T[]): ContentState<T[]> {
+export function useCollection<T>(
+  type: CollectionType,
+  fallback: T[],
+): ContentState<PublicCollectionItem<T>[]> {
   const { locale } = useLocale()
-  const [state, setState] = useState<ContentState<T[]>>({
-    data: fallback,
+  const [state, setState] = useState<ContentState<PublicCollectionItem<T>[]>>({
+    data: fallback as PublicCollectionItem<T>[],
     loading: true,
     degraded: false,
   })
@@ -194,7 +199,7 @@ export function useCollection<T>(type: CollectionType, fallback: T[]): ContentSt
       .catch((error: unknown) => {
         if (controller.signal.aborted) return
         if (error instanceof Error && error.name === 'AbortError') return
-        setState({ data: fallback, loading: false, degraded: true })
+        setState({ data: fallback as PublicCollectionItem<T>[], loading: false, degraded: true })
       })
 
     return () => {

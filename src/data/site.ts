@@ -29,6 +29,7 @@ export type Job = {
   level: string
   posted: string
   closes: string
+  applicationUrl?: string
   summary: string
   responsibilities: string[]
   requirements: string[]
@@ -163,11 +164,12 @@ export type Tender = {
   ref: string
   title: string
   category: string
-  published: string
+  published?: string
+  createdAt?: string
   deadline: string
   status: TenderStatus
   summary: string
-  documents: { label: string; size: string }[]
+  documents: { label: string; size: string; fileUploadedAt?: string }[]
 }
 
 export const TENDERS: Tender[] = [
@@ -236,7 +238,8 @@ export type Article = {
   excerpt: string
   author: string
   authorRole: string
-  published: string
+  published?: string
+  createdAt?: string
   readMins: number
   image: string
 }
@@ -363,7 +366,9 @@ export type FormDoc = {
   description: string
   fileType: 'PDF' | 'DOCX' | 'XLSX'
   size: string
-  updated: string
+  updated?: string
+  createdAt?: string
+  fileUploadedAt?: string
   /** Media key/URL from the upload pipeline. Absent on a row created before
    *  this field existed, or one nobody has attached a file to yet. */
   file?: string
@@ -523,6 +528,20 @@ export function formatDate(iso: string) {
     month: 'short',
     year: 'numeric',
   })
+}
+
+export function formatTimestamp(iso?: string) {
+  if (!iso) return ''
+  const timestamp = new Date(iso)
+  if (Number.isNaN(timestamp.getTime())) return ''
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Africa/Kigali',
+  }).format(timestamp)
 }
 
 /** Whole days from today until `iso`. Negative once the date has passed. */

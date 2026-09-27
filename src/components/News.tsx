@@ -1,12 +1,15 @@
 import { useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { IconNews } from './Icons'
 import { mediaUrl, useCollection } from '../lib/content'
+import { formatTimestamp } from '../data/site'
 import { useT } from '../lib/i18n'
 
 interface Article {
+  id: string
   category: string
   tag: string
-  date: string
+  createdAt?: string
   title: string
   excerpt: string
   image: string
@@ -16,27 +19,30 @@ interface Article {
 /** Shown only until the CMS responds, and if it never does. */
 const FALLBACK: Article[] = [
   {
+    id: 'p1',
     category: 'Bancassurance',
     tag: 'New Product',
-    date: 'July 2026',
+    createdAt: '2026-07-12T09:00:00+02:00',
     title: 'NGOBOKA Life Insurance Now Available at All AB Rwanda Branches',
     excerpt: 'In partnership with Sanlam Vie, AB Rwanda launches NGOBOKA — an accessible life insurance scheme offering individual coverage from RWF 400/month and family protection for spouse and up to four children from RWF 900/month.',
     image: 'https://images.unsplash.com/photo-1678225894217-ec0de2dc0548?w=800&h=500&fit=crop&auto=format',
     featured: true,
   },
   {
+    id: 'p2',
     category: 'Digital',
     tag: 'Milestone',
-    date: 'June 2023',
+    createdAt: '2023-06-10T09:00:00+02:00',
     title: 'E-kash Expands Across All Mobile Networks in Rwanda',
     excerpt: 'Our digital payment platform E-kash — accessible via *540# — now covers all major MNOs and partner banks, bringing seamless mobile banking to every Rwandan.',
     image: 'https://images.unsplash.com/photo-1708772565599-2c4e4b3ed9db?w=600&h=400&fit=crop&auto=format',
     featured: false,
   },
   {
+    id: 'p3',
     category: 'Expansion',
     tag: 'Partnership',
-    date: 'July 2020',
+    createdAt: '2020-07-10T09:00:00+02:00',
     title: 'AB IBAKWE Mobile Service Launches with MTN Rwanda',
     excerpt: 'Customers can now transfer between their MTN MoMo wallet and AB Rwanda account in both directions using *182*4# — no branch visit required.',
     image: 'https://images.unsplash.com/photo-1585540083814-ea6ee8af9e4f?w=600&h=400&fit=crop&auto=format',
@@ -47,6 +53,9 @@ const FALLBACK: Article[] = [
 export default function News() {
   const t = useT()
   const { data: articles } = useCollection<Article>('news', FALLBACK)
+  const latestFirst = [...articles].sort(
+    (a, b) => Date.parse(b.createdAt ?? '') - Date.parse(a.createdAt ?? ''),
+  )
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -76,7 +85,7 @@ export default function News() {
      unpublishing every article is a real, reachable state, not an impossible
      one. Reading articles[0] unguarded crashed the whole page here. With no
      news to show, the section removes itself rather than heading an empty grid. */
-  const [featured, ...rest] = articles
+  const [featured, ...rest] = latestFirst
   if (!featured) return null
 
   return (
@@ -120,7 +129,11 @@ export default function News() {
         </div>
 
         {/* Featured article */}
-        <div data-reveal style={{ marginBottom: 24 }}>
+        <Link
+          to={`/media/news/${encodeURIComponent(featured.id)}`}
+          data-reveal
+          style={{ display: 'block', color: 'inherit', textDecoration: 'none', marginBottom: 24 }}
+        >
           <div className="news-featured" style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
             background: '#ffffff', border: '1px solid rgba(14,165,233,0.12)',
@@ -172,7 +185,9 @@ export default function News() {
             <div className="news-featured-content" style={{ padding: '44px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
                 <div style={{ width: 40, height: 3, background: '#0ea5e9', borderRadius: 2 }} />
-                <span style={{ fontSize: 12, color: '#8fa0aa', fontWeight: 600 }}>{featured.date}</span>
+                <span style={{ fontSize: 12, color: '#8fa0aa', fontWeight: 600 }}>
+                  {t.common.uploaded} {formatTimestamp(featured.createdAt)}
+                </span>
               </div>
               <h3 style={{
                 fontWeight: 800, fontSize: 22, color: '#0284c7',
@@ -183,40 +198,38 @@ export default function News() {
               <p style={{ fontSize: 14.5, color: '#647080', lineHeight: 1.7, marginBottom: 28 }}>
                 {featured.excerpt}
               </p>
-              <a href="#news" style={{
+              <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 fontSize: 13.5, fontWeight: 700, color: '#0ea5e9', textDecoration: 'none',
                 transition: 'gap 0.2s',
-              }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '12px' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.gap = '8px' }}
-              >
+              }}>
                 {t.newsSection.readFullStory}
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </a>
+              </span>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Sub articles */}
         <div className="news-sub-articles" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           {rest.map(article => (
-            <div key={article.title} data-reveal style={{
+            <Link key={article.id} to={`/media/news/${encodeURIComponent(article.id)}`} data-reveal style={{
               background: '#ffffff', border: '1px solid rgba(14,165,233,0.1)',
               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
               transition: 'box-shadow 0.25s, border-color 0.25s, transform 0.25s',
               boxShadow: '0 4px 20px rgba(14,165,233,0.06)',
+              color: 'inherit', textDecoration: 'none', display: 'block',
             }}
               onMouseEnter={e => {
-                const el = e.currentTarget as HTMLDivElement
+                const el = e.currentTarget as HTMLAnchorElement
                 el.style.boxShadow = '0 16px 48px rgba(14,165,233,0.14)'
                 el.style.borderColor = 'rgba(14,165,233,0.3)'
                 el.style.transform = 'translateY(-4px)'
               }}
               onMouseLeave={e => {
-                const el = e.currentTarget as HTMLDivElement
+                const el = e.currentTarget as HTMLAnchorElement
                 el.style.boxShadow = '0 4px 20px rgba(14,165,233,0.06)'
                 el.style.borderColor = 'rgba(14,165,233,0.1)'
                 el.style.transform = 'none'
@@ -246,7 +259,7 @@ export default function News() {
 
               <div style={{ padding: '24px 26px 28px' }}>
                 <p style={{ fontSize: 11, color: '#8fa0aa', fontWeight: 700, marginBottom: 10, letterSpacing: '0.06em' }}>
-                  {article.date}
+                  {t.common.uploaded} {formatTimestamp(article.createdAt)}
                 </p>
                 <h3 style={{
                   fontWeight: 800, fontSize: 17, color: '#0284c7',
@@ -261,7 +274,7 @@ export default function News() {
                   {`${t.newsSection.readMore} \u2192`}
                 </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

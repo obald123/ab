@@ -8,6 +8,7 @@ import Careers from './pages/Careers'
 import Tenders from './pages/Tenders'
 import Articles from './pages/Articles'
 import NewsPage from './pages/NewsPage'
+import NewsArticlePage from './pages/NewsArticlePage'
 import Forms from './pages/Forms'
 import ReportIncident from './pages/ReportIncident'
 import ReportStatus from './pages/ReportStatus'
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="awards" element={<Awards />} />
           <Route path="tenders" element={<Tenders />} />
           <Route path="media/news" element={<NewsPage />} />
+          <Route path="media/news/:id" element={<NewsArticlePage />} />
           <Route path="media/articles" element={<Articles />} />
           <Route path="forms" element={<Forms />} />
           <Route path="report" element={<ReportIncident />} />

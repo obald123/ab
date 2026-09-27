@@ -56,6 +56,20 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+.about-member-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+@media (max-width: 1023px) {
+  .about-member-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .about-member-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+}
+
 html { scroll-behavior: smooth; }
 
 body {

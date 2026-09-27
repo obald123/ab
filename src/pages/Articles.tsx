@@ -3,11 +3,14 @@ import { IconBookOpen, IconClock, IconArrowRight } from '../components/Icons'
 import PageHero from '../components/page/PageHero'
 import { Card, Chip, EmptyState, FilterBar, Section } from '../components/page/ui'
 import { mediaUrl, useCollection } from '../lib/content'
-import { ARTICLES, formatDate, type Article } from '../data/site'
+import { ARTICLES, formatTimestamp, type Article } from '../data/site'
 import { useT } from '../lib/i18n'
 
 /** Shown only until the CMS responds, and if it never does. */
-const FALLBACK_ARTICLES: Article[] = ARTICLES
+const FALLBACK_ARTICLES: Article[] = ARTICLES.map((article) => ({
+  ...article,
+  createdAt: article.published ? `${article.published}T09:00:00+02:00` : undefined,
+}))
 
 function Byline({ article, light = false }: { article: Article; light?: boolean }) {
   const initials = article.author
@@ -67,22 +70,26 @@ export default function Articles() {
   const [query, setQuery] = useState('')
   const [topic, setTopic] = useState<string>('All')
   const { data: articles } = useCollection<Article>('article', FALLBACK_ARTICLES)
+  const latestFirst = useMemo(
+    () => [...articles].sort((a, b) => Date.parse(b.createdAt ?? '') - Date.parse(a.createdAt ?? '')),
+    [articles],
+  )
 
   /* Topics come from what is published rather than a fixed list, so an editor
      writing under a new one gets a filter chip for it without a deploy. */
   const topics = useMemo(
-    () => ['All', ...new Set(articles.map((a) => a.topic).filter(Boolean))],
-    [articles],
+    () => ['All', ...new Set(latestFirst.map((a) => a.topic).filter(Boolean))],
+    [latestFirst],
   )
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return articles.filter(
+    return latestFirst.filter(
       (a) =>
         (topic === 'All' || a.topic === topic) &&
         (!q || `${a.title} ${a.excerpt} ${a.author} ${a.topic}`.toLowerCase().includes(q)),
     )
-  }, [query, topic, articles])
+  }, [query, topic, latestFirst])
 
   const [lead, ...rest] = filtered
 
@@ -161,7 +168,7 @@ export default function Articles() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                     <Byline article={lead} light />
                     <span style={{ fontSize: 12, color: 'rgba(224,242,254,0.62)', fontWeight: 700 }}>
-                      {formatDate(lead.published)}
+                      {lead.createdAt && `${t.common.uploaded} ${formatTimestamp(lead.createdAt)}`}
                     </span>
                   </div>
                 </div>
@@ -216,7 +223,9 @@ export default function Articles() {
                           marginTop: 14,
                         }}
                       >
-                        <span style={{ fontSize: 11.5, color: '#94a3b8', fontWeight: 700 }}>{formatDate(a.published)}</span>
+                        <span style={{ fontSize: 11.5, color: '#94a3b8', fontWeight: 700 }}>
+                          {a.createdAt && `${t.common.uploaded} ${formatTimestamp(a.createdAt)}`}
+                        </span>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 800, color: '#0ea5e9' }}>
                           {t.articles.readArticle}
                           <IconArrowRight size={13} strokeWidth={2.4} color="#0ea5e9" />

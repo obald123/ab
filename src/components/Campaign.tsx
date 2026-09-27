@@ -7,14 +7,35 @@ const B = '#0ea5e9'
 const GL = '#9fa8b8'
 
 /* ── Countdown ── */
+interface Countdown {
+  d: number
+  h: number
+  m: number
+  s: number
+  expired: boolean
+}
+
+function countdownAt(target: Date): Countdown {
+  const diff = target.getTime() - Date.now()
+  const remaining = Math.max(0, diff)
+  return {
+    d: Math.floor(remaining / 86400000),
+    h: Math.floor((remaining % 86400000) / 3600000),
+    m: Math.floor((remaining % 3600000) / 60000),
+    s: Math.floor((remaining % 60000) / 1000),
+    expired: diff <= 0,
+  }
+}
+
 function useCountdown(target: Date) {
-  const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0 })
+  const [t, setT] = useState(() => countdownAt(target))
   useEffect(() => {
-    const tick = () => {
-      const diff = Math.max(0, target.getTime() - Date.now())
-      setT({ d: Math.floor(diff / 86400000), h: Math.floor((diff % 86400000) / 3600000), m: Math.floor((diff % 3600000) / 60000), s: Math.floor((diff % 60000) / 1000) })
-    }
-    tick(); const id = setInterval(tick, 1000); return () => clearInterval(id)
+    const id = window.setInterval(() => {
+      const next = countdownAt(target)
+      setT(next)
+      if (next.expired) clearInterval(id)
+    }, 1000)
+    return () => window.clearInterval(id)
   }, [target])
   return t
 }
@@ -142,14 +163,8 @@ function useCampaign(): CampaignDocument {
 }
 
 /* ── Campaign countdown banner ── */
-function CampaignBanner() {
+function CampaignBanner({ countdown }: { countdown: Countdown }) {
   const t = useT()
-  const { banner } = useCampaign()
-  const launch = useMemo(() => {
-    const parsed = new Date(banner.launchDate)
-    return Number.isNaN(parsed.getTime()) ? LAUNCH : parsed
-  }, [banner.launchDate])
-  const cd = useCountdown(launch)
   const pad = (n: number) => String(n).padStart(2, '0')
   return (
     <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg,#0c4a6e 0%,#0ea5e9 55%,#38bdf8 100%)', borderRadius: 28, padding: '52px', boxShadow: '0 32px 80px rgba(14,165,233,0.30)' }}>
@@ -185,7 +200,7 @@ function CampaignBanner() {
         <div className="campaign-countdown" style={{ textAlign: 'center', minWidth: 230 }}>
           <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', marginBottom: 14 }}>{t.campaign.offerEndsIn}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
-            {([['d', cd.d], ['h', cd.h], ['m', cd.m], ['s', cd.s]] as [string, number][]).map(([lbl, val]) => (
+            {([['d', countdown.d], ['h', countdown.h], ['m', countdown.m], ['s', countdown.s]] as [string, number][]).map(([lbl, val]) => (
               <div key={lbl} style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 12, padding: '14px 6px', backdropFilter: 'blur(8px)' }}>
                 <div style={{ fontSize: 28, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{pad(val)}</div>
                 <div style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 5 }}>{lbl}</div>
@@ -280,7 +295,14 @@ function StatsStrip() {
 
 export default function Campaign() {
   const t = useT()
-  const { products } = useCampaign()
+  const { products, banner } = useCampaign()
+  const launch = useMemo(() => {
+    const parsed = new Date(banner.launchDate)
+    return Number.isNaN(parsed.getTime()) ? LAUNCH : parsed
+  }, [banner.launchDate])
+  const countdown = useCountdown(launch)
+
+  if (countdown.expired) return null
 
   return (
     <section id="campaign" style={{ background: '#f4f8fc', padding: '96px 0' }}>
@@ -301,7 +323,7 @@ export default function Campaign() {
         </div>
 
         {/* Campaign banner with countdown */}
-        <CampaignBanner />
+        <CampaignBanner countdown={countdown} />
 
         {/* Product cards */}
         <div className="campaign-products" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, marginTop: 48 }}>
