@@ -51,7 +51,7 @@ export const rw: Dictionary = {
   footer: {
     regulatedBy: 'Igenzurwa na',
     member: 'Umunyamuryango',
-    dial: 'Hamagara 5500',
+    dial: 'Hamagara 5400',
     cookieSettings: 'Igenamiterere rya cookies',
   },
 

@@ -48,7 +48,7 @@ export const en = {
   footer: {
     regulatedBy: 'Regulated By',
     member: 'Member',
-    dial: 'Dial 5500',
+    dial: 'Dial 5400',
     cookieSettings: 'Cookie Settings',
   },
 

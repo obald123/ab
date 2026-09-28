@@ -48,7 +48,7 @@ export const fr: Dictionary = {
   footer: {
     regulatedBy: 'Régulée par',
     member: 'Membre',
-    dial: 'Composez le 5500',
+    dial: 'Composez le 5400',
     cookieSettings: 'Paramètres des cookies',
   },
 

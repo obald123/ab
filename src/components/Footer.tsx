@@ -5,17 +5,6 @@ import { useT } from '../lib/i18n'
 import { OPEN_EVENT } from './CookieConsent'
 import logo from '../imports/logo1-transparent.png'
 
-/* The site's single footer.
-
-   This is the design that previously lived inside Contact.tsx and only
-   ever appeared on the home page. It is now the shared footer rendered by
-   PageShell on every route, so the old Tailwind-token footer (which never
-   rendered — its `bank-*` colours were undefined) is gone and there is
-   exactly one footer again.
-
-   Link groups, the tagline and the bottom bar all come from the CMS `footer`
-   document; the brand column, socials and regulator badges stay in code
-   because they are structural rather than editorial. */
 
 interface CmsFooterLink {
   id: string
@@ -70,8 +59,7 @@ const FALLBACK_FOOTER: FooterDocument = {
   ],
 }
 
-/** A route gets a <Link>; anything containing a hash stays an <a> so the
- *  browser resolves the anchor. */
+
 function isRoute(href: string): boolean {
   return href.startsWith('/') && !href.includes('#')
 }
@@ -127,8 +115,6 @@ export default function Footer() {
     }
   }, [])
 
-  /* Already on the home page, <Link to="/"> is inert; take over and scroll
-     back up to the hero. From any other route, let it navigate normally. */
   function goHome(e: React.MouseEvent) {
     if (pathname === '/') {
       e.preventDefault()
@@ -145,11 +131,6 @@ export default function Footer() {
         >
           {/* Brand */}
           <div>
-            {/* The logo keeps its real colours here — same globe, same navy
-                wordmark as the navbar. Those colours have no contrast against
-                the #0284c7 footer on their own, so the mark sits on a white
-                plate instead of being reversed to flat white, which was
-                flattening the globe into a silhouette. */}
             <Link
               to="/"
               onClick={goHome}
@@ -246,8 +227,6 @@ export default function Footer() {
             </div>
           ))}
 
-          {/* Membership badge. The regulator links themselves now come from
-              the CMS `footer` document, alongside every other footer link. */}
           <div>
             <div
               style={{
@@ -292,9 +271,7 @@ export default function Footer() {
         >
           <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.35)', margin: 0 }}>{footer.copyright}</p>
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            {/* These were plain <span>s with a click handler — now real links
-                to the published documents, and a real button for the one that
-                opens the cookie dialog. */}
+            
             {footer.bottomLinks.map((l) => (
               <Link
                 key={l.id}
