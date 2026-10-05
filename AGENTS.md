@@ -21,7 +21,12 @@ npm run lint       # eslint
 
 ```ini
 VITE_API_URL=http://localhost:4000
+VITE_PROTO_CHATBOT_ID=
 ```
+
+Set `VITE_PROTO_CHATBOT_ID` to the public Intumwa widget ID for local use and
+in the Vercel project's environment variables for production. Vite embeds
+`VITE_*` values in browser assets, so this ID is configuration, not a secret.
 
 ## Key files
 

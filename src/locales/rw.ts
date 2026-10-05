@@ -67,10 +67,10 @@ export const rw: Dictionary = {
     policy: 'Amabwiriza ya cookies',
     necessaryTitle: 'Ngombwa rwose',
     necessaryBody:
-      'Zikenewe kugira ngo urubuga rukore, harimo no kwibuka icyo wahisemo kuri iyi banner. Uru rubuga ntirusaba kwinjira (login), bityo nta cookie y’igihe (session) igushyirwaho hano — icyo iki cyiciro cyonyine kibika ni icyo wahisemo ku ma cookies. Ntibishobora guhagarikwa.',
+      'Zikenewe kugira ngo urubuga rukore, harimo no kwibuka ibyo wahisemo kuri cookies. Chatbot ya Intumwa irahora iboneka uko wahitamo kose; iframe yayo itangwa n’undi mutanga ikoresha ububiko bwo muri mushakisha, kandi uwo mutanga yakira ubutumwa n’amakuru ya tekiniki ajyanye n’ihuzanzira. Ntukandike ijambo ry’ibanga, PIN, kode y’igihe gito, cyangwa amakuru ya konti muri chatbot. Iki cyiciro ntigishobora guhagarikwa.',
     preferencesTitle: 'Ibyo wahisemo',
     preferencesBody:
-      'Zibuka igenamiterere ryoroshya ikoreshwa, nk’amabara arambuye cyangwa inyandiko nini, mu nshuro zizakurikira usuye urubuga. Iyo wanze, bikomeza gukora mu gihe cy’urusure ariko ntibizibukwa ubutaha. Ururimi wahisemo ruzajya rwibukwa uko byagenda kose, kuko atari ikintu gikurikirana abakoresha.',
+      'Zibuka igenamiterere ryoroshya ikoreshwa, nk’amabara arambuye cyangwa inyandiko nini, mu nshuro zizakurikira usuye urubuga. Iyo ubyanze, bikomeza gukora mu gihe uri ku rubuga ariko ntibizibukwa ubutaha. Ururimi wahisemo ruzajya rwibukwa uko byagenda kose, kuko atari ikintu gikurikirana abakoresha.',
     analyticsTitle: 'Isesengura',
     analyticsBody:
       'Zidufasha kumenya uko abasura urubuga barukoresha kugira ngo turunonosore, kandi zituma ibintu biva ahandi (nk’urupapuro rwacu rwa Facebook) bigaragara neza. Amakuru yose ahurizwa hamwe kandi ntiyerekana uwo ari we; kwanga ntibibuza urubuga gukora neza, hagaragara gusa ihuza rijya kuri Facebook aho kuba feed nzima.',

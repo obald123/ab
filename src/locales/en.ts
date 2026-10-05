@@ -64,7 +64,7 @@ export const en = {
     policy: 'Cookie Policy',
     necessaryTitle: 'Strictly Necessary',
     necessaryBody:
-      'Required for the site to function, including remembering the choice you make in this banner. This site does not require a login, so no session cookie is set here — the only thing this category stores is your cookie preference itself. It cannot be switched off.',
+      'Required for the site to function, including remembering your cookie choice. The Intumwa support chatbot is available regardless of your choice; its third-party frame uses browser storage and its provider receives messages and technical connection data. Never enter passwords, PINs, one-time codes, or account details in chat. This category cannot be switched off.',
     preferencesTitle: 'Preferences',
     preferencesBody:
       'Remember accessibility settings you choose, such as high contrast or larger text, across visits. If declined, they still work during your visit but are not remembered next time. Your language choice is always remembered regardless, since it is not a tracking preference.',
