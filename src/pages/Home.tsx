@@ -4,7 +4,6 @@ import LoanCalculator from '../components/LoanCalculator'
 import Services from '../components/Services'
 import Campaign from '../components/Campaign'
 import News from '../components/News'
-import SocialFeed from '../components/SocialFeed'
 import Contact from '../components/Contact'
 import Branches from '../components/Branches'
 
@@ -20,7 +19,6 @@ export default function Home() {
       <Campaign />
       <Branches />
       <News />
-      <SocialFeed />
       <Contact />
     </>
   )

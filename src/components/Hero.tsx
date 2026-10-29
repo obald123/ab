@@ -248,7 +248,7 @@ const FALLBACK_STORY: StoryPanel[] = [
   {
     id: 'placeholder-1',
     image: storyPhoto,
-    alt: 'Sample artwork: the AB Rwanda globe over a blue horizon.',
+    alt: 'Sample artwork: the AB BANK PLC globe over a blue horizon.',
     kicker: '01',
     title: 'Apply in minutes',
     caption: 'At any of our branches and outlets across all five provinces.',
@@ -257,7 +257,7 @@ const FALLBACK_STORY: StoryPanel[] = [
     // Exercises the video path, so the reel is not only ever proven with stills.
     id: 'placeholder-2',
     image: storyClip,
-    alt: 'Sample clip: the AB Rwanda globe turning.',
+    alt: 'Sample clip: the AB BANK PLC globe turning.',
     kicker: '02',
     title: 'Approved in 48 hours',
     caption: "Collateral-light lending built for Rwanda's entrepreneurs.",

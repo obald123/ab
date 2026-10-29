@@ -51,7 +51,7 @@ const FALLBACK_FOOTER: FooterDocument = {
     },
   ],
   tagline: '',
-  copyright: `© ${String(new Date().getFullYear())} AB Bank Rwanda Ltd. All rights reserved.`,
+  copyright: `© ${String(new Date().getFullYear())} AB BANK PLC All rights reserved.`,
   bottomLinks: [
     { id: 'b1', label: 'Privacy Policy', href: '/forms' },
     { id: 'b2', label: 'Terms of Use', href: '/forms' },
@@ -149,7 +149,7 @@ export default function Footer() {
             >
               <img
                 src={logo}
-                alt="AB Bank Rwanda"
+                alt="AB BANK PLC"
                 width={1352}
                 height={402}
                 style={{ height: 44, width: 'auto', display: 'block' }}

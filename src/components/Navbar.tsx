@@ -75,10 +75,10 @@ function ABLogo({ onClick }: { onClick: (e: React.MouseEvent) => void }) {
     <Link
       to="/"
       onClick={onClick}
-      aria-label="AB Bank Rwanda — home"
+      aria-label="AB BANK PLC — home"
       style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
     >
-      <img src={logo} alt="AB Bank Rwanda" style={{ height: 50, width: 'auto' }} />
+      <img src={logo} alt="AB BANK PLC" style={{ height: 50, width: 'auto' }} />
     </Link>
   )
 }

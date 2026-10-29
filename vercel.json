@@ -1,15 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [{ "source": "/((?!assets/).*)", "destination": "/index.html" }],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://embed.proto.cx; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://abapi.dtecsoftwaresolutions.com https://*.dtecsoftwaresolutions.com https://v3-api.proto.cx; frame-src https://frame.proto.cx; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors https://abadmin.dtecsoftwaresolutions.com; object-src 'none'; img-src 'self' data: https:; script-src 'self' https://embed.proto.cx; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://abapi.dtecsoftwaresolutions.com https://v3-api.proto.cx; frame-src 'self' https://frame.proto.cx; upgrade-insecure-requests"
         },
-        { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "no-referrer" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
@@ -17,6 +16,14 @@
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
       ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/((?!assets/).*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
     }
   ]
 }

@@ -1,4 +1,4 @@
-# AB Bank Rwanda — public site (`Frontend/`)
+# AB BANK PLC — public site (`Frontend/`)
 
 Public marketing site: **React 19 + Vite + Tailwind CSS v4 + react-router 7**.
 Reads published content from the CMS API (`VITE_API_URL`), with built-in

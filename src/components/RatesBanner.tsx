@@ -175,7 +175,7 @@ export default function RatesBanner() {
         borderTop: '1px solid rgba(168,216,240,0.06)',
         fontSize: 9, color: 'rgba(168,216,240,0.22)', letterSpacing: '0.04em',
       }}>
-        Rates are indicative only and subject to change without notice. AB Rwanda is regulated by the National Bank of Rwanda.
+        Rates are indicative only and subject to change without notice. AB BANK PLC is regulated by the National Bank of Rwanda.
       </div>
     </div>
   )

@@ -7,7 +7,7 @@
  * and public/apple-touch-icon.png. (The browser-tab favicon is a separate
  * script — scripts/gen-favicon.mjs.)
  *
- * Source is the globe/swirl mark from the left of the AB Rwanda logo — the
+ * Source is the globe/swirl mark from the left of the AB BANK PLC logo — the
  * full wordmark is too wide to read once cropped to an icon. Every icon is the
  * mark centred on a white ground (matching the manifest `background_color` and
  * iOS, which ignores transparency), sized well inside the 80% safe zone on the

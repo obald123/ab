@@ -260,7 +260,7 @@ function TenderRow({ tender }: { tender: Notice }) {
             <p style={{ fontSize: 13, color: '#647080', lineHeight: 1.75, margin: 0 }}>
               {live ? (
                 <>
-                  Sealed bids must reach the Procurement Committee, AB Bank Rwanda Plc, Nyarugenge Avenue, KN 78 St,
+                  Sealed bids must reach the Procurement Committee, AB BANK PLC, Nyarugenge Avenue, KN 78 St,
                   Kigali, before <strong>{formatDate(tender.deadline)}</strong>, clearly marked with the reference{' '}
                   <strong style={{ fontFamily: MONO }}>{tender.reference}</strong>. Queries to{' '}
                   <a href={`mailto:${PROCUREMENT_EMAIL}`} style={{ color: '#0284c7', fontWeight: 700 }}>

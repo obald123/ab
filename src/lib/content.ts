@@ -136,6 +136,7 @@ export type CollectionType =
   | 'form'
   | 'article'
   | 'notice'
+  | 'loan_product'
 export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | 'contact' | 'award'
 
 interface CollectionResponse<T> {

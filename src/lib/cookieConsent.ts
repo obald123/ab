@@ -48,8 +48,9 @@ export function hasFunctionalConsent(): boolean {
   return getStoredConsent()?.functional === true
 }
 
-/** True only once the visitor has explicitly turned "Analytics" on — gates
- *  third-party embeds (the Facebook feed) that set their own cookies. */
+/** True only once the visitor has explicitly turned "Analytics" on. Nothing
+ *  is gated on it today (the Facebook feed embed was removed); any future
+ *  analytics loader or third-party embed that sets cookies must check it. */
 export function hasAnalyticsConsent(): boolean {
   return getStoredConsent()?.analytics === true
 }

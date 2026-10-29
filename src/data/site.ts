@@ -182,7 +182,7 @@ export const TENDERS: Tender[] = [
     deadline: '2026-08-06',
     status: 'Open',
     summary:
-      'AB Bank Rwanda Plc invites sealed bids from eligible firms for the supply, installation and three-year maintenance of CCTV and electronic access control across twelve branches and credit outlets.',
+      'AB BANK PLC invites sealed bids from eligible firms for the supply, installation and three-year maintenance of CCTV and electronic access control across twelve branches and credit outlets.',
     documents: [
       { label: 'Tender document (RFP)', size: '1.8 MB' },
       { label: 'Bill of quantities', size: '240 KB' },
@@ -291,7 +291,7 @@ export const ARTICLES: Article[] = [
     topic: 'Agriculture',
     excerpt:
       'Farming income arrives in bursts while costs run all year. How seasonal savings products and quarterly-repayment agro loans can smooth the gap for Rwandan smallholders.',
-    author: 'AB Rwanda Agri Desk',
+    author: 'AB BANK PLC Agri Desk',
     authorRole: 'Agriculture Finance Team',
     published: '2026-06-06',
     readMins: 7,
@@ -354,7 +354,7 @@ export const NOTICES: Notice[] = [
     title: 'Public Warning: Fraudulent Loan Offers Using the AB Bank Name',
     level: 'Urgent',
     effective: '2026-06-28',
-    body: 'We are aware of individuals contacting the public via WhatsApp and SMS offering AB Bank loans in exchange for an advance "processing fee". AB Bank Rwanda never requests payment before disbursement and never asks for your PIN. Report any such contact to 5500.',
+    body: 'We are aware of individuals contacting the public via WhatsApp and SMS offering AB Bank loans in exchange for an advance "processing fee". AB BANK PLC never requests payment before disbursement and never asks for your PIN. Report any such contact to 5500.',
   },
 ]
 
@@ -487,7 +487,7 @@ export const FORMS: FormDoc[] = [
     id: 'f12',
     title: 'General Terms & Conditions of Account',
     category: 'Tariffs & Terms',
-    description: 'The contractual terms governing all AB Bank Rwanda deposit accounts.',
+    description: 'The contractual terms governing all AB BANK PLC deposit accounts.',
     fileType: 'PDF',
     size: '740 KB',
     updated: '2026-01-20',

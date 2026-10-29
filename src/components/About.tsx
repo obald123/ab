@@ -32,14 +32,14 @@ const FALLBACK_TIMELINE: TimelineEvent[] = [
     id: 'm1',
     year: '2014', quarter: 'Q1', category: 'Founded', icon: 'bank',
     headline: 'Born in Nyamirambo',
-    text: 'AB Rwanda opens its very first branch in Nyamirambo. Before the year is out, two more branches follow in Nyarugenge and Gisozi — bringing accessible credit to micro-entrepreneurs from day one.',
+    text: 'AB BANK PLC opens its very first branch in Nyamirambo. Before the year is out, two more branches follow in Nyarugenge and Gisozi — bringing accessible credit to micro-entrepreneurs from day one.',
     stat: '3', statLabel: 'Branches', highlight: true,
   },
   {
     id: 'm2',
     year: '2015', quarter: 'Q2', category: 'Expansion', icon: 'map-pin',
     headline: 'Kimironko Opens',
-    text: 'The fourth branch launches in Kimironko, making AB Rwanda the fastest-growing microfinance bank in its segment.',
+    text: 'The fourth branch launches in Kimironko, making AB BANK PLC the fastest-growing microfinance bank in its segment.',
     stat: '4', statLabel: 'Branches', highlight: false,
   },
   {
@@ -53,7 +53,7 @@ const FALLBACK_TIMELINE: TimelineEvent[] = [
     id: 'm4',
     year: '2018', quarter: 'Q2', category: 'Network', icon: 'building',
     headline: 'Nyabugogo & First Outlets',
-    text: 'Nyabugogo branch opens in Kigali while the original Nyamirambo branch merges into Nyarugenge. The same year, AB Rwanda opens its first three credit outlets — Muhanga, Rwamagana and Kabarondo — beginning its rural push.',
+    text: 'Nyabugogo branch opens in Kigali while the original Nyamirambo branch merges into Nyarugenge. The same year, AB BANK PLC opens its first three credit outlets — Muhanga, Rwamagana and Kabarondo — beginning its rural push.',
     stat: '3', statLabel: 'New Outlets', highlight: true,
   },
   {
@@ -92,28 +92,28 @@ const FALLBACK_MANAGEMENT = [
     name: 'Zachary Raymond', role: 'Chief Executive Officer',
     image: 'https://abr.rw/wp-content/uploads/2023/02/CEO_Zach.jpg',
     detail: 'MBA · University of Cape Town',
-    bio: 'Zach joined AB Rwanda as CEO in September 2022. Prior to joining AB Rwanda, he served as Chief Business Officer at Access Microfinance Bank Tanzania and spent 2012–2020 in senior roles at The Small Enterprise Foundation in South Africa.',
+    bio: 'Zach joined AB BANK PLC as CEO in September 2022. Prior to joining AB BANK PLC, he served as Chief Business Officer at Access Microfinance Bank Tanzania and spent 2012–2020 in senior roles at The Small Enterprise Foundation in South Africa.',
     color: '#0284c7',
   },
   {
     name: 'Joas Ndikumana', role: 'Chief Business Officer',
     image: 'https://abr.rw/wp-content/uploads/2021/05/Jerry-Joas.jpg',
-    detail: 'With AB Rwanda since 2013',
-    bio: 'Joas has led multiple business, microcredit and branch teams since joining AB Rwanda in November 2013. He holds a Master’s degree in Economics and a First Class Honors Bachelor’s degree in Management.',
+    detail: 'With AB BANK PLC since 2013',
+    bio: 'Joas has led multiple business, microcredit and branch teams since joining AB BANK PLC in November 2013. He holds a Master’s degree in Economics and a First Class Honors Bachelor’s degree in Management.',
     color: '#0ea5e9',
   },
   {
     name: 'Celestin Karera', role: 'Chief Finance Officer',
     image: 'https://abr.rw/wp-content/uploads/2022/12/Celestin-Pictures-150x150.jpg',
     detail: 'M.A. · Jomo Kenyatta University',
-    bio: 'Celestin joined AB Rwanda in July 2022 as Head of Finance. Before that he spent seven years as Senior Manager – Financial Reporting at NCBA and five years as Chief Accountant for Access Bank and Volcanoes Safaris Rwanda.',
+    bio: 'Celestin joined AB BANK PLC in July 2022 as Head of Finance. Before that he spent seven years as Senior Manager – Financial Reporting at NCBA and five years as Chief Accountant for Access Bank and Volcanoes Safaris Rwanda.',
     color: '#38bdf8',
   },
   {
     name: 'Joselyne Bivugire', role: 'Chief Risk Officer',
     image: 'https://abr.rw/wp-content/uploads/2022/12/joselyne-Picture-2-150x150.jpg',
     detail: 'Certified microfinance expert',
-    bio: 'Joselyne joined AB Rwanda in 2013 and has served in credit, compliance and risk leadership roles. She holds a Master’s degree in Finance and Accounting, a Bachelor’s degree in Computer Science, and multiple risk management certifications.',
+    bio: 'Joselyne joined AB BANK PLC in 2013 and has served in credit, compliance and risk leadership roles. She holds a Master’s degree in Finance and Accounting, a Bachelor’s degree in Computer Science, and multiple risk management certifications.',
     color: '#1a7ab5',
   },
 ]
@@ -124,7 +124,7 @@ const FALLBACK_BOARD = [
     name: 'Dianne Dusaidi', role: 'Chairperson',
     image: 'https://abr.rw/wp-content/uploads/2021/05/Dianne_Dusaidi.jpg',
     detail: 'MBA · Maastricht School of Management',
-    bio: 'Dianne is a Program Manager at the Mastercard Foundation, leading programs for financial inclusion, women’s e-commerce and youth employment. She joined AB Rwanda’s board in September 2020.',
+    bio: 'Dianne is a Program Manager at the Mastercard Foundation, leading programs for financial inclusion, women’s e-commerce and youth employment. She joined AB BANK PLC’s board in September 2020.',
     color: '#0284c7',
   },
   {
@@ -138,7 +138,7 @@ const FALLBACK_BOARD = [
     name: 'Bernd Zattler', role: 'Board Member',
     image: 'https://abr.rw/wp-content/uploads/2021/05/bernd_zattler-2.jpg',
     detail: 'PhD · Economics',
-    bio: 'Bernd joined AB Rwanda’s board in September 2018 and also chairs several AccessHolding investees. He founded LFS Advisory GmbH and has extensive experience in development finance across Europe and Africa.',
+    bio: 'Bernd joined AB BANK PLC’s board in September 2018 and also chairs several AccessHolding investees. He founded LFS Advisory GmbH and has extensive experience in development finance across Europe and Africa.',
     color: '#38bdf8',
   },
   {
@@ -1100,7 +1100,7 @@ const FALLBACK_ABOUT_CONTENT: AboutContentDoc = {
   headline: 'Improving Financial Access',
   headlineAccent: 'Across All of Rwanda',
   narrative: [
-    'Established in 2014 and headquartered on Nyarugenge Avenue, Kigali, AB Rwanda Plc has grown from a single branch in Nyamirambo to a nationwide network of 47+ branches and rural credit outlets spanning all five provinces.',
+    'Established in 2014 and headquartered on Nyarugenge Avenue, Kigali, AB BANK PLC has grown from a single branch in Nyamirambo to a nationwide network of 47+ branches and rural credit outlets spanning all five provinces.',
     "Regulated by the National Bank of Rwanda and backed by AccessHolding, KFW and IFC, we are committed to Rwanda's financial inclusion agenda.",
   ],
   narrativeImage:
@@ -1453,7 +1453,7 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
               <div style={{ position: 'relative', minHeight: 280 }}>
                 <img
                   src={mediaUrl(content.narrativeImage)}
-                  alt="AB Rwanda customer"
+                  alt="AB BANK PLC customer"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', inset: 0 }}
                 />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 55%, rgba(2,30,60,0.75) 100%)' }} />

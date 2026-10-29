@@ -1,5 +1,5 @@
 /* Regenerate the browser-tab favicon from the brand mark (the globe/swirl on
- * the left of the AB Rwanda logo — NOT the full wordmark, which is unreadable
+ * the left of the AB BANK PLC logo — NOT the full wordmark, which is unreadable
  * at 16px).
  *
  *   node scripts/gen-favicon.mjs

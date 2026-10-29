@@ -18,7 +18,7 @@ const FALLBACK: TickerItem[] = [
   { icon: 'trend-up', text: 'SME Boost Loan: up to RWF 50M approved in 48 hours — apply now at any branch' },
   { icon: 'heart', text: "Umugore Savings: 9.5% p.a. interest rate — celebrating Rwanda's women entrepreneurs" },
   { icon: 'globe', text: 'Send money to 12 African countries instantly via eKash — competitive FX rates daily' },
-  { icon: 'star', text: 'AB Rwanda rated #1 for customer satisfaction — 94% of customers would recommend us' },
+  { icon: 'star', text: 'AB BANK PLC rated #1 for customer satisfaction — 94% of customers would recommend us' },
 ]
 
 export default function Ticker() {

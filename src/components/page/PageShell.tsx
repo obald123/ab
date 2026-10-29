@@ -6,7 +6,7 @@ import Footer from '../Footer'
 import CookieConsent from '../CookieConsent'
 import PreviewBanner from '../PreviewBanner'
 import AccessibilityPanel from '../AccessibilityPanel'
-import PwaPrompts from '../PwaPrompts'
+import PwaAutoUpdate from '../PwaAutoUpdate'
 import ProtoChatbot from '../ProtoChatbot'
 import { isPreviewing } from '../../lib/content'
 
@@ -66,7 +66,7 @@ export default function PageShell() {
       {/* Installed-app prompts: "new version available" and "install this
           app". Mounted here so they exist on every route; both sit under the
           cookie-consent modal so a first visit answers that first. */}
-      <PwaPrompts />
+      <PwaAutoUpdate />
       <ProtoChatbot />
       {/* Mounted once, here, rather than inside whatever page happened to
           declare it (it used to live in Contact.tsx, reachable only from

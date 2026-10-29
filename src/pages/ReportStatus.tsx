@@ -211,7 +211,7 @@ function IncidentThread({ incident, passphrase }: { incident: IncidentStatusView
                 }}
               >
                 <div style={{ fontSize: 10.5, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
-                  {m.fromBank ? 'AB Bank Rwanda' : 'You'}
+                  {m.fromBank ? 'AB BANK PLC' : 'You'}
                 </div>
                 <p style={{ fontSize: 13.5, color: '#334155', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{m.body}</p>
               </div>

@@ -8,6 +8,7 @@ import path from 'node:path'
 export default defineConfig({
   base: '/',
   plugins: [react(), tailwindcss(), abrPwa()],
+  build: { sourcemap: false },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -28,9 +29,10 @@ export default defineConfig({
  * Progressive Web App: installable + offline-capable public site.
  *
  * `registerType: 'prompt'` — a bank site must not swap its own code out from
- * under a visitor mid-session. A new build is picked up only when the visitor
- * accepts the "refresh for the latest version" prompt (see
- * src/components/PwaPrompts.tsx). Registration is owned by that component
+ * under a visitor mid-session. A new build waits until
+ * src/components/PwaAutoUpdate.tsx applies it at a natural break (the next
+ * route change, or the tab going into the background) — automatically, with
+ * no prompt. Registration is owned by that component
  * through the `virtual:pwa-register/react` hook, so `injectRegister` is
  * disabled here to avoid a second registration from an injected script.
  *
@@ -49,10 +51,10 @@ function abrPwa(): Plugin[] {
     injectRegister: null,
     includeAssets: ['favicon.ico', 'favicon.png', 'apple-touch-icon.png'],
     manifest: {
-      name: 'AB Bank Rwanda',
+      name: 'AB BANK PLC',
       short_name: 'AB Bank',
       description:
-        'AB Bank Rwanda — banking services, news, exchange rates and branch information.',
+        'AB BANK PLC — banking services, news, exchange rates and branch information.',
       id: '/',
       start_url: '/',
       scope: '/',
