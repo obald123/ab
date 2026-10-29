@@ -39,6 +39,8 @@ interface LoanProduct {
   minimumMaturity: number
   maximumMaturity: number
   interestRate: number
+  /** Present when the rate depends on the amount (ascending bands). */
+  rateTiers?: { upToAmount: number; value: number }[]
   interestRateType: 'declining' | 'flat'
   installmentFrequency: number
   effectiveDate: string
@@ -94,6 +96,17 @@ const compactRwf = (n: number): string => {
   if (n >= 1000) return `${String(n / 1000)}K`
   return String(n)
 }
+
+/** The yearly rate for `amount` — mirrors the backend's banding. */
+function rateFor(product: LoanProduct, amount: number): number {
+  const bands = product.rateTiers ?? []
+  if (bands.length === 0) return product.interestRate
+  return (bands.find((band) => amount <= band.upToAmount) ?? bands[bands.length - 1])?.value ?? product.interestRate
+}
+
+/** The lowest rate a product offers, for its button. */
+const lowestRate = (product: LoanProduct) =>
+  Math.min(product.interestRate, ...(product.rateTiers ?? []).map((band) => band.value))
 
 /** A sensible starting point inside the product's limits: RWF 1 million and
  *  a one-year term where the product allows them. */
@@ -472,7 +485,8 @@ export default function LoanCalculator() {
                         >
                           {product.name}
                           <span style={{ marginLeft: 6, opacity: 0.65, fontWeight: 600 }}>
-                            {pct1(product.interestRate)}%
+                            {(product.rateTiers ?? []).length > 0 ? `${t.calculator.from} ` : ''}
+                            {pct1(lowestRate(product))}%
                           </span>
                         </button>
                       )
@@ -525,7 +539,7 @@ export default function LoanCalculator() {
                 >
                   <div style={{ fontSize: 12.5, fontWeight: 700, color: '#647080' }}>{t.calculator.interestRate}</div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: '#0284c7', marginTop: 2 }}>
-                    {pct1(selected.interestRate)}
+                    {pct1(rateFor(selected, draft.amount))}
                     {t.calculator.perYear}
                     <span style={{ fontSize: 12.5, fontWeight: 600, color: '#647080', marginLeft: 6 }}>
                       {selected.interestRateType === 'flat'
@@ -534,6 +548,7 @@ export default function LoanCalculator() {
                     </span>
                   </div>
                   <div style={{ fontSize: 10.5, color: '#94a3b8', fontWeight: 600, marginTop: 4 }}>
+                    {(selected.rateTiers ?? []).length > 0 && `${t.calculator.dependsOnAmount} · `}
                     {t.calculator.ratesEffective} {selected.effectiveDate}
                   </div>
                 </div>

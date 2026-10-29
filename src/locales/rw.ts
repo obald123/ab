@@ -135,6 +135,8 @@ export const rw: Dictionary = {
     termSteps: 'Mu byiciro by’amezi {n}',
     interestRate: 'Igipimo cy’inyungu',
     perYear: '% ku mwaka',
+    from: 'guhera kuri',
+    dependsOnAmount: 'Igipimo giterwa n’umubare w’inguzanyo',
     onReducingBalance: 'ku mafaranga asigaye kwishyurwa',
     onOriginalAmount: 'ku mubare w’inguzanyo wose',
     ratesEffective: 'Ibipimo bikurikizwa guhera',

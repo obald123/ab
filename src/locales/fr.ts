@@ -132,6 +132,8 @@ export const fr: Dictionary = {
     termSteps: 'Par paliers de {n} mois',
     interestRate: 'Taux d’intérêt',
     perYear: '% par an',
+    from: 'dès',
+    dependsOnAmount: 'Le taux dépend du montant',
     onReducingBalance: 'sur le capital restant dû',
     onOriginalAmount: 'sur le montant initial',
     ratesEffective: 'Taux en vigueur depuis le',

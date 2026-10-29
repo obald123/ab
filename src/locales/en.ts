@@ -133,6 +133,8 @@ export const en = {
     termSteps: 'In steps of {n} months',
     interestRate: 'Interest rate',
     perYear: '% per year',
+    from: 'from',
+    dependsOnAmount: 'Rate depends on the amount',
     onReducingBalance: 'on the reducing balance',
     onOriginalAmount: 'on the original amount',
     ratesEffective: 'Rates effective',
