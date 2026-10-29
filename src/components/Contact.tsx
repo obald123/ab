@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { IconSend } from './Icons'
-import { useSingleton } from '../lib/content'
+import { Link } from 'react-router-dom'
+import { API_ROOT, useSingleton } from '../lib/content'
 import { useT } from '../lib/i18n'
+
+const EMPTY_FORM = { name: '', email: '', phone: '', subject: '', message: '', website: '' }
 
 interface ContactDocument {
   info: {
@@ -49,8 +52,9 @@ export default function Contact() {
   const { data: contact } = useSingleton<ContactDocument>('contact', FALLBACK)
   const { smartValues, branches } = contact
   const containerRef = useRef<HTMLDivElement>(null)
-  const [formState, setFormState] = useState({ name: '', email: '', message: '' })
-  const [submitted, setSubmitted] = useState(false)
+  const [formState, setFormState] = useState(EMPTY_FORM)
+  const [sendState, setSendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [sendError, setSendError] = useState<string | null>(null)
 
   useEffect(() => {
     const el = containerRef.current; if (!el) return
@@ -79,12 +83,32 @@ export default function Contact() {
     setFormState(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  /* Sent to the API, which stores the message encrypted in the CMS inbox and
+     emails it to the bank. Success is shown only after the API confirms —
+     never optimistically, so nobody believes they wrote to the bank when the
+     message was lost. */
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    // In this demo we simply show a success state; integrate with backend as needed
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 4000)
-    setFormState({ name: '', email: '', message: '' })
+    setSendState('sending')
+    setSendError(null)
+    try {
+      const response = await fetch(`${API_ROOT}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      })
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as {
+          error?: { message?: string; details?: { message: string }[] }
+        } | null
+        throw new Error(body?.error?.details?.[0]?.message ?? body?.error?.message ?? t.contact.sendFailed)
+      }
+      setSendState('sent')
+      setFormState(EMPTY_FORM)
+    } catch (error) {
+      setSendState('error')
+      setSendError(error instanceof Error && error.message ? error.message : t.contact.sendFailed)
+    }
   }
 
   return (
@@ -319,13 +343,41 @@ export default function Contact() {
                   <input name="email" type="email" value={formState.email} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
                 </label>
               </div>
+              <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+                <label style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>{t.contact.phone}</div>
+                  <input name="phone" type="tel" autoComplete="tel" value={formState.phone} onChange={handleChange} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
+                </label>
+                <label style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>{t.contact.subject}</div>
+                  <input name="subject" value={formState.subject} onChange={handleChange} required maxLength={150} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
+                </label>
+              </div>
+              {/* Honeypot: hidden from people and screen readers, filled by bots. */}
+              <input
+                name="website"
+                value={formState.website}
+                onChange={handleChange}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, opacity: 0 }}
+              />
               <label style={{ display: 'block', marginBottom: 12 }}>
                 <div style={{ fontSize: 12, color: '#647080', marginBottom: 6 }}>{t.contact.message}</div>
-                <textarea name="message" value={formState.message} onChange={handleChange} rows={5} required style={{ width: '100%', padding: '12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
+                <textarea name="message" value={formState.message} onChange={handleChange} rows={5} required minLength={10} maxLength={4000} style={{ width: '100%', padding: '12px', borderRadius: 8, border: '1px solid #e6eef8' }} />
               </label>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <button type="submit" style={{ background: '#0ea5e9', color: '#fff', padding: '10px 18px', borderRadius: 10, border: 'none', fontWeight: 800 }}>{t.contact.send}</button>
-                {submitted && <div role="status" aria-live="polite" style={{ color: '#2b7a3a', fontWeight: 700 }}>Message sent — thank you.</div>}
+              <p style={{ fontSize: 11.5, color: '#647080', margin: '0 0 12px', lineHeight: 1.55 }}>
+                {t.contact.privacyNote}{' '}
+                <Link to="/privacy" style={{ color: '#0284c7', fontWeight: 700 }}>{t.contact.privacyLink}</Link>
+              </p>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                <button type="submit" disabled={sendState === 'sending'} style={{ background: '#0ea5e9', color: '#fff', padding: '10px 18px', borderRadius: 10, border: 'none', fontWeight: 800, opacity: sendState === 'sending' ? 0.7 : 1, cursor: sendState === 'sending' ? 'wait' : 'pointer' }}>
+                  {sendState === 'sending' ? t.contact.sending : t.contact.send}
+                </button>
+                <div role="status" aria-live="polite" style={{ fontWeight: 700, color: sendState === 'error' ? '#b91c1c' : '#2b7a3a' }}>
+                  {sendState === 'sent' ? t.contact.sent : sendState === 'error' ? sendError : ''}
+                </div>
               </div>
             </form>
 

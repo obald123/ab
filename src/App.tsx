@@ -13,6 +13,7 @@ import Forms from './pages/Forms'
 import ReportIncident from './pages/ReportIncident'
 import ReportStatus from './pages/ReportStatus'
 import NotFound from './pages/NotFound'
+import LegalPage from './pages/LegalPage'
 
 export default function App() {
   return (
@@ -31,6 +32,9 @@ export default function App() {
           <Route path="forms" element={<Forms />} />
           <Route path="report" element={<ReportIncident />} />
           <Route path="report/status" element={<ReportStatus />} />
+          <Route path="privacy" element={<LegalPage doc="privacy" />} />
+          <Route path="cookies" element={<LegalPage doc="cookies" />} />
+          <Route path="terms" element={<LegalPage doc="terms" />} />
           {/* Convenience aliases so shorter URLs still resolve */}
           <Route path="news" element={<Navigate to="/media/news" replace />} />
           <Route path="articles" element={<Navigate to="/media/articles" replace />} />

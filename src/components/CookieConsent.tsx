@@ -261,7 +261,7 @@ export default function CookieConsent() {
                 We use cookies to enhance your browsing experience, and analyze our traffic.
                 {t.cookies.intro}{' '}
                 <Link
-                  to="/forms"
+                  to="/cookies"
                   onClick={() => setOpen(false)}
                   style={{ color: BLUE_DARK, fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 3 }}
                 >

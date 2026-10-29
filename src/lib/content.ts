@@ -137,7 +137,7 @@ export type CollectionType =
   | 'article'
   | 'notice'
   | 'loan_product'
-export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | 'contact' | 'award'
+export type SingletonType = 'hero' | 'nav' | 'footer' | 'campaign' | 'about' | 'contact' | 'award' | 'legal'
 
 interface CollectionResponse<T> {
   kind: 'collection'

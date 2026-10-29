@@ -1,3 +1,7 @@
+/* Bundled brand artwork stands in for photos until the CMS responds — no
+   third-party image host is contacted on page load. */
+import FALLBACK_ART from '../imports/story/story-photo.webp'
+
 /* ═══════════════════════════════════════════════════════════════
    Content for the standalone pages (Careers, Tenders, News,
    Articles, Forms).
@@ -256,7 +260,7 @@ export const ARTICLES: Article[] = [
     authorRole: 'Chief Business Officer',
     published: '2026-07-18',
     readMins: 6,
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=500&fit=crop&auto=format',
+    image: FALLBACK_ART,
   },
   {
     id: 'a2',
@@ -269,7 +273,7 @@ export const ARTICLES: Article[] = [
     authorRole: 'Chief Finance Officer',
     published: '2026-07-04',
     readMins: 8,
-    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=500&fit=crop&auto=format',
+    image: FALLBACK_ART,
   },
   {
     id: 'a3',
@@ -282,7 +286,7 @@ export const ARTICLES: Article[] = [
     authorRole: 'Chief Risk Officer',
     published: '2026-06-20',
     readMins: 5,
-    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=500&fit=crop&auto=format',
+    image: FALLBACK_ART,
   },
   {
     id: 'a4',
@@ -295,7 +299,7 @@ export const ARTICLES: Article[] = [
     authorRole: 'Agriculture Finance Team',
     published: '2026-06-06',
     readMins: 7,
-    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=500&fit=crop&auto=format',
+    image: FALLBACK_ART,
   },
   {
     id: 'a5',
@@ -308,7 +312,7 @@ export const ARTICLES: Article[] = [
     authorRole: 'Board Chairperson',
     published: '2026-05-22',
     readMins: 9,
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=500&fit=crop&auto=format',
+    image: FALLBACK_ART,
   },
 ]
 
@@ -584,7 +588,7 @@ export const EMPLOYEE_OF_THE_YEAR: Award = {
   role: 'Branch Manager',
   branch: 'Musanze',
   department: 'Business',
-  photo: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=900&fit=crop&auto=format',
+  photo: FALLBACK_ART,
   citation:
     'Immaculée took the Musanze branch from the smallest upcountry portfolio to the strongest in the network in a single financial year — without a single write-off. She rebuilt the branch appraisal routine around on-site visits, trained four new relationship officers herself, and personally reworked the repayment schedules of 60 agri-borrowers so instalments landed after harvest rather than before it.',
   quote:
@@ -605,7 +609,7 @@ export const EMPLOYEE_OF_THE_MONTH: Award = {
   role: 'Digital Channels Engineer',
   branch: 'Kigali (HQ)',
   department: 'IT & Digital',
-  photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=900&fit=crop&auto=format',
+  photo: FALLBACK_ART,
   citation:
     'When the MTN settlement file format changed without notice on a Saturday night, Jean-Paul traced the failure, wrote the parser fix and had eKash reconciling again before the Sunday morning agent float run. Customers never saw an outage. He then wrote the runbook so the next person would not need to be him.',
   quote:

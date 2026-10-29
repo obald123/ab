@@ -4,6 +4,9 @@ import { IconNews } from './Icons'
 import { mediaUrl, useCollection } from '../lib/content'
 import { formatTimestamp } from '../data/site'
 import { useT } from '../lib/i18n'
+/* Bundled brand artwork stands in for photos until the CMS responds — no
+   third-party image host is contacted on page load. */
+import FALLBACK_ART from '../imports/story/story-photo.webp'
 
 interface Article {
   id: string
@@ -25,7 +28,7 @@ const FALLBACK: Article[] = [
     createdAt: '2026-07-12T09:00:00+02:00',
     title: 'NGOBOKA Life Insurance Now Available at All AB BANK PLC Branches',
     excerpt: 'In partnership with Sanlam Vie, AB BANK PLC launches NGOBOKA — an accessible life insurance scheme offering individual coverage from RWF 400/month and family protection for spouse and up to four children from RWF 900/month.',
-    image: 'https://images.unsplash.com/photo-1678225894217-ec0de2dc0548?w=800&h=500&fit=crop&auto=format',
+    image: FALLBACK_ART,
     featured: true,
   },
   {
@@ -35,7 +38,7 @@ const FALLBACK: Article[] = [
     createdAt: '2023-06-10T09:00:00+02:00',
     title: 'E-kash Expands Across All Mobile Networks in Rwanda',
     excerpt: 'Our digital payment platform E-kash — accessible via *540# — now covers all major MNOs and partner banks, bringing seamless mobile banking to every Rwandan.',
-    image: 'https://images.unsplash.com/photo-1708772565599-2c4e4b3ed9db?w=600&h=400&fit=crop&auto=format',
+    image: FALLBACK_ART,
     featured: false,
   },
   {
@@ -45,7 +48,7 @@ const FALLBACK: Article[] = [
     createdAt: '2020-07-10T09:00:00+02:00',
     title: 'AB IBAKWE Mobile Service Launches with MTN Rwanda',
     excerpt: 'Customers can now transfer between their MTN MoMo wallet and AB BANK PLC account in both directions using *182*4# — no branch visit required.',
-    image: 'https://images.unsplash.com/photo-1585540083814-ea6ee8af9e4f?w=600&h=400&fit=crop&auto=format',
+    image: FALLBACK_ART,
     featured: false,
   },
 ]

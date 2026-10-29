@@ -53,9 +53,9 @@ const FALLBACK_FOOTER: FooterDocument = {
   tagline: '',
   copyright: `© ${String(new Date().getFullYear())} AB BANK PLC All rights reserved.`,
   bottomLinks: [
-    { id: 'b1', label: 'Privacy Policy', href: '/forms' },
-    { id: 'b2', label: 'Terms of Use', href: '/forms' },
-    { id: 'b3', label: 'Cookie Policy', href: '/forms' },
+    { id: 'b1', label: 'Privacy Policy', href: '/privacy' },
+    { id: 'b2', label: 'Terms of Use', href: '/terms' },
+    { id: 'b3', label: 'Cookie Policy', href: '/cookies' },
   ],
 }
 

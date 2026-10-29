@@ -55,7 +55,7 @@ export const fr: Dictionary = {
   cookies: {
     title: 'Nous respectons votre vie privée',
     intro:
-      'Nous utilisons des cookies pour sécuriser le site, mémoriser vos préférences et comprendre son utilisation.',
+      'Nous utilisons des cookies et un stockage similaire dans le navigateur pour sécuriser le site et mémoriser vos choix.',
     acceptAll: 'Tout accepter',
     rejectAll: 'Tout refuser',
     customize: 'Personnaliser',
@@ -64,7 +64,7 @@ export const fr: Dictionary = {
     policy: 'Politique relative aux cookies',
     necessaryTitle: 'Strictement nécessaires',
     necessaryBody:
-      'Nécessaires au fonctionnement du site, notamment pour mémoriser votre choix de cookies. Le chatbot Intumwa reste disponible quel que soit votre choix ; son cadre tiers utilise le stockage du navigateur et son fournisseur reçoit les messages ainsi que des données techniques de connexion. Ne saisissez jamais de mot de passe, PIN, code à usage unique ou donnée de compte dans le chat. Cette catégorie ne peut pas être désactivée.',
+      'Nécessaires au fonctionnement du site, notamment pour mémoriser votre choix de cookies. Le chatbot Intumwa ne se charge que lorsque vous l’ouvrez ; il utilise alors le stockage du navigateur et son fournisseur reçoit les messages ainsi que des données techniques de connexion. Ne saisissez jamais de mot de passe, PIN, code à usage unique ou donnée de compte dans le chat. Cette catégorie ne peut pas être désactivée.',
     preferencesTitle: 'Préférences',
     preferencesBody:
       'Mémorisent les paramètres d’accessibilité que vous choisissez, comme le contraste élevé ou un texte plus grand. En cas de refus, ils restent actifs pendant votre visite mais ne sont pas mémorisés la prochaine fois. Votre choix de langue est toujours mémorisé, car ce n’est pas une préférence de suivi.',
@@ -207,6 +207,13 @@ export const fr: Dictionary = {
     email: 'E-mail',
     message: 'Message',
     send: 'Envoyer le message',
+    phone: 'Téléphone (facultatif)',
+    subject: 'Objet',
+    sending: 'Envoi en cours…',
+    sent: 'Message envoyé — merci. Nous vous répondrons par e-mail.',
+    sendFailed: 'Votre message n’a pas pu être envoyé. Veuillez réessayer ou nous appeler.',
+    privacyNote: 'Nous utilisons vos coordonnées uniquement pour répondre à votre message. N’indiquez jamais de numéro de compte, de code PIN ni de mot de passe.',
+    privacyLink: 'Avis de confidentialité',
     commitment: 'Notre engagement',
     smartCampaign: 'La campagne SMART',
   },
@@ -274,6 +281,24 @@ export const fr: Dictionary = {
   page: {
     home: 'Accueil',
     breadcrumb: 'Fil d’Ariane',
+  },
+
+  chatbot: {
+    open: 'Discuter avec Intumwa, notre assistant virtuel',
+    retry: 'Le chat n’a pas pu se charger. Réessayer',
+    unavailable: 'Le chat est indisponible pour le moment. Réessayez ou contactez-nous.',
+  },
+
+  legal: {
+    eyebrow: 'Mentions légales',
+    privacy: 'Avis de confidentialité',
+    cookies: 'Politique relative aux cookies',
+    terms: 'Conditions d’utilisation',
+    effective: 'En vigueur depuis le',
+    version: 'version',
+    leadPending: 'Ce document est en cours de mise à jour.',
+    pending: 'Nous mettons ce document à jour. La version en vigueur sera publiée ici prochainement.',
+    contact: 'Pour toute question sur vos données personnelles d’ici là, écrivez à',
   },
 
   notFound: {

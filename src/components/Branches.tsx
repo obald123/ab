@@ -139,8 +139,16 @@ export default function Branches() {
     if (!mapRef.current) return
     const map = L.map(mapRef.current, { center, zoom: 8, scrollWheelZoom: false })
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
+    /* OpenStreetMap's tile servers refuse requests without a Referer and
+       answer with an "Access blocked" picture (still HTTP 200, so nothing
+       errors). The site sends `Referrer-Policy: no-referrer` everywhere
+       (vercel.json), so the tile images opt back in to sending just our
+       origin — never the page path. The single host replaces the
+       deprecated a/b/c subdomains, per OSM's tile usage policy. */
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      referrerPolicy: 'strict-origin-when-cross-origin',
+      maxZoom: 19,
     }).addTo(map)
 
     // Bundled SVG icons (imported as URLs so they survive the production build)

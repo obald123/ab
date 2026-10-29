@@ -58,7 +58,7 @@ export const rw: Dictionary = {
   cookies: {
     title: 'Twubaha ibanga ryawe',
     intro:
-      'Dukoresha cookies kugira ngo urubuga rukore neza, twibuke ibyo wahisemo, kandi tumenye uko rukoreshwa.',
+      'Dukoresha cookies n’ububiko busa na zo muri mushakisha kugira ngo urubuga rukore neza kandi twibuke ibyo wahisemo.',
     acceptAll: 'Emera byose',
     rejectAll: 'Anga byose',
     customize: 'Hindura uko ubishaka',
@@ -67,7 +67,7 @@ export const rw: Dictionary = {
     policy: 'Amabwiriza ya cookies',
     necessaryTitle: 'Ngombwa rwose',
     necessaryBody:
-      'Zikenewe kugira ngo urubuga rukore, harimo no kwibuka ibyo wahisemo kuri cookies. Chatbot ya Intumwa irahora iboneka uko wahitamo kose; iframe yayo itangwa n’undi mutanga ikoresha ububiko bwo muri mushakisha, kandi uwo mutanga yakira ubutumwa n’amakuru ya tekiniki ajyanye n’ihuzanzira. Ntukandike ijambo ry’ibanga, PIN, kode y’igihe gito, cyangwa amakuru ya konti muri chatbot. Iki cyiciro ntigishobora guhagarikwa.',
+      'Zikenewe kugira ngo urubuga rukore, harimo no kwibuka ibyo wahisemo kuri cookies. Chatbot ya Intumwa ifunguka gusa iyo uyifunguye; icyo gihe ikoresha ububiko bwo muri mushakisha, kandi uwo mutanga yakira ubutumwa n’amakuru ya tekiniki ajyanye n’ihuzanzira. Ntukandike ijambo ry’ibanga, PIN, kode y’igihe gito, cyangwa amakuru ya konti muri chatbot. Iki cyiciro ntigishobora guhagarikwa.',
     preferencesTitle: 'Ibyo wahisemo',
     preferencesBody:
       'Zibuka igenamiterere ryoroshya ikoreshwa, nk’amabara arambuye cyangwa inyandiko nini, mu nshuro zizakurikira usuye urubuga. Iyo ubyanze, bikomeza gukora mu gihe uri ku rubuga ariko ntibizibukwa ubutaha. Ururimi wahisemo ruzajya rwibukwa uko byagenda kose, kuko atari ikintu gikurikirana abakoresha.',
@@ -210,6 +210,13 @@ export const rw: Dictionary = {
     email: 'Imeyili',
     message: 'Ubutumwa',
     send: 'Ohereza ubutumwa',
+    phone: 'Telefoni (si ngombwa)',
+    subject: 'Impamvu',
+    sending: 'Biroherezwa…',
+    sent: 'Ubutumwa bwoherejwe — murakoze. Tuzabasubiza kuri imeri.',
+    sendFailed: 'Ubutumwa bwanyu ntibwashoboye koherezwa. Mwongere mugerageze, cyangwa mutuhamagare.',
+    privacyNote: 'Amakuru yanyu tuyakoresha gusa mu gusubiza ubutumwa bwanyu. Ntimukigere mwandika nimero za konti, PIN cyangwa ijambo ry’ibanga.',
+    privacyLink: 'Amabwiriza yo kurinda amakuru bwite',
     commitment: 'Ubwiyemezo bwacu',
     smartCampaign: 'Igikorwa cya SMART',
   },
@@ -277,6 +284,24 @@ export const rw: Dictionary = {
   page: {
     home: 'Ahabanza',
     breadcrumb: 'Inzira',
+  },
+
+  chatbot: {
+    open: 'Ganira na Intumwa, umufasha wacu w’ikoranabuhanga',
+    retry: 'Ikiganiro nticyashoboye gufunguka. Ongera ugerageze',
+    unavailable: 'Ikiganiro ntikiboneka ubu. Ongera ugerageze cyangwa utuvugishe.',
+  },
+
+  legal: {
+    eyebrow: 'Amategeko',
+    privacy: 'Amabwiriza yo kurinda amakuru bwite',
+    cookies: 'Amabwiriza ya cookies',
+    terms: 'Amabwiriza yo gukoresha urubuga',
+    effective: 'Bikurikizwa guhera',
+    version: 'verisiyo',
+    leadPending: 'Iyi nyandiko irimo kuvugururwa.',
+    pending: 'Turimo kuvugurura iyi nyandiko. Verisiyo ikurikizwa izashyirwa hano vuba.',
+    contact: 'Niba mufite ibibazo ku makuru yanyu bwite muri iki gihe, mwandikire kuri',
   },
 
   notFound: {

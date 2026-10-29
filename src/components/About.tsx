@@ -6,6 +6,9 @@ import { iconFor } from '../lib/icon-map'
    iconFor — only icons used directly in fixed page furniture are imported. */
 import { IconBuilding, IconCalendar, IconMap, IconCoin, IconBank, IconRoute, IconUsers, IconBriefcase, IconHandshake } from './Icons'
 import { useT } from '../lib/i18n'
+/* Bundled brand artwork stands in for photos until the CMS responds — no
+   third-party image host is contacted on page load. */
+import FALLBACK_ART from '../imports/story/story-photo.webp'
 
 /* ── data ──
    The timeline, vision/mission and company narrative all come from the CMS
@@ -1104,7 +1107,7 @@ const FALLBACK_ABOUT_CONTENT: AboutContentDoc = {
     "Regulated by the National Bank of Rwanda and backed by AccessHolding, KFW and IFC, we are committed to Rwanda's financial inclusion agenda.",
   ],
   narrativeImage:
-    'https://images.unsplash.com/photo-1687422808311-a776f467a468?w=700&h=500&fit=crop&auto=format',
+    FALLBACK_ART,
   vision: FALLBACK_VISION_MISSION[0],
   mission: FALLBACK_VISION_MISSION[1],
 }

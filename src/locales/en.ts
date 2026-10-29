@@ -55,7 +55,7 @@ export const en = {
   cookies: {
     title: 'We value your privacy',
     intro:
-      'We use cookies to run the site securely, remember your preferences and understand how it is used.',
+      'We use cookies and similar browser storage to run the site securely and remember your choices.',
     acceptAll: 'Accept All',
     rejectAll: 'Reject All',
     customize: 'Customize',
@@ -64,7 +64,7 @@ export const en = {
     policy: 'Cookie Policy',
     necessaryTitle: 'Strictly Necessary',
     necessaryBody:
-      'Required for the site to function, including remembering your cookie choice. The Intumwa support chatbot is available regardless of your choice; its third-party frame uses browser storage and its provider receives messages and technical connection data. Never enter passwords, PINs, one-time codes, or account details in chat. This category cannot be switched off.',
+      'Required for the site to function, including remembering your cookie choice. The Intumwa support chatbot loads only when you open it; it then uses browser storage, and its provider receives your messages and technical connection data. Never enter passwords, PINs, one-time codes, or account details in chat. This category cannot be switched off.',
     preferencesTitle: 'Preferences',
     preferencesBody:
       'Remember accessibility settings you choose, such as high contrast or larger text, across visits. If declined, they still work during your visit but are not remembered next time. Your language choice is always remembered regardless, since it is not a tracking preference.',
@@ -208,6 +208,13 @@ export const en = {
     email: 'Email',
     message: 'Message',
     send: 'Send Message',
+    phone: 'Phone (optional)',
+    subject: 'Subject',
+    sending: 'Sending…',
+    sent: 'Message sent — thank you. We will reply by email.',
+    sendFailed: 'Your message could not be sent. Please try again, or call us.',
+    privacyNote: 'We use your details only to answer your message. Never include account numbers, PINs or passwords.',
+    privacyLink: 'Privacy notice',
     commitment: 'Our Commitment',
     smartCampaign: 'The SMART Campaign',
   },
@@ -275,6 +282,24 @@ export const en = {
   page: {
     home: 'Home',
     breadcrumb: 'Breadcrumb',
+  },
+
+  chatbot: {
+    open: 'Chat with Intumwa, our virtual assistant',
+    retry: 'The chat could not load. Try again',
+    unavailable: 'The chat is unavailable right now. Please try again or contact us.',
+  },
+
+  legal: {
+    eyebrow: 'Legal',
+    privacy: 'Privacy notice',
+    cookies: 'Cookie policy',
+    terms: 'Terms of use',
+    effective: 'Effective',
+    version: 'version',
+    leadPending: 'This document is being updated.',
+    pending: 'We are updating this document. The current version will be published here shortly.',
+    contact: 'For questions about your personal data in the meantime, write to',
   },
 
   notFound: {
