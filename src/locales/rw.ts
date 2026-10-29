@@ -205,6 +205,7 @@ export const rw: Dictionary = {
     location: 'Aho tuherereye',
     callOrWrite: 'Hamagara cyangwa wandike',
     bankDigitally: 'Koresha banki kuri interineti',
+    dialDigital: 'Kanda kuri telefoni yawe ya MTN urebe amafaranga asigaye kandi wohereze amafaranga — igihe cyose, aho uri hose mu Rwanda.',
     keyBranches: 'Amashami y’ingenzi',
     branchesNationwide: 'amashami mu gihugu hose',
     formLabel: 'Ifishi yo kutwandikira',
@@ -294,6 +295,15 @@ export const rw: Dictionary = {
     unavailable: 'Ikiganiro ntikiboneka ubu. Ongera ugerageze cyangwa utuvugishe.',
   },
 
+  quickLinks: {
+    findBranch: 'Shaka ishami',
+    calculator: 'Mubaruzi w’inguzanyo',
+    openAccount: 'Fungura konti',
+    ekash: 'eKash',
+    insurance: 'Ubwishingizi',
+    forms: 'Impapuro',
+  },
+
   legal: {
     eyebrow: 'Amategeko',
     privacy: 'Amabwiriza yo kurinda amakuru bwite',
@@ -314,6 +324,7 @@ export const rw: Dictionary = {
   },
 
   careers: {
+    noVacancies: 'Nta myanya y’akazi ifunguye muri iki gihe. Imyanya mishya itangazwa kuri uru rupapuro — muzongere murebe.',
     searchPlaceholder: 'Shakisha imyanya ukoresheje izina, aho iherereye cyangwa urwego',
     openPositions: 'Imyanya ifunguye',
     departments: 'Amashami',

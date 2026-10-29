@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- AB BANK PLC public pages. Update the domain if the site moves (see robots.txt). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/who-we-are</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/media/news</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/media/articles</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/careers</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/awards</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/tenders</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/forms</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/report</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/cookies</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://abrwanda.dtecsoftwaresolutions.com/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>

@@ -203,6 +203,7 @@ export const en = {
     location: 'Our Location',
     callOrWrite: 'Call or Write',
     bankDigitally: 'Bank Digitally',
+    dialDigital: 'Dial from your MTN line to check your balance and send money — anytime, anywhere in Rwanda.',
     keyBranches: 'Key Branches',
     branchesNationwide: 'branches nationwide',
     formLabel: 'Contact form',
@@ -292,6 +293,15 @@ export const en = {
     unavailable: 'The chat is unavailable right now. Please try again or contact us.',
   },
 
+  quickLinks: {
+    findBranch: 'Find a branch',
+    calculator: 'Loan calculator',
+    openAccount: 'Open an account',
+    ekash: 'eKash',
+    insurance: 'Insurance',
+    forms: 'Forms',
+  },
+
   legal: {
     eyebrow: 'Legal',
     privacy: 'Privacy notice',
@@ -312,6 +322,7 @@ export const en = {
   },
 
   careers: {
+    noVacancies: 'There are no open positions at the moment. New vacancies are published on this page — please check back.',
     searchPlaceholder: 'Search roles by title, location or level',
     openPositions: 'Open positions',
     departments: 'Departments',

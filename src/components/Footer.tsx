@@ -64,18 +64,27 @@ function isRoute(href: string): boolean {
   return href.startsWith('/') && !href.includes('#')
 }
 
-const SOCIALS = [
-  {
-    label: 'Facebook',
-    href: 'https://www.facebook.com/ABBankRwanda',
-    d: 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z',
-  },
-  {
-    label: 'LinkedIn',
-    href: 'https://rw.linkedin.com/company/ab-bank-rwanda-limited',
-    d: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z',
-  },
-]
+/* Social profiles come from CMS → Settings → Social links; a platform with
+   no address is simply not shown. The two below are used only until the CMS
+   responds, or if it cannot be reached. */
+type SocialKey = 'facebook' | 'linkedin' | 'twitter' | 'instagram' | 'youtube'
+
+const SOCIAL_ICONS: Record<SocialKey, { label: string; d: string }> = {
+  facebook: { label: 'Facebook', d: 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z' },
+  linkedin: { label: 'LinkedIn', d: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z' },
+  twitter: { label: 'X (Twitter)', d: 'M3 3h4.6l4.4 6.1L17.3 3H21l-7.2 8.2L21.5 21h-4.6l-4.8-6.6L6.3 21H2.6l7.7-8.8z' },
+  instagram: { label: 'Instagram', d: 'M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm5 5.5A4.5 4.5 0 1012 16.5 4.5 4.5 0 0012 7.5zm0 2A2.5 2.5 0 1112 14.5 2.5 2.5 0 0112 9.5zM17.5 5.2a1.3 1.3 0 100 2.6 1.3 1.3 0 000-2.6z' },
+  youtube: { label: 'YouTube', d: 'M23 7.2a3 3 0 00-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 001 7.2 31 31 0 00.5 12a31 31 0 00.5 4.8 3 3 0 002.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 002.1-2.1 31 31 0 00.5-4.8 31 31 0 00-.5-4.8zM9.8 15.1V8.9l5.4 3.1z' },
+}
+
+const FALLBACK_SOCIAL_LINKS: Partial<Record<SocialKey, string>> = {
+  facebook: 'https://www.facebook.com/ABBankRwanda',
+  linkedin: 'https://rw.linkedin.com/company/ab-bank-rwanda-limited',
+}
+
+interface SiteSettings {
+  socialLinks?: Partial<Record<SocialKey, string>>
+}
 
 const linkStyle: React.CSSProperties = {
   display: 'block',
@@ -96,6 +105,10 @@ function dim(e: React.MouseEvent<HTMLElement>) {
 export default function Footer() {
   const t = useT()
   const { data: footer } = useSingleton<FooterDocument>('footer', FALLBACK_FOOTER)
+  const { data: settings } = useSingleton<SiteSettings>('settings', { socialLinks: FALLBACK_SOCIAL_LINKS })
+  const socials = (Object.keys(SOCIAL_ICONS) as SocialKey[])
+    .map((key) => ({ key, href: settings.socialLinks?.[key]?.trim() ?? '', ...SOCIAL_ICONS[key] }))
+    .filter((social) => /^https:\/\//.test(social.href))
   const { pathname } = useLocation()
   const footerRef = useRef<HTMLElement | null>(null)
   const [footerLogoHidden, setFooterLogoHidden] = useState(false)
@@ -161,9 +174,9 @@ export default function Footer() {
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', fontWeight: 800, marginTop: 12 }}>{t.footer.dial}</p>
 
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-              {SOCIALS.map((s) => (
+              {socials.map((s) => (
                 <a
-                  key={s.label}
+                  key={s.key}
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"

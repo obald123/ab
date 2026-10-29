@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { IconSend } from './Icons'
 import { Link } from 'react-router-dom'
-import { API_ROOT, useSingleton } from '../lib/content'
+import { API_ROOT, useCollection, useSingleton } from '../lib/content'
 import { useT } from '../lib/i18n'
 
 const EMPTY_FORM = { name: '', email: '', phone: '', subject: '', message: '', website: '' }
@@ -50,7 +50,12 @@ const FALLBACK: ContactDocument = {
 export default function Contact() {
   const t = useT()
   const { data: contact } = useSingleton<ContactDocument>('contact', FALLBACK)
-  const { smartValues, branches } = contact
+  const { smartValues, branches, info } = contact
+  // The real network size, from the branch list — never a typed-in claim.
+  const { data: allBranches } = useCollection<{ name: string }>('branch', [])
+  const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`
+  const whatsappHref = `https://wa.me/${info.whatsapp.replace(/\D/g, '').replace(/^0?(?=7)/, '250')}`
+  const linkColor = { color: 'inherit', textDecoration: 'none' } as const
   const containerRef = useRef<HTMLDivElement>(null)
   const [formState, setFormState] = useState(EMPTY_FORM)
   const [sendState, setSendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
@@ -229,12 +234,14 @@ export default function Contact() {
                 </svg>
               </div>
               <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>{t.contact.location}</h3>
-              <p style={{ fontSize: 14, color: '#647080', lineHeight: 1.7 }}>
-                Nyarugenge Avenue<br />
-                KN 78 St<br />
-                Kigali, Rwanda
+              <p style={{ fontSize: 14, color: '#647080', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+                {info.address.split(/,\s*/).join('\n')}
               </p>
-              <p style={{ fontSize: 12.5, color: '#8fa0aa', marginTop: 12 }}>47+ branches nationwide</p>
+              {allBranches.length > 0 && (
+                <p style={{ fontSize: 12.5, color: '#8fa0aa', marginTop: 12 }}>
+                  {allBranches.length} {t.contact.branchesNationwide}
+                </p>
+              )}
             </div>
 
             {/* Phone & Email */}
@@ -265,16 +272,20 @@ export default function Contact() {
                 </svg>
               </div>
               <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0284c7', marginBottom: 12 }}>{t.contact.callOrWrite}</h3>
-              <p style={{ fontSize: 15, color: '#0ea5e9', fontWeight: 800, marginBottom: 6 }}>
-                5500
-              </p>
-              <p style={{ fontSize: 14.5, color: '#0ea5e9', fontWeight: 700, marginBottom: 6 }}>
-                +(250) 78 819 83 00
-              </p>
+              {info.phone1 && (
+                <p style={{ fontSize: 15, color: '#0ea5e9', fontWeight: 800, marginBottom: 6 }}>
+                  <a href={telHref(info.phone1)} style={linkColor}>{info.phone1}</a>
+                </p>
+              )}
+              {info.phone2 && (
+                <p style={{ fontSize: 14.5, color: '#0ea5e9', fontWeight: 700, marginBottom: 6 }}>
+                  <a href={telHref(info.phone2)} style={linkColor}>{info.phone2}</a>
+                </p>
+              )}
               <p style={{ fontSize: 14.5, color: '#0ea5e9', fontWeight: 700, marginBottom: 14 }}>
-                info@abr.rw
+                <a href={`mailto:${info.email}`} style={linkColor}>{info.email}</a>
               </p>
-              <p style={{ fontSize: 12.5, color: '#8fa0aa' }}>Mon – Fri: 8:00 – 17:00 · Sat: 9:00 – 13:00</p>
+              <p style={{ fontSize: 12.5, color: '#8fa0aa' }}>{info.hours}</p>
             </div>
 
             {/* Digital / eKash */}
@@ -306,25 +317,25 @@ export default function Contact() {
               </div>
               <h3 style={{ fontSize: 16, fontWeight: 800, color: '#ffffff', marginBottom: 12 }}>{t.contact.bankDigitally}</h3>
               <p style={{ fontSize: 26, fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: 6 }}>
-                *540#
+                {info.ekashCode}
               </p>
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, marginBottom: 18 }}>
-                Dial to access eKash on any phone, any network — anytime, anywhere in Rwanda.
+                {t.contact.dialDigital}
               </p>
               <div style={{ display: 'flex', gap: 12 }}>
                 <div style={{
                   flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
                   borderRadius: 8, padding: '8px 12px', textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>MTN MoMo</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>*182*4#</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>AB IBAKWE</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{info.momoCode}</div>
                 </div>
                 <div style={{
                   flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
                   borderRadius: 8, padding: '8px 12px', textAlign: 'center',
                 }}>
                   <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>WhatsApp</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>78 819 83 00</div>
+                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, fontWeight: 700, color: '#fff', textDecoration: 'none' }}>{info.whatsapp}</a>
                 </div>
               </div>
             </div>

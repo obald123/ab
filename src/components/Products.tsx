@@ -1,22 +1,32 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useCollection } from '../lib/content'
 import { motion } from 'framer-motion'
-import { IconCoin, IconTrendUp, IconLeaf, IconBank, IconCreditCard, IconExchange, IconGlobe, IconShield, IconMobile, IconZap, IconPercent, IconUsers, IconMapPin, IconCalculator, IconPen } from './Icons'
+import { IconCoin, IconTrendUp, IconLeaf, IconBank, IconCreditCard, IconExchange, IconGlobe, IconShield, IconMobile, IconZap, IconPercent, IconUsers, IconMapPin, IconCalculator, IconFileText } from './Icons'
 import { useT } from '../lib/i18n'
 
 /* ── Quick access bar ── */
-const quickLinks = [
-  { label: 'Find Branch',  Icon: IconMapPin },
-  { label: 'Calculate',    Icon: IconCalculator },
-  { label: 'FX Rates',     Icon: IconExchange },
-  { label: 'Apply Online', Icon: IconPen },
-  { label: 'eKash',        Icon: IconMobile },
-  { label: 'Insurance',    Icon: IconShield },
-]
-
 type IconComp = React.FC<{size?:number;color?:string;strokeWidth?:number}>
 
 type Cat = 'Loans' | 'Accounts' | 'Banking Services' | 'Bancassurance' | 'Digital Solutions'
+
+/* Each goes somewhere real: a homepage section, a product tab, or a page.
+   `category` opens that tab of the products section on the way. */
+type QuickLink = {
+  key: 'findBranch' | 'calculator' | 'openAccount' | 'ekash' | 'insurance' | 'forms'
+  href: string
+  Icon: IconComp
+  category?: Cat
+}
+const quickLinks: QuickLink[] = [
+  { key: 'findBranch',  href: '#branches',   Icon: IconMapPin },
+  { key: 'calculator',  href: '#calculator', Icon: IconCalculator },
+  { key: 'openAccount', href: '#products',   Icon: IconBank,   category: 'Accounts' },
+  { key: 'ekash',       href: '#products',   Icon: IconMobile, category: 'Digital Solutions' },
+  { key: 'insurance',   href: '#products',   Icon: IconShield, category: 'Bancassurance' },
+  { key: 'forms',       href: '/forms',      Icon: IconFileText },
+]
+
+
 const cats: Cat[] = ['Loans', 'Accounts', 'Banking Services', 'Bancassurance', 'Digital Solutions']
 
 const catIcons: Record<Cat, IconComp> = {
@@ -357,8 +367,11 @@ export default function Products() {
         <div style={{ margin: '0 auto', padding: '0 48px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
           {quickLinks.map((q, i) => (
             <motion.a
-              key={i}
-              href="#products"
+              key={q.key}
+              href={q.href}
+              onClick={() => {
+                if (q.category) setActive(q.category)
+              }}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ y: -4 }}
@@ -374,7 +387,7 @@ export default function Products() {
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent' }}
             >
               <q.Icon size={18} color="#9fa8b8" strokeWidth={1.75} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{q.label}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{t.quickLinks[q.key]}</span>
             </motion.a>
           ))}
         </div>

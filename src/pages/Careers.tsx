@@ -595,7 +595,13 @@ export default function Careers() {
         </p>
 
         {filtered.length === 0 ? (
-          <EmptyState message="No positions match that search. Try a different department or clear the filters." />
+          <EmptyState
+            message={
+              openJobs.length === 0
+                ? t.careers.noVacancies
+                : 'No positions match that search. Try a different department or clear the filters.'
+            }
+          />
         ) : (
           <div style={{ display: 'grid', gap: 18 }}>
             {filtered.map((j) => (

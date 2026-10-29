@@ -18,8 +18,6 @@ import { useT } from '../lib/i18n'
 const BANK_CONTACT = {
   phone: '+250 788 198 300',
   phoneHref: 'tel:+250788198300',
-  whatsapp: '+250 788 319 108',
-  whatsappHref: 'https://wa.me/250788319108',
   email: 'info@abr.rw',
 }
 

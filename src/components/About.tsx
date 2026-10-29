@@ -391,6 +391,9 @@ function PathMarker({ pt, item, index, total, progress, active, onEnter, onLeave
       <motion.circle
         cx={pt.x} cy={pt.y} r={item.highlight ? 18 : 14}
         fill="none" stroke={item.highlight ? 'rgba(14,165,233,0.25)' : 'rgba(14,165,233,0.12)'} strokeWidth={1}
+        /* Without a starting r, the first frame renders r="undefined" (a
+           console error per marker in every browser). */
+        initial={{ r: item.highlight ? 18 : 14, opacity: 1 }}
         animate={active ? { r: (item.highlight ? 18 : 14) + 6, opacity: 0 } : { r: item.highlight ? 18 : 14, opacity: 1 }}
         transition={active ? { duration: 1.1, repeat: Infinity, ease: 'easeOut' } : { duration: 0.3 }}
       />
@@ -1385,6 +1388,7 @@ function VisionMission({ vision, mission }: { vision: VisionMissionItem; mission
 /* `standalone` = rendered as the /who-we-are page rather than a home
    section, so the first masthead must clear the fixed navbar. */
 export default function About({ standalone = false }: { standalone?: boolean }) {
+  const Heading = standalone ? 'h1' : 'h2'
   const t = useT()
   const { content, timeline, management, board, shareholders } = useAbout()
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -1432,14 +1436,15 @@ export default function About({ standalone = false }: { standalone?: boolean }) 
                 <IconBank size={14} strokeWidth={2} color="#bae6fd" />
                 {t.about.whoWeAre}
               </span>
-              <h2 style={{
+              {/* The page's main heading on /who-we-are; a section heading on the home page. */}
+              <Heading style={{
                 fontFamily: 'var(--font-serif)',
                 fontWeight: 700, fontSize: 'clamp(30px, 4.5vw, 54px)',
                 color: '#ffffff', lineHeight: 1.1, letterSpacing: '-0.01em',
               }}>
                 {content.headline}<br />
                 <span style={{ color: '#bae6fd' }}>{content.headlineAccent}</span>
-              </h2>
+              </Heading>
             </div>
           </R>
 

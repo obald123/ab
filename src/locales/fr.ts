@@ -202,6 +202,7 @@ export const fr: Dictionary = {
     location: 'Notre adresse',
     callOrWrite: 'Appelez ou écrivez',
     bankDigitally: 'Banque à distance',
+    dialDigital: 'Composez depuis votre ligne MTN pour consulter votre solde et envoyer de l’argent — partout au Rwanda, à tout moment.',
     keyBranches: 'Agences principales',
     branchesNationwide: 'agences dans tout le pays',
     formLabel: 'Formulaire de contact',
@@ -291,6 +292,15 @@ export const fr: Dictionary = {
     unavailable: 'Le chat est indisponible pour le moment. Réessayez ou contactez-nous.',
   },
 
+  quickLinks: {
+    findBranch: 'Trouver une agence',
+    calculator: 'Simulateur de prêt',
+    openAccount: 'Ouvrir un compte',
+    ekash: 'eKash',
+    insurance: 'Assurance',
+    forms: 'Formulaires',
+  },
+
   legal: {
     eyebrow: 'Mentions légales',
     privacy: 'Avis de confidentialité',
@@ -311,6 +321,7 @@ export const fr: Dictionary = {
   },
 
   careers: {
+    noVacancies: 'Aucun poste n’est ouvert pour le moment. Les nouvelles offres sont publiées sur cette page — revenez bientôt.',
     searchPlaceholder: 'Rechercher un poste par intitulé, lieu ou niveau',
     openPositions: 'Postes ouverts',
     departments: 'Départements',
