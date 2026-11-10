@@ -1,0 +1,10 @@
+# Included in each location (nginx drops inherited add_header lines as soon as
+# a location adds its own, so they cannot simply live at server level).
+# frame-ancestors lets the CMS show this site in its preview pane.
+add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors ${CMS_ORIGIN}; object-src 'none'; img-src 'self' data: https:; media-src 'self' https:; script-src 'self' https://embed.proto.cx; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://v3-api.proto.cx; frame-src 'self' https://frame.proto.cx; upgrade-insecure-requests" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "no-referrer" always;
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+add_header Cross-Origin-Resource-Policy "same-site" always;
+add_header Cross-Origin-Opener-Policy "same-origin" always;
+add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;

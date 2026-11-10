@@ -1,0 +1,119 @@
+# AB BANK PLC — public website: check, then publish a container image.
+#
+# Every push and pull request is type-checked and built. On a push to main (or
+# a v* tag) the image is published to GitHub Container Registry as
+#   ghcr.io/<owner>/ab-site
+# tagged with the commit (sha-xxxxxxx), `latest` for main, and the version for
+# v* tags. The image holds no domain or secret: those are set where it runs.
+
+name: docker
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: npm ci
+      - run: npm run typecheck
+      # There are no test files yet; keep CI green but add real tests before
+      # treating this as a meaningful test gate.
+      - run: npm test -- --passWithNoTests
+      # Reported but not yet blocking: the codebase still has a few lint errors
+      # from before CI existed. Remove continue-on-error once they are fixed.
+      - run: npm run lint
+        continue-on-error: true
+
+  image:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/ab-site" >> "$GITHUB_ENV"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        env:
+          DOCKER_METADATA_SHORT_SHA_LENGTH: 40
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+      # Pull requests build the image to prove it builds, without publishing.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_PROTO_CHATBOT_ID=${{ vars.VITE_PROTO_CHATBOT_ID }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_PRIVATE_KEY" || { echo "Missing production secret DEPLOY_SSH_PRIVATE_KEY" >&2; exit 1; }
+          test -n "$SSH_KNOWN_HOSTS" || { echo "Missing production secret DEPLOY_KNOWN_HOSTS" >&2; exit 1; }
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/abr_deploy"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/abr_deploy" "$HOME/.ssh/known_hosts"
+      - name: Deploy public website to VPS
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+          IMAGE_TAG: sha-${{ github.sha }}
+        run: |
+          set -euo pipefail
+          : "${DEPLOY_HOST:?Missing production variable DEPLOY_HOST}"
+          : "${DEPLOY_USER:?Missing production variable DEPLOY_USER}"
+          ssh -p "$DEPLOY_SSH_PORT" \
+            -i "$HOME/.ssh/abr_deploy" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "/opt/abr/deploy.sh site $IMAGE_TAG"

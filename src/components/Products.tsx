@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { useCollection } from '../lib/content'
+import { useCollection, useSingleton } from '../lib/content'
+import { iconFor } from '../lib/icon-map'
 import { motion } from 'framer-motion'
 import { IconCoin, IconTrendUp, IconLeaf, IconBank, IconCreditCard, IconExchange, IconGlobe, IconShield, IconMobile, IconZap, IconPercent, IconUsers, IconMapPin, IconCalculator, IconFileText } from './Icons'
 import { useT } from '../lib/i18n'
@@ -17,7 +18,7 @@ type QuickLink = {
   Icon: IconComp
   category?: Cat
 }
-const quickLinks: QuickLink[] = [
+const FALLBACK_QUICK_LINKS: QuickLink[] = [
   { key: 'findBranch',  href: '#branches',   Icon: IconMapPin },
   { key: 'calculator',  href: '#calculator', Icon: IconCalculator },
   { key: 'openAccount', href: '#products',   Icon: IconBank,   category: 'Accounts' },
@@ -292,6 +293,24 @@ interface CmsProduct {
   tag: string
   highlight: boolean
   bullets: string[]
+  icon?: string
+}
+
+/** One link of the strip, as stored in the hero document. */
+interface CmsQuickLink {
+  id: string
+  label: string
+  icon: string
+  href?: string
+  category?: Cat
+}
+
+interface ShownQuickLink {
+  id: string
+  label: string
+  href: string
+  Icon: IconComp
+  category?: Cat
 }
 
 export default function Products() {
@@ -300,9 +319,33 @@ export default function Products() {
   const sectionRef = useRef<HTMLElement>(null)
 
   const { data: cmsProducts, degraded } = useCollection<CmsProduct>('product', [])
+  const { data: hero } = useSingleton<{ quickLinks?: CmsQuickLink[] } | null>('hero', null)
 
-  /* The CMS stores a flat list; the tabs need it grouped. Each product's icon
-     comes from its category, which is the only icon signal the CMS carries. */
+  /* The strip comes from the hero document's quick links. Links saved before
+     they carried an address have no `href` and are skipped; if none qualify,
+     the built-in strip is shown so the bar is never empty. */
+  const quickLinks: ShownQuickLink[] = useMemo(() => {
+    const fromCms = (hero?.quickLinks ?? [])
+      .filter((q): q is CmsQuickLink & { href: string } => Boolean(q.href))
+      .map((q) => ({
+        id: q.id,
+        label: q.label,
+        href: q.href,
+        Icon: iconFor(q.icon),
+        ...(q.category ? { category: q.category } : {}),
+      }))
+    if (fromCms.length > 0) return fromCms
+    return FALLBACK_QUICK_LINKS.map((q) => ({
+      id: q.key,
+      label: t.quickLinks[q.key],
+      href: q.href,
+      Icon: q.Icon,
+      ...(q.category ? { category: q.category } : {}),
+    }))
+  }, [hero, t])
+
+  /* The CMS stores a flat list; the tabs need it grouped. A product without
+     its own icon takes its category's. */
   const data: Record<Cat, ProductCard[]> = useMemo(() => {
     // Only an unreachable API falls back. Once the CMS answers it is
     // authoritative — backfilling empty categories here used to show mock
@@ -320,7 +363,7 @@ export default function Products() {
       const bucket = grouped[product.category]
       if (!bucket) continue
       bucket.push({
-        Icon: catIcons[product.category],
+        Icon: iconFor(product.icon, catIcons[product.category]),
         title: product.title,
         tag: product.tag,
         bullets: product.bullets,
@@ -364,10 +407,10 @@ export default function Products() {
           background: 'rgba(30, 35, 50, 0.88)',
         }}
       >
-        <div style={{ margin: '0 auto', padding: '0 48px', display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))' }}>
+        <div style={{ margin: '0 auto', padding: '0 48px', display: 'grid', gridTemplateColumns: `repeat(${String(quickLinks.length)}, minmax(0, 1fr))` }}>
           {quickLinks.map((q, i) => (
             <motion.a
-              key={q.key}
+              key={q.id}
               href={q.href}
               onClick={() => {
                 if (q.category) setActive(q.category)
@@ -387,7 +430,7 @@ export default function Products() {
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent' }}
             >
               <q.Icon size={18} color="#9fa8b8" strokeWidth={1.75} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{t.quickLinks[q.key]}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.74)', letterSpacing: '0.03em', textAlign: 'center' }}>{q.label}</span>
             </motion.a>
           ))}
         </div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { useSingleton } from '../lib/content'
+import { iconFor } from '../lib/icon-map'
 import { IconMobile, IconTrendUp, IconHeart } from './Icons'
 import { useT } from '../lib/i18n'
 
@@ -91,6 +92,8 @@ interface CampaignProduct {
   accentLight: string
   stat: string
   statLabel: string
+  /** Icon name chosen in the CMS. */
+  icon?: string
   Icon?: IconComp
 }
 
@@ -132,8 +135,7 @@ const FALLBACK_PRODUCTS: CampaignProduct[] = [
   },
 ]
 
-/* Icons are presentation and are not modelled in the CMS, so CMS products
-   reuse the fallback icons in order. */
+/* A product without a CMS icon reuses the fallback icons in order. */
 function useCampaign(): CampaignDocument {
   const { data } = useSingleton<CampaignDocument>('campaign', {
     banner: {
@@ -156,7 +158,9 @@ function useCampaign(): CampaignDocument {
       ...data,
       products: data.products.map((p, i) => ({
         ...p,
-        Icon: p.Icon ?? FALLBACK_PRODUCTS[i % FALLBACK_PRODUCTS.length]?.Icon,
+        Icon: p.icon
+          ? iconFor(p.icon)
+          : (p.Icon ?? FALLBACK_PRODUCTS[i % FALLBACK_PRODUCTS.length]?.Icon),
       })),
     }
   }, [data])

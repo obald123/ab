@@ -1,5 +1,7 @@
 import {
+  IconAlert,
   IconBank,
+  IconBookOpen,
   IconBriefcase,
   IconBuilding,
   IconBulb,
@@ -8,11 +10,15 @@ import {
   IconCar,
   IconChart,
   IconCheck,
+  IconCheckCircle,
   IconClock,
   IconCoin,
   IconCpu,
   IconCreditCard,
+  IconDownload,
   IconExchange,
+  IconFileText,
+  IconGavel,
   IconGift,
   IconGlobe,
   IconGraduate,
@@ -24,26 +30,33 @@ import {
   IconMap,
   IconMapPin,
   IconMobile,
+  IconNetwork,
   IconNews,
   IconPen,
   IconPercent,
   IconRoute,
+  IconSearch,
   IconSend,
   IconShield,
   IconStar,
   IconTrendUp,
+  IconUpload,
   IconUsers,
   IconZap,
 } from '../components/Icons'
 
 /* The CMS stores an icon *name*; the components need a component. This is the
-   one place that translation happens, so an editor typing an unknown name gets
+   one place that translation happens. The names must match ICON_NAMES in
+   backend/src/content/fields.ts (which validates them) and the admin picker in
+   admin/src/lib/site-icons.tsx, so an editor typing an unknown name gets
    a sensible default instead of a blank space or a crash. */
 
 export type IconComponent = React.FC<{ size?: number; color?: string; strokeWidth?: number }>
 
 const ICONS: Record<string, IconComponent> = {
+  alert: IconAlert,
   bank: IconBank,
+  'book-open': IconBookOpen,
   briefcase: IconBriefcase,
   building: IconBuilding,
   bulb: IconBulb,
@@ -52,11 +65,15 @@ const ICONS: Record<string, IconComponent> = {
   car: IconCar,
   chart: IconChart,
   check: IconCheck,
+  'check-circle': IconCheckCircle,
   clock: IconClock,
   coin: IconCoin,
   cpu: IconCpu,
   'credit-card': IconCreditCard,
+  download: IconDownload,
   exchange: IconExchange,
+  'file-text': IconFileText,
+  gavel: IconGavel,
   gift: IconGift,
   globe: IconGlobe,
   graduate: IconGraduate,
@@ -68,14 +85,17 @@ const ICONS: Record<string, IconComponent> = {
   map: IconMap,
   'map-pin': IconMapPin,
   mobile: IconMobile,
+  network: IconNetwork,
   news: IconNews,
   pen: IconPen,
   percent: IconPercent,
   route: IconRoute,
+  search: IconSearch,
   send: IconSend,
   shield: IconShield,
   star: IconStar,
   'trend-up': IconTrendUp,
+  upload: IconUpload,
   users: IconUsers,
   zap: IconZap,
 }

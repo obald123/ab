@@ -23,6 +23,7 @@ import {
   IconGrid,
 } from './Icons'
 import { useCollection } from '../lib/content'
+import { iconFor } from '../lib/icon-map'
 import { useT } from '../lib/i18n'
 
 type IconComp = React.FC<{ size?: number; color?: string; strokeWidth?: number }>
@@ -299,11 +300,12 @@ interface CmsService {
   title: string
   description: string
   highlight: string
+  icon?: string
 }
 
-/* Merges CMS services into the hardcoded chapters. Icons are not modelled in
-   the CMS, so each chapter reuses its own icons in order and repeats the last
-   one if editors add more services than there are icons. */
+/* Merges CMS services into the hardcoded chapters. A service without its own
+   icon reuses the chapter's icons in order, repeating the last one if editors
+   add more services than there are icons. */
 /* Tab text is translated; `tab` itself stays English because every CMS
    service is matched on it. */
 function tabLabel(t: ReturnType<typeof useT>, tab: string): string {
@@ -358,10 +360,12 @@ function useChapters(): Chapter[] {
         services: forTab.map((s, i) => ({
           title: s.title,
           description: s.description,
-          Icon:
+          Icon: iconFor(
+            s.icon,
             chapter.services[i]?.Icon ??
-            chapter.services[chapter.services.length - 1]?.Icon ??
-            IconBank,
+              chapter.services[chapter.services.length - 1]?.Icon ??
+              IconBank,
+          ),
           ...(s.highlight ? { highlight: s.highlight } : {}),
         })),
       }
